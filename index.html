@@ -30,6 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-listing/list.min.js"></script>
+<script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -66,10 +68,68 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script>
+
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-portfolio-listing .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-title','listing-description','listing-featured',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-file-modified-sort'] },{ data: ['listing-reading-time-sort'] },{ data: ['listing-word-count-sort'] }],
+      
+      searchColumns: ["listing-project","listing-website","listing-format","listing-reference-location","listing-citation-location","listing-language","listing-execute","listing-toc","listing-toc-depth","listing-title","listing-subtitle","listing-description","listing-featured","listing-image","listing-category","listing-type","listing-skills","listing-path","listing-outputHref","listing-author","listing-filename","listing-file-modified","listing-reading-time","listing-word-count"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-portfolio-listing'] = new List('listing-portfolio-listing', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<link rel="stylesheet" href="styles.css">
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
 <body class="nav-fixed fullcontent">
@@ -159,12 +219,34 @@ $(document).ready(function() {
 Hi, I’m Marco Camilo, <span></span>
 </h1>
 <p>I design, build, and operate deep learning systems that process natural language. I also specialize in data analysis and machine learning. Here are some of the projects in my portfolio:</p>
-<p><a href="">BERT, Encoders and Linear Models for Resume Text Classification</a><br>
-Exploring performance of advanced NLP techniques on topic modeling, text classification and document similarity. 11 Jun 2024 • GitHub • Jupyter • Article</p>
-<p><a href="">Airline On-Time Performance across 80 Years EDA</a><br>
-An analysis of airline peformance from 2 million flights spanning 80 years. 30 Apr 2024 • GitHub • Jupyter • Article</p>
-<p><a href="">Raspberry-LLM - Making My Raspberry Pico a Little Smarter</a><br>
-Generating Dr.&nbsp;Seuss headlines, fake WSJ quotes, HackerNews troll comments, and more. 16 Apr 2024 • GitHub • Jupyter • Article</p>
+<div id="listing-portfolio-listing" class="quarto-listing quarto-listing-container-custom">
+<p>
+<a href="./projects/resume-analyzer.html">BERT, Encoders and Linear Models for Resume Text Classification</a><br> Explores the performance of advanced NLP models and vectorization techniques on topic modeling, text classification and document similarity.
+</p>
+<p>
+<a href="./projects/airline.html">Airline On-Time EDA</a><br> Explore a data-driven journey into predicting and mitigating customer churn with this project on predictive analytics. Leveraging a Random Forest Classifier, discover insights that empower businesses to proactively retain customers and enhance overall satisfaction.
+</p>
+<p>
+<a href="./projects/biodiversity.html">Biodiversity, Endangerement and Conversation in Data from National Parks Service</a><br> Embark on a captivating exploration of biodiversity with this data science project, delving into the conservation statuses of endangered species across national parks. Through meticulous analysis, uncover profound insights into the distribution of endangered species, their likelihood of endangerment, and the most frequently spotted species in each park, illuminating the intricate dynamics of wildlife preservation and ecological sustainability.
+</p>
+<div class="listing-no-matching d-none">
+No matching items
+</div>
+</div>
+<!-- <h1 id="hi">Hi, I’m Marco Camilo, <span></span></h1> -->
+<!-- I design, build, and operate deep learning systems that process natural language. I also specialize in data analysis and machine learning. Here are some of the projects in my portfolio: -->
+<!---->
+<!-- [BERT, Encoders and Linear Models for Resume Text Classification]()   -->
+<!-- Exploring performance of advanced NLP techniques on topic modeling, text classification and document similarity. -->
+<!-- 11 Jun 2024 • GitHub • Jupyter • Article -->
+<!---->
+<!-- [Airline On-Time Performance across 80 Years EDA]()   -->
+<!-- An analysis of airline peformance from 2 million flights spanning 80 years. -->
+<!-- 30 Apr 2024 • GitHub • Jupyter • Article -->
+<!---->
+<!-- [Raspberry-LLM - Making My Raspberry Pico a Little Smarter]()   -->
+<!-- Generating Dr. Seuss headlines, fake WSJ quotes, HackerNews troll comments, and more. -->
+<!-- 16 Apr 2024 • GitHub • Jupyter • Article -->
 </div>
 <div class="g-col-12 g-col-lg-3">
 <div class="profile-sidebar">
@@ -191,6 +273,7 @@ Computational Linguist.</p>
 </div>
 </div>
 </div>
+
 
 
 

@@ -6,5 +6,13 @@
       "/projects/resume-analyzer.html",
       "/projects/biodiversity.html"
     ]
+  },
+  {
+    "listing": "/index.html",
+    "items": [
+      "/projects/resume-analyzer.html",
+      "/projects/airline.html",
+      "/projects/biodiversity.html"
+    ]
   }
 ]
