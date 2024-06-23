@@ -1,0 +1,687 @@
+---
+title: Biodiversity, Endangerement and Conversation in Data from National Parks Service
+description: Embark on a captivating exploration of biodiversity with this data science project, delving into the conservation statuses of endangered species across national parks. Through meticulous analysis, uncover profound insights into the distribution of endangered species, their likelihood of endangerment, and the most frequently spotted species in each park, illuminating the intricate dynamics of wildlife preservation and ecological sustainability.
+image: assets/img/biodiversity.jpg
+category: Exploratory Data Analysis
+type: Data Analysis
+skills:
+    - Pandas
+    - NumPy
+    - Matplotlib
+    - Seaborn
+---
+
+## Introduction
+
+This project explores biodiversity data from the National Parks Service about endangered species in various parks. In particular, the project delves into the conservation statuses of endangered species to see if there are any patterns regarding the type of species the become endangered. The goal of this project will be to perform an Exploratory Data Analysis and explain findings from the analysis in a meaningful way.
+
+**Sources:**
+Both `Observations.csv` and `Species_info.csv` was provided by [Codecademy.com](https://www.codecademy.com).
+
+### Project Goals
+
+The project will analyze data from the National Parks Service, with the goal of understanding characteristics about species and their conservations status, and the relationship between those species and the national parks they inhabit.
+
+Some of the questions to be tackled include:
+
+-   What is the distribution of conservation status for animals?
+-   Are certain types of species more likely to be endangered?
+-   Are the differences between species and their conservation status significant?
+-   Which species were spotted the most at each park?
+
+### Data
+
+The project makes use of two datasets. The first dataset contains data about different species and their conservation statuses. The second dataset holds recorded sightings of different species at several national parks for 7 days.
+
+### Analysis
+
+The analysis consists of the use of descriptive statistics and data visualization techniques to understand the data. Some of the key metrics that will be computed include:
+
+1.  What is the distribution of conservation status for animals?
+2.  Are certain types of species more likely to be endangered?
+3.  Are the differences between species and their conservation status significant?
+4.  Which species were spotted the most at each park?
+
+### Evaluation
+
+Lastly, the project will revisit its initial goals and summarize the findings using the research questions. This section will also suggest additional questions which may expand on limitations in the current analysis and further guide future analyses on the subject.
+
+## Importing Modules and Data from Files
+
+First, we will import the preliminary modules for this project, along with the data from the two separate files provided for this analysis.
+
+``` python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.stats import chi2_contingency
+
+# Set default figure size
+# figsize = (15,9)
+figsize = (10,6)
+plt.rcParams['figure.figsize'] = figsize
+sns.set(rc={'figure.figsize':figsize})
+
+# Set default float size
+pd.set_option('display.float_format', lambda x: '%.2f' % x)
+
+observations = pd.read_csv('observations.csv')
+species = pd.read_csv('species_info.csv')
+```
+
+    Import successful
+
+## Preview the Data
+
+To prepare for our exploratory data analysis, we'll first conduct an initial preview of the data. This will involve sampling a subset of the data and inspecting its structure and characteristics.
+
+### `species.csv`
+
+Let's begin by examening the `species` dataset.
+
+``` python
+display("SAMPLE OF SPECIES DATASET:")
+display(species.sample(5))
+display("INFORMATION ABOUT THE SPECIES DATASET:")
+display(species.info())
+```
+
+    'SAMPLE OF SPECIES DATASET:'
+
+|      | category          | scientific_name         | common_names           | conservation_status |
+|------|-------------------|-------------------------|------------------------|---------------------|
+| 718  | Vascular Plant    | Pogonia ophioglossoides | Pogonia, Rose Pogonia  | NaN                 |
+| 1361 | Vascular Plant    | Lespedeza stuevei       | Tall Lespedeza         | NaN                 |
+| 4725 | Vascular Plant    | Calycadenia mollis      | Soft Western Rosinweed | NaN                 |
+| 2912 | Nonvascular Plant | Thuidium allenii        | Allen\'s Thuidium Moss | NaN                 |
+| 1929 | Vascular Plant    | Picea abies             | Norway Spruce          | NaN                 |
+
+    'INFORMATION ABOUT THE SPECIES DATASET:'
+
+    <class 'pandas.core.frame.DataFrame'>
+    RangeIndex: 5824 entries, 0 to 5823
+    Data columns (total 4 columns):
+     #   Column               Non-Null Count  Dtype 
+    ---  ------               --------------  ----- 
+     0   category             5824 non-null   object
+     1   scientific_name      5824 non-null   object
+     2   common_names         5824 non-null   object
+     3   conservation_status  191 non-null    object
+    dtypes: object(4)
+    memory usage: 182.1+ KB
+
+    None
+
+The `species` dataset shows 5824 entries with four variables:
+
+-   **category**: taxonomy for each species.
+-   **scientific_name**: scientific name of each species.
+-   **common_names**: common names of each species.
+-   **conservation_status**: species' conservation status.
+
+Upon inspection with .info(), we observe that the conservation_status column contains 191 non-null entries, indicating a high presence of missing values. While the majority of columns may retain their data type as objects, an argument could be made for converting conservation_status to an ordinal variable. However, due to the presence of incomplete conservation statuses and the ambiguity surrounding the ordinal nature of `in recovery`, we'll retain it as an object.
+
+### `observations.csv`
+
+We'll now move on to the `observations` dataset.
+
+
+``` python
+display("SAMPLE OF SPECIES DATASET:")
+display(observations.sample(5))
+display("INFORMATION ABOUT THE SPECIES DATASET:")
+display(observations.info())
+```
+
+
+<pre>'SAMPLE OF SPECIES DATASET:'</pre>
+
+|       | scientific_name      | park_name                 | observations |
+|-------|----------------------|---------------------------|--------------|
+| 21462 | Lepomis humilis      | Yellowstone National Park | 222          |
+| 1305  | Saxifraga odontoloma | Yosemite National Park    | 116          |
+| 1307  | Perdix perdix        | Yosemite National Park    | 162          |
+| 20947 | Fraxinus profunda    | Bryce National Park       | 129          |
+| 10240 | Muhlenbergia andina  | Yellowstone National Park | 235          |
+
+
+<pre>'INFORMATION ABOUT THE SPECIES DATASET:'
+
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 23296 entries, 0 to 23295
+Data columns (total 3 columns):
+ #   Column           Non-Null Count  Dtype 
+---  ------           --------------  ----- 
+ 0   scientific_name  23296 non-null  object
+ 1   park_name        23296 non-null  object
+ 2   observations     23296 non-null  int64 
+dtypes: int64(1), object(2)
+memory usage: 546.1+ KB
+
+None</pre>
+
+The `observations` dataset consists of three columns:
+
+-   **scientific_name**: scientific name of each species.
+-   **park_name**: name of the national park species are located in.
+-   **observations**: number of observations in the past 7 days.
+
+Based on the information above, the columns don't show any missing data, and the data types seem to be appropriate for the analysis.
+
+## Exploratory Data Analysis
+
+### `species.csv`
+
+Let's delve deeper into the species dataset to gain insights into its characteristics and identify any anomalies or patterns. We'll begin by employing a custom function `column_eda()` to analyze each column:
+
+
+``` python
+def column_eda(dataset):
+    cols = list(dataset.columns)
+    for col in cols:
+        print(f'---------------{col}---------------')
+        print(f'Unique values:', dataset[col].nunique(), 
+              f'Non-null values: {dataset[col].notnull().sum()}',
+              f'Missing values: {dataset[col].isnull().sum()}\n', 
+              sep='\n')
+        print(dataset[col].value_counts().head(4))
+
+column_eda(species)
+```
+
+
+<pre>---------------category---------------
+Unique values:
+7
+Non-null values: 5824
+Missing values: 0
+
+category
+Vascular Plant       4470
+Bird                  521
+Nonvascular Plant     333
+Mammal                214
+Name: count, dtype: int64
+---------------scientific_name---------------
+Unique values:
+5541
+Non-null values: 5824
+Missing values: 0
+
+scientific_name
+Castor canadensis       3
+Canis lupus             3
+Hypochaeris radicata    3
+Columba livia           3
+Name: count, dtype: int64
+---------------common_names---------------
+Unique values:
+5504
+Non-null values: 5824
+Missing values: 0
+
+common_names
+Brachythecium Moss    7
+Dicranum Moss         7
+Panic Grass           6
+Bryum Moss            6
+Name: count, dtype: int64
+---------------conservation_status---------------
+Unique values:
+4
+Non-null values: 191
+Missing values: 5633
+
+conservation_status
+Species of Concern    161
+Endangered             16
+Threatened             10
+In Recovery             4
+Name: count, dtype: int64</pre>
+
+The function shows there are 7 categories of species, 5541 species, 5504 common names and 4 conservation statuses. From the analysis, several insights emerge:
+
+1.  **Missing Conversation Statuses**: the `conservation_status` column exhibits a high number of `nan` values (5633), which could be interpreted as 'species of no concern' or requiring 'no intervention'.
+
+To address this, we'll impute the missing values with "No intervention", expanding the conservation status categories to five.
+
+
+``` python
+print('Old conservation status:\n', list(species.conservation_status.unique()))
+
+species.conservation_status = species.conservation_status.fillna('No intervention')
+
+print('New conservation status:\n', list(species.conservation_status.unique()))
+```
+
+
+<pre>Old conservation status:
+ [nan, 'Species of Concern', 'Endangered', 'Threatened', 'In Recovery']
+New conservation status:
+ ['No intervention', 'Species of Concern', 'Endangered', 'Threatened', 'In Recovery']</pre>
+
+{:start="2"}
+2.  **Duplicate Entries**: there is a discrepancy between the number of unique values of `scientific_name` and `common_names` despite all entries having non-null values. This points to the presence of duplicate common names for different species.
+
+We'll confirm this by identifying and examining these duplicates.
+
+
+``` python
+duplicates = species.duplicated().sum()
+print(f'Overall duplicates (rows): {duplicates}')
+
+repeated_scientific_names = species.duplicated(subset=['scientific_name']).sum()
+print(f'Duplicated scientific names: {repeated_scientific_names}')
+
+repeated_common_names = species.duplicated(subset=['common_names']).sum()
+print(f'Duplicated common names: {repeated_common_names}')
+```
+
+
+<pre>Overall duplicates (rows): 0
+Duplicated scientific names: 283
+Duplicated common names: 320</pre>
+
+To illustrate, we'll display the most frequent common name alongside its associated scientific names.
+
+
+``` python
+display(species.common_names.value_counts().reset_index()[:5])
+display(species.query("common_names == 'Brachythecium Moss'")[['common_names', 'scientific_name']])
+```
+
+
+|     | common_names       | count |
+|-----|--------------------|-------|
+| 0   | Brachythecium Moss | 7     |
+| 1   | Dicranum Moss      | 7     |
+| 2   | Panic Grass        | 6     |
+| 3   | Bryum Moss         | 6     |
+| 4   | Sphagnum           | 6     |
+
+|      | common_names       | scientific_name          |
+|------|--------------------|--------------------------|
+| 2812 | Brachythecium Moss | Brachythecium digastrum  |
+| 2813 | Brachythecium Moss | Brachythecium oedipodium |
+| 2814 | Brachythecium Moss | Brachythecium oxycladon  |
+| 2815 | Brachythecium Moss | Brachythecium plumosum   |
+| 2816 | Brachythecium Moss | Brachythecium rivulare   |
+| 2817 | Brachythecium Moss | Brachythecium rutabulum  |
+| 2818 | Brachythecium Moss | Brachythecium salebrosum |
+
+
+As seen above, the most frequent common name is *Brachythecium Moss*, with a total of 7 different species identified with this name. Organisms in this example all share the same genus (i.e. *brachythecium*, a genus of moss), but differ in species, thus the different scientific names.
+
+This demonstrates instances where multiple species share identical common names but differ in scientific nomenclature.
+
+{:start="3"}
+3.  **Duplicate Scientific Names**: the presence of duplicate scientific names suggests repeated observations of the same species, since the dataset should report the conservation status of each species, thus one observation per species.
+
+Since there are no overall duplicates in the dataset (see above), these duplicate names must have some difference at the row level. To confirm this, we'll print out a sample of duplicates and inspect three random duplicates species, to see what kind of differences are there within the rows themselves.
+
+
+``` python
+duplicated_species = species[species['scientific_name'].duplicated(keep=False)]
+
+display('-------Sample of duplicated scientific names-------')
+display(duplicated_species.head())
+
+def display_duplicated_species(scientific_name):
+    duplicated_entries = duplicated_species[duplicated_species['scientific_name'] == scientific_name]
+    display(f'-------Duplicated \'{scientific_name}\'-------')
+    display(duplicated_entries)
+
+scientific_names_to_check = ['Cervus elaphus', 'Canis lupus', 'Odocoileus virginianus']
+for scientific_name in scientific_names_to_check:
+    display_duplicated_species(scientific_name)
+```
+
+
+<pre>'-------Sample of duplicated scientific names-------'</pre>
+
+|     | category | scientific_name          | common_names              | conservation_status |
+|-----|----------|--------------------------|---------------------------|---------------------|
+| 4   | Mammal   | Cervus elaphus           | Wapiti Or Elk             | No intervention     |
+| 5   | Mammal   | Odocoileus virginianus   | White-Tailed Deer         | No intervention     |
+| 6   | Mammal   | Sus scrofa               | Feral Hog, Wild Pig       | No intervention     |
+| 8   | Mammal   | Canis lupus              | Gray Wolf                 | Endangered          |
+| 10  | Mammal   | Urocyon cinereoargenteus | Common Gray Fox, Gray Fox | No intervention     |
+
+<pre>"-------Duplicated 'Cervus elaphus'-------"</pre>
+
+
+|      | category | scientific_name | common_names       | conservation_status |
+|------|----------|-----------------|--------------------|---------------------|
+| 4    | Mammal   | Cervus elaphus  | Wapiti Or Elk      | No intervention     |
+| 3017 | Mammal   | Cervus elaphus  | Rocky Mountain Elk | No intervention     |
+
+<pre>"-------Duplicated 'Canis lupus'-------"</pre>
+
+|      | category | scientific_name | common_names    | conservation_status |
+|------|----------|-----------------|-----------------|---------------------|
+| 8    | Mammal   | Canis lupus     | Gray Wolf       | Endangered          |
+| 3020 | Mammal   | Canis lupus     | Gray Wolf, Wolf | In Recovery         |
+| 4448 | Mammal   | Canis lupus     | Gray Wolf, Wolf | Endangered          |
+
+<pre>"-------Duplicated 'Odocoileus virginianus'-------"</pre>
+
+|      | category | scientific_name        | common_names                         | conservation_status |
+|------|----------|------------------------|--------------------------------------|---------------------|
+| 5    | Mammal   | Odocoileus virginianus | White-Tailed Deer                    | No intervention     |
+| 3019 | Mammal   | Odocoileus virginianus | White-Tailed Deer, White-Tailed Deer | No intervention     |
+
+It seems that both the number of common names and the types of conservation statuses are different for duplicate observations. That is, the same species exhibits both different common names, as well as conservation statuses. To solve the question of duplicates, given the differences in conversation statuses do not affect our question on the likelihood of endangerment given a species' protection status, I'll retain the first instance of these duplicates.
+
+
+``` python
+species = species.drop_duplicates(subset=['scientific_name'], keep='first')
+
+repeated_scientific_names = species.scientific_name[species.scientific_name.duplicated()]
+print(f'Duplicated scientific names: {len(repeated_scientific_names)}\n')
+
+print('-------Previously duplicated examples (now clean)-------')
+scientific_names_to_check = ['Cervus elaphus', 'Canis lupus', 'Odocoileus virginianus']
+display(species[species['scientific_name'].isin(scientific_names_to_check)])
+```
+
+
+<pre>Duplicated scientific names: 0
+
+-------Previously duplicated examples (now clean)-------</pre>
+
+|     | category | scientific_name        | common_names      | conservation_status |
+|-----|----------|------------------------|-------------------|---------------------|
+| 4   | Mammal   | Cervus elaphus         | Wapiti Or Elk     | No intervention     |
+| 5   | Mammal   | Odocoileus virginianus | White-Tailed Deer | No intervention     |
+| 8   | Mammal   | Canis lupus            | Gray Wolf         | Endangered          |
+
+### `observations.csv`
+
+Let's extend our exploratory analysis to the observations dataset, mirroring the approach applied to the species dataset. We'll begin by employing the `column_eda()` function to analyze each column.
+
+
+``` python
+column_eda(observations)
+```
+
+
+<pre>---------------scientific_name---------------
+Unique values:
+5541
+Non-null values: 23296
+Missing values: 0
+
+scientific_name
+Myotis lucifugus        12
+Puma concolor           12
+Hypochaeris radicata    12
+Holcus lanatus          12
+Name: count, dtype: int64
+---------------park_name---------------
+Unique values:
+4
+Non-null values: 23296
+Missing values: 0
+
+park_name
+Great Smoky Mountains National Park    5824
+Yosemite National Park                 5824
+Bryce National Park                    5824
+Yellowstone National Park              5824
+Name: count, dtype: int64
+---------------observations---------------
+Unique values:
+304
+Non-null values: 23296
+Missing values: 0
+
+observations
+84    220
+85    210
+91    206
+92    203
+Name: count, dtype: int64</pre>
+
+The column analysis revelas the following insights. There are 23296 observations of 5541 unique species documented in 4 parks. The number of species (`scientific_name`) in the `observations` datset coincides with the number of species in the `species` dataset. This suggest that the `observations` dataset contains observations of all species in the `species` dataset. To confirm this, we'll check if the `scientific_name` column in the `observations` dataset is a subset of the `scientific_name` column in the `species` dataset.
+
+
+``` python
+species_names = species.scientific_name
+observations_names = observations.scientific_name
+
+print(f'Is the observations dataset a subset of the species dataset? {observations_names.isin(species_names).all()}')
+```
+
+
+<pre>Is the observations dataset a subset of the species dataset? True</pre>
+
+The result confirms that the `observations` dataset is a subset of the `species` dataset, as all species in the `observations` dataset are also present in the `species` dataset.
+
+Furthermore, as `observations` is a numerical variable, its distribution provides insights into the frequency of species sightings. To better explore this column given its data type, we'll visualize the distribution using a histogram.
+
+
+``` python
+sns.histplot(x='observations', data=observations, kde=True)
+plt.show()
+```
+
+
+![](assets/projects/biodiversity_files/figure-markdown_strict/cell-13-output-2.png)
+
+The distribution of in the number of observations seems to follow a multimodal distribution, with at least three discernible peaks in the data: one at 80, another at 150, and a third at 250. This may suggest that the overall distribution is a combination of several distributions, grouped by a certain variable. Given the low number of disceernible peaks, this variable might be the `park_name` variable. That is: the distribution in the number of observations may be influenced by the size of the parks they were made in.
+
+To confirm this, we'll plot the distribution of observations per park using the `hue` parameter in the seaborn histplot function.
+
+
+``` python
+sns.histplot(x='observations', data=observations, kde=True, hue='park_name')
+plt.show()
+```
+
+
+![](assets/projects/biodiversity_files/figure-markdown_strict/cell-14-output-1.png)
+
+As suspected, the distribution of observations is indeed influenced by the park in which they were made. The peaks in the distribution clearly correspond to each of the four parks in the dataset. This proves that the number of observations is influenced by the park in which they were made.
+
+### Summary
+
+To encapsulate the insights obtained from our Exploratory Data Analysis (EDA), we present the key characteristics of both datasets.
+
+#### `species`
+
+-   **Dataset Overview**: the data comprises 5,824 entries with 4 variables---category, scientific_name, common_names, and conservation_status---offering a diverse array of taxonomic information.
+-   **Missing Values**: the conservation_status column contains 5,633 missing values, which were imputed with "No intervention" to account for species not under any conservation status.
+-   **Duplicates**: the dataset contains no overall duplicates, but does exhibit duplicate scientific names, which were resolved by retaining the first instance of each duplicate.
+-   **Common Names**: the dataset contains 5541 species, with some sharing identical common names but differing in scientific nomenclature.
+-   **Conservation Status**: the dataset reports 5 conservation statuses, with most species not under any conservation status.
+
+#### `observations`
+
+-   **Dataset Overview**: the data consists of 23,296 entries with 3 variables---scientific_name, park_name, and observations---documenting species sightings in 4 national parks over 7 days.
+-   **Unique Species**: the dataset contains observations of 5,541 unique species, all of which are present in the `species` dataset.
+-   **Missing Values**: the dataset contains no missing values, with all columns having non-null entries.
+-   **Distribution**: the number of observations followed a multimodal distribution, which was influenced by the park in which observations were conducted.
+
+## Analysis
+
+In this section, we aim to address the questions posed earlier by analyzing the `species` dataset and later exploring the `observations` dataset.
+
+### Q: What is the distribution of conservation status for animals?
+
+To gain insights into the distribution of conservation statuses among animal categories, we begin by aggregating the conservations statuses per species category and calculating both discrete and normalized counts. We then visualize the normalized counts using a stacked bar chart.
+
+
+``` python
+category_conservation = pd.crosstab(species['conservation_status'], species['category']).drop(index='No intervention')
+display(category_conservation)
+
+category_conservation_norm = pd.crosstab(species['conservation_status'], species['category'], normalize='index').drop(index='No intervention')
+display(category_conservation_norm.style.background_gradient(cmap='Blues', axis=1, vmin=0, vmax=1))
+
+ax = category_conservation_norm.plot(kind='bar', stacked=True)
+ax.set_xlabel('Conservation Status')
+ax.set_ylabel('Number of Species')
+ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.title("Distribution of Species Among Conservation Statuses")
+plt.show()
+```
+
+
+| category            | Amphibian | Bird | Fish | Mammal | Nonvascular Plant | Reptile | Vascular Plant |
+|---------------------|-----------|------|------|--------|-------------------|---------|----------------|
+| conservation_status |           |      |      |        |                   |         |                |
+| Endangered          | 1         | 4    | 3    | 6      | 0                 | 0       | 1              |
+| In Recovery         | 0         | 3    | 0    | 0      | 0                 | 0       | 0              |
+| Species of Concern  | 4         | 68   | 4    | 22     | 5                 | 5       | 43             |
+| Threatened          | 2         | 0    | 3    | 2      | 0                 | 0       | 2              |
+
+| category            | Amphibian | Bird     | Fish     | Mammal   | Nonvascular Plant | Reptile  | Vascular Plant |
+|---------------------|-----------|----------|----------|----------|-------------------|----------|----------------|
+| conservation_status |           |          |          |          |                   |          |                |
+| Endangered          | 0.066667  | 0.266667 | 0.200000 | 0.400000 | 0.000000          | 0.000000 | 0.066667       |
+| In Recovery         | 0.000000  | 1.000000 | 0.000000 | 0.000000 | 0.000000          | 0.000000 | 0.000000       |
+| Species of Concern  | 0.026490  | 0.450331 | 0.026490 | 0.145695 | 0.033113          | 0.033113 | 0.284768       |
+| Threatened          | 0.222222  | 0.000000 | 0.333333 | 0.222222 | 0.000000          | 0.000000 | 0.222222       |
+
+![](assets/projects/biodiversity_files/figure-markdown_strict/cell-15-output-3.png)
+
+The table and stacked bar chart above reveal several insights about the distribution of conservation status among different categories of species.
+
+Firstly, the only animal *in recovery* are birds, of which there are 3 species making up 100% of this status. This points to the fact that birds are the only species in recovery at the time of the dataset. Moreover, mammals, birds and fish are the most *endangered* species in the dataset, making more than 85% of all endangered species. Furthermore, more than 70% of *species of concern* consist of birds and vascular plants. Lastly, the *threatened* status is almost equally distributed among all species categories, except birds, nonvascular plants and reptiles.
+
+Overall, the distribution of animals among conservations statuses support the following conclusions:
+
+-   The most endangered animals in the dataset consist of mammals, birds and fishes.
+-   Birds are the only species in recovery, with only 3 species documented.
+-   The most common conservation status is *species of concern*, with birds and vascular plants making up the majority of this category.
+-   The *threatened* status is almost equally distributed among amphibians, fish, mammals and vascular plants.
+
+### Q: Are certain types of species more likely to be endangered?
+
+The next question concerns the relation between species and their conservation status. To answer this question requires establishing a definition of likelihood for endangerment. Given protection measures are not documented in the dataset, we can only establish a definition based on the available variables. Therefore, we consider species to be more likely to be engangered if they are classified as *endangered*, *threatened*, or *species of concern* and if no protection measures are placed in response to their endangerment.
+
+To answer this question, we create a new `protected` column with True for all conservations statuses that are not *No intervention* nor *In recovery*. We then calculate the relative frequencies of protected and protected species per category. We visualize the results then using a bar chart.
+
+
+``` python
+species['protected'] = species.conservation_status.isin(['No intervention', 'In Recovery'])
+
+category_protections = pd.crosstab(species['category'], species['protected'], normalize='index')
+display(category_protections)
+
+ax = sns.barplot(data = category_protections, y = category_protections.iloc[:, 0]*100, x = 'category')
+ax.bar_label(ax.containers[0], fmt="%0.2f%%")
+plt.title('Percentage of Likely Endangerement per Species Category')
+plt.ylabel('Percentage Not Protected')
+plt.xlabel('Category')
+plt.show()
+```
+
+
+| protected         | False | True |
+|-------------------|-------|------|
+| category          |       |      |
+| Amphibian         | 0.09  | 0.91 |
+| Bird              | 0.15  | 0.85 |
+| Fish              | 0.08  | 0.92 |
+| Mammal            | 0.17  | 0.83 |
+| Nonvascular Plant | 0.02  | 0.98 |
+| Reptile           | 0.06  | 0.94 |
+| Vascular Plant    | 0.01  | 0.99 |
+
+![](assets/projects/biodiversity_files/figure-markdown_strict/cell-16-output-2.png)
+
+Based on the information from the bar chart, we can see that mammals and birds have the highest percentage of no protection, with roughly 17% and 15% of species exhibiting some level of engangered, respectively. This suggests that mammals and birds are the most likely to be endangered among the categories.
+
+### Q: Are the differences between species and their conservation status significant?
+
+The question of statistical significance for categorical variables is answered in statistics by use of the chi-square test.
+
+Crosstabulating both variables would yield a complex result, thus it's better to break down the question into pairs of species categories. Since based on the previous question mammals are the most likely category to be endangered, we'll compare the significance of other category differences with mammals.
+
+We'll start by permutating the pairs of categories with mammals. Then I'll loop over this list to perform the chi-square tests for each pair and plot the p-values to find the statistically significant differences among category pairs.
+
+
+``` python
+categories = list(species.category.unique())
+combinations_mammal = [['Mammal', i] for i in categories][1:]
+
+category_protections_counts = pd.crosstab(species['category'], species['protected'])
+
+significance_data = {'Animal Pair': [], 'p-value': []}
+for pair in combinations_mammal:
+  contingency_table = category_protections_counts.loc[pair]
+  chi2, pval, dof, expected = chi2_contingency(contingency_table)
+
+  significance_data['Animal Pair'].append(f'{pair[0]} vs {pair[1]}')
+  significance_data['p-value'].append(pval)
+
+sign_data = pd.DataFrame(significance_data)
+sign_data['p-value'] = sign_data['p-value']*100
+# display(sign_data)
+
+# Plot
+plt.subplots(figsize=(10,5))
+ax =sns.barplot(data = sign_data, x = 'Animal Pair', y = 'p-value')
+plt.title('Statistical Significance of Protection Statuses per Animal\n(difference with mammals)')
+plt.axhline(5, color='red', linestyle='--')
+ax.set_xlabel("")
+ax.set_ylabel('p-value\n(alpha = 5%)')
+plt.xticks(rotation=45)
+ax.bar_label(ax.containers[0], fmt="%0.2f%%")
+plt.show()
+```
+
+
+![](assets/projects/biodiversity_files/figure-markdown_strict/cell-17-output-1.png)
+
+The above graph illustrates the p-values for the chi-square tests performed for each animal category against mammals. Given an alpha of 5%, the analysis shows that birds and amphibians display no statistically significant differences in their conservations statuses compared with mammals. However, all other categories such as reptiles, fishes and plants show statistically significant differences in their conservation statuses when comapred to mammals. This means that the conservation statuses of these categories are significantly different from mammals.
+
+### Q: Which species were spotted the most at each park?
+
+Lastly, we explore the `observations` dataset to identify the most frequently spotted species in each park.
+
+Since the dataset doesn't include common names, we'll map the common names from the `species` dataset to the scientific names in the `observations` dataset. Then, we'll aggregate the data by park and by species, summing their observations to identify the most frequently spotted species in each park.
+
+
+``` python
+merged_df = observations.merge(species[['category', 'scientific_name', 'common_names']], how='left').drop_duplicates()
+merged_df_grouped = merged_df.groupby(['park_name', 'scientific_name', 'common_names']).observations.sum().reset_index()
+merged_df_grouped = merged_df_grouped.loc[merged_df_grouped.groupby('park_name')['observations'].idxmax()].sort_values(by = 'observations', ascending=False)
+
+display(merged_df_grouped.head())
+```
+
+
+|       | park_name                           | scientific_name       | common_names                     | observations |
+|-------|-------------------------------------|-----------------------|----------------------------------|--------------|
+| 13534 | Yellowstone National Park           | Holcus lanatus        | Common Velvet Grass, Velvetgrass | 805          |
+| 19178 | Yosemite National Park              | Hypochaeris radicata  | Cat\'s Ear, Spotted Cat\'s-Ear   | 505          |
+| 1359  | Bryce National Park                 | Columba livia         | Rock Dove                        | 339          |
+| 10534 | Great Smoky Mountains National Park | Streptopelia decaocto | Eurasian Collared-Dove           | 256          |
+
+Based on the aggregation above, in Yellowstone National Park, the species Holcus lanatus was the most commonly observed, with a total of 805 sightings. Meanwhile, Hypochaeris radicata was the predominant species in Yosemite National Park, with 505 observations. In Bryce National Park, Columba livia garnered the highest number of sightings, totaling 339. Finally, in Great Smoky Mountains National Park, Streptopelia decaocto was the most frequently spotted species, with 256 observations.
+
+## Conclusions
+
+This project set out to explore biodiversity data from the National Parks Service, focusing on endangered species and their conservation statuses. Through a detailed exploratory data analysis, several key findings emerged, shedding light on the distribution of conservation statuses among different species categories, the likelihood of species endangerment, the significance of differences in conservation statuses among species categories, and the most frequently spotted species in each national park.
+
+### Distribution of Conservation Statuses
+
+The analysis revealed that mammals, birds, and fishes are the most endangered species categories, making up the majority of the *endangered* conservation status. Birds were the only category with species classified as *in recovery*, indicating a unique conservation status among all the categories. Out of 178 species marked with some conservation status other than *no intervention*, most species are under the status of species of concern, especially birds and vascular plants.
+
+### Likelihood of Species Endangerment
+
+Mammals and birds emerged as the most likely categories to be endangered, with approximately 17% and 15% of species not classified as either *in recovery* or *no intervention*. Without any protection measures, this suggests a higher vulnerability to endangerment among mammals and birds compared to other species categories.
+
+### Significance of Conservation Status Differences
+
+Statistical significance testing showed that birds and amphibians did not exhibit statistically significant differences in their conservation statuses compared with mammals. However, all other categories, including reptiles, fishes, and plants, displayed significant differences in conservation statuses compared with mammals. This highlights the importance of considering species-specific conservation measures based on their unique characteristics.
+
+### Most Frequently Spotted Species
+
+The analysis identified the most frequently spotted species in each national park. Species such as common velvet grass, a vascular plant, in Yellowstome National Park. Moreover, doves were the most commonly observed species both in Bryce and Great Smoky Mountains National Parks. Furthermore, the most observed species Yosemite National Park was the cat's ear plant. This findings are examples of the rich biodiversity present in national parks.
+
+In conclusion, this project contributes to our understanding of endangered species and their conservation statuses, highlighting the need for targeted conservation efforts to protect vulnerable species and preserve biodiversity in national parks. Further research could explore additional factors influencing species endangerment and conservation strategies tailored to specific species categories. By understanding and honoring the unique needs of each species category, we can forge a path towards sustainable coexistence and ensure the enduring legacy of our national parks for generations to come.
+

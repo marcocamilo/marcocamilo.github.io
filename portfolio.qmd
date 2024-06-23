@@ -1,0 +1,23 @@
+---
+title: Portfolio
+subtitle: A collection of projects in NLP, machine learning and data science
+listing:
+  id: portfolio-listing
+  contents: projects
+  fields: [title, description, image]
+  template: _templates/listing.ejs
+---
+
+:::: {.grid}
+::: {.g-col-12 .g-col-lg-9}
+
+::: {#portfolio-listing}
+:::
+
+:::
+::: {.g-col-12 .g-col-lg-3}
+
+{{< include _sidebar.qmd >}}
+
+:::
+::::

@@ -1,0 +1,38 @@
+project:
+  type: website
+
+website:
+  title: "marcocamilo"
+  navbar:
+    background: white
+    foreground: black
+    right:
+      - href: index.qmd
+        text: Home
+      - portfolio.qmd
+      - about.qmd
+  page-footer: 
+    left: "© 2024 Marco-Andrés Camilo-Pietri"
+  bread-crumbs: false
+
+format:
+  html:
+    # theme
+    theme: default
+    css: styles.css
+    toc: false
+    
+    # code blocks
+    highlight-style: github
+    code-block-border-left: true
+    code-fold: true
+    code-summary: View Code
+    
+    # includes
+    include-in-header:
+      - text: |
+          <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+reference-location: margin
+citation-location: margin
+
+

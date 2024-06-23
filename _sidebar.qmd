@@ -1,0 +1,27 @@
+<div class="profile-sidebar">
+<div><img class="profile" src="/assets/img/profile.png" /></div>
+
+**I am Marco Camilo,**  
+an NLP Data Scientist &  
+Computational Linguist.
+
+<div class="about-links">
+  <div><a href="https://linkedin.com/in/marcocamilo" class="about-link" rel="" target="">
+    <i class="bi bi-linkedin"></i>
+     <span class="about-link-text">LinkedIn</span>
+  </a></div>
+  <div><a href="https://twitter.com/_marcocamilo" class="about-link" rel="" target="">
+    <i class="bi bi-twitter"></i>
+     <span class="about-link-text">Twitter</span>
+  </a></div>
+  <div><a href="https://github.com/marcocamilo" class="about-link" rel="" target="">
+    <i class="bi bi-github"></i>
+     <span class="about-link-text">Github</span>
+  </a></div>
+  <div><a href="mailto:{{site.email}}" class="about-link" rel="" target="">
+    <i class="bi bi-envelope-fill"></i>
+     <span class="about-link-text">Email</span>
+  </a></div>
+</div>
+
+</div>

@@ -1,0 +1,19 @@
+---
+title: ""
+---
+
+::: {.grid}
+::: {.g-col-12 .g-col-lg-9}
+
+# About
+
+About this site
+
+:::
+::: {.g-col-12 .g-col-lg-3}
+
+{{< include _sidebar.qmd >}}
+
+:::
+
+:::
