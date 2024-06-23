@@ -1,6 +1,7 @@
 ---
 title: Biodiversity, Endangerement and Conversation in Data from National Parks Service
 description: Embark on a captivating exploration of biodiversity with this data science project, delving into the conservation statuses of endangered species across national parks. Through meticulous analysis, uncover profound insights into the distribution of endangered species, their likelihood of endangerment, and the most frequently spotted species in each park, illuminating the intricate dynamics of wildlife preservation and ecological sustainability.
+featured: 3
 image: assets/img/biodiversity.jpg
 category: Exploratory Data Analysis
 type: Data Analysis

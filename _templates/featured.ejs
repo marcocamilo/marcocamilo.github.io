@@ -1,0 +1,6 @@
+<% for (const item of items) { %>
+<% if (item.featured) { %>
+<p><a href="<%- item.path %>"><%= item.title %></a><br>
+<%= item.description %></p>
+<% } %>
+<% } %>

@@ -2,6 +2,7 @@
 title: Airline On-Time EDA
 subtitle: Exploring Airline Performance from 2 Million Flights across 40 Years
 description: Explore a data-driven journey into predicting and mitigating customer churn with this project on predictive analytics. Leveraging a Random Forest Classifier, discover insights that empower businesses to proactively retain customers and enhance overall satisfaction.
+featured: 2
 image: "![](https://i.dailymail.co.uk/i/pix/2013/05/02/article-2318173-19957F94000005DC-90_964x639.jpg)"
 category: Exploratory Data Analysis
 type: EDA
