@@ -2,12 +2,36 @@ body {
   color: black;
 }
 
+/* links */
+p a {
+	font-weight: 500;
+  color: rgb(10, 123, 255);
+}
+
+p a:hover {
+  color: rgb(10, 88, 202);
+}
+
+/* p a { */
+/* 	font-weight: 500; */
+/*   color: rgb(10, 123, 255); */
+	/* text-decoration-color: rgba(13, 110, 253, 0.25); */
+  /* transition: all 0.2s ease-in-out; */
+/* } */
+
+/* p a:hover { */
+/*   color: rgb(10, 88, 202); */
+/*   text-decoration: underline; */
+/* 	text-decoration-color: rgba(13, 110, 253, 1); */
+/* } */
+
 /* navbar */
 .navbar-title {
   font-weight: 600;
 }
 .navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
   font-weight: 600;
+  color: black;
 }
 
 /* full page layout */

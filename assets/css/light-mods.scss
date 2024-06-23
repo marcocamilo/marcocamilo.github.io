@@ -1,0 +1,24 @@
+/*-- scss:defaults --*/
+$body-color: black;
+
+/*-- scss:rules --*/
+.about-links {
+  div {
+    display: flex;
+    margin-bottom: .5em;
+
+    a.about-link {
+      font-size: .8em;
+      color: #4e5862;
+      text-decoration: none;
+      padding: .25em .5em;
+      border-radius: 4px;
+      border: solid 1px;
+      width: 100%;
+
+      &:hover {
+        color: #0d6efd;
+      }
+    }
+  }
+}
