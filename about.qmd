@@ -7,7 +7,15 @@ title: ""
 
 # About
 
-About this site
+Hello! I'm Marco Camilo, a seasoned professional with a diverse background bridging linguistics, education, and cutting-edge technology.
+
+During my time as a lecturer, I found immense fulfillment in simplifying complex linguistic concepts and guiding students to exceed their own expectations. By analyzing student data—from test scores to speech lab performance and even Duolingo statistics—I employed advanced clustering techniques to tailor instructional strategies and unlock the full potential of every learner.
+
+My academic journey, including coursework in machine learning and natural language processing (NLP), has equipped me with practical skills and deep insights into applying state-of-the-art solutions to real-world challenges. Projects in NLP provided compelling opportunities to excel in using cutting-edge technologies, preparing me for impactful contributions in the IT sector.
+
+My transition from linguistics to data science and NLP stems from a lifelong fascination with language, mathematics, and algorithms. As a linguist, I delved into the intricate workings of language systems, craving to apply analytical and mathematical methods to linguistic inquiries. This quest led me to the field of NLP, where my passions converge, empowering me to derive innovative solutions to modern challenges—from both linguistic and computational perspectives.
+
+I am excited to leverage my unique background and expertise to tackle complex problems in NLP and contribute meaningfully to the evolving landscape of technology.
 
 :::
 ::: {.g-col-12 .g-col-lg-3}

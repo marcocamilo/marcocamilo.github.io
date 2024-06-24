@@ -1,23 +1,16 @@
-/* links */
 p a {
 	font-weight: 500;
-  color: rgb(10, 123, 255);
 }
 
-p a:hover {
-  color: rgb(10, 88, 202);
-}
-
-/* navbar */
 .navbar-title {
   font-weight: 600;
 }
-.navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
+
+.navbar-nav .nav-link.active, 
+.navbar-nav .nav-link.show {
   font-weight: 600;
-  /* color: black; */
 }
 
-/* full page layout */
 @media (min-width: 992px) {
     body.fullcontent:not(.floating):not(.docked) .page-columns {
         display: grid;
@@ -26,7 +19,10 @@ p a:hover {
     }
 }
 
-/* sidebar */
+img {
+  border-radius: 8px;
+}
+
 img.profile {
   width: 100%;
   height: auto;
@@ -51,9 +47,8 @@ img.profile {
   margin-bottom: .5em;
 }
 
-div a.about-link {
+.about-link {
   font-size: .8em;
-  color: #4e5862;
   text-decoration: none;
   padding: .25em .5em;
   border-radius: 4px;
@@ -61,11 +56,6 @@ div a.about-link {
   width: 100%;
 }
 
-.about-link:hover {
-  color: #0d6efd;
-}
-
-/* badges */
 .badges-container {
 	display: flex;
 	margin-bottom: 1rem;
@@ -84,19 +74,6 @@ div a.about-link {
   margin: 0rem;
 }
 
-/* blockquote */
-blockquote {
-  color: black !important;
-  margin: 0 0 1rem -2rem !important;
-  padding: 0 0 0 1.75rem !important;
-  border-left: .25rem solid #e5e5e5;
-  margin-inline-start: 0;
-  margin-inline-end: 0;
-  margin-block-start: 0;
-  margin-block-end: 0;
-}
-
-/* lists */
 main li {
   margin-bottom: 0.25rem;
 }
@@ -105,7 +82,6 @@ main ul {
   padding-left: 1.5rem;
 }
 
-/* pre */ /* configure margins */
 pre {
   border-radius: 0;
 }
@@ -113,7 +89,6 @@ pre {
 pre.sourceCode {
   border-left: 0.25rem;
   border-left-style: solid;
-  border-left-color: rgba(0, 0, 0, 0.05);
   padding: 1.5rem;
   border-right: none;
   border-top: none;
@@ -121,4 +96,3 @@ pre.sourceCode {
   font-size: 0.85rem;
   overflow: visible !important;
 }
-

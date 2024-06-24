@@ -1,0 +1,79 @@
+/*-- scss:defaults --*/
+$body-color: white;
+$navbar-bg: black;
+$navbar-fg: white;
+
+/*-- scss:rules --*/
+/* p a, */
+/* figcaption a { */
+/*   color: rgb(0, 243, 255) !important; */
+/* } */
+/**/
+/* p a:hover, */
+/* figcaption a:hover { */
+/*   color: rgb(3, 191, 211) !important; */
+/* } */
+/**/
+/* .sidebar { */
+/*   nav[role="doc-toc"] { */
+/*     ul { */
+/*       > li { */
+/*         > a.active { */
+/*           color: rgb(0, 243, 255) !important; */
+/*         } */
+/*       } */
+/*     } */
+/*   } */
+/* } */
+
+.navbar-nav {
+  .nav-link {
+    &.active,
+    &.show {
+      color: rgb(10, 123, 255);
+    }
+
+    &:hover {
+      color: rgb(10, 88, 202);
+    }
+  }
+}
+
+.about-links {
+  div {
+    a.about-link {
+      color: white;
+      &:hover {
+        color: #0d6efd;
+      }
+    }
+  }
+}
+
+.about-link {
+  color: white;
+
+  &:hover {
+    color: #0d6efd;
+  }
+}
+blockquote {
+  color: white !important;
+}
+
+.column-margin {
+  color: white;
+  figcaption {
+    color: white;
+  }
+}
+
+img:not(.profile) {
+  background-color: white !important;
+}
+
+details {
+  summary {
+    color: white;
+  }
+}

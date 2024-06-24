@@ -20,8 +20,11 @@ website:
 format:
   html:
     # theme
-    theme: default
-    css: assets/css/styles.css
+    theme: 
+      light: [default, assets/css/light-mods.scss]
+      dark: [cyborg, assets/css/dark-mods.scss]
+    css: assets/css/global.css
+    # css: assets/css/styles.css
     # theme: 
     #   light: [default, assets/css/light-mods.scss]
     #   dark: cyborg
