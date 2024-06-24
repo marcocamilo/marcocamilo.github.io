@@ -1,0 +1,43 @@
+---
+title: ""
+include-before-body: _includes/loop.html
+listing:
+  id: portfolio-listing
+  contents: projects
+  sort: "featured"
+  fields: [title, description, featured]
+  template: _templates/featured.ejs
+---
+
+::: {.grid}
+::: {.g-col-12 .g-col-lg-9}
+
+<h1 id="hi">Hi, I’m Marco Camilo, <span></span></h1>
+I design, build, and operate deep learning systems that process natural language. I also specialize in data analysis and machine learning. Here are some of the projects in my portfolio:
+
+:::{#portfolio-listing}
+:::
+
+<!-- <h1 id="hi">Hi, I’m Marco Camilo, <span></span></h1> -->
+<!-- I design, build, and operate deep learning systems that process natural language. I also specialize in data analysis and machine learning. Here are some of the projects in my portfolio: -->
+<!---->
+<!-- [BERT, Encoders and Linear Models for Resume Text Classification]()   -->
+<!-- Exploring performance of advanced NLP techniques on topic modeling, text classification and document similarity. -->
+<!-- 11 Jun 2024 • GitHub • Jupyter • Article -->
+<!---->
+<!-- [Airline On-Time Performance across 80 Years EDA]()   -->
+<!-- An analysis of airline peformance from 2 million flights spanning 80 years. -->
+<!-- 30 Apr 2024 • GitHub • Jupyter • Article -->
+<!---->
+<!-- [Raspberry-LLM - Making My Raspberry Pico a Little Smarter]()   -->
+<!-- Generating Dr. Seuss headlines, fake WSJ quotes, HackerNews troll comments, and more. -->
+<!-- 16 Apr 2024 • GitHub • Jupyter • Article -->
+
+:::
+::: {.g-col-12 .g-col-lg-3}
+
+{{< include _sidebar.qmd >}}
+
+:::
+
+:::
