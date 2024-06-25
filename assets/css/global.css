@@ -19,7 +19,7 @@ p a {
     }
 }
 
-img {
+img.img-fluid {
   border-radius: 8px;
 }
 
@@ -82,17 +82,3 @@ main ul {
   padding-left: 1.5rem;
 }
 
-pre {
-  border-radius: 0;
-}
-
-pre.sourceCode {
-  border-left: 0.25rem;
-  border-left-style: solid;
-  padding: 1.5rem;
-  border-right: none;
-  border-top: none;
-  border-bottom: none;
-  font-size: 0.85rem;
-  overflow: visible !important;
-}

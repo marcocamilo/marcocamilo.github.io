@@ -2,7 +2,6 @@
 title: Airline On-Time EDA
 subtitle: Exploring Airline Performance from 2 Million Flights across 40 Years
 description: Explore a data-driven journey into predicting and mitigating customer churn with this project on predictive analytics. Leveraging a Random Forest Classifier, discover insights that empower businesses to proactively retain customers and enhance overall satisfaction.
-featured: 2
 image: "![](https://i.dailymail.co.uk/i/pix/2013/05/02/article-2318173-19957F94000005DC-90_964x639.jpg)"
 category: Exploratory Data Analysis
 type: EDA
@@ -256,7 +255,6 @@ df[time_cols]
 </table>
 
 <p>1958948 rows × 4 columns</p>
-</div>
 
 Now, all values are in a valid `datetime` format, and in a continuous
 range of values. Moreover, all 0 values are now uniformely represented
@@ -288,21 +286,6 @@ to see if there is any pattern that could help us fill them.
 df[df[time_cols].isna().any(axis=1)][dep_cols + arr_cols].sample(10)
 ```
 
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -476,8 +459,6 @@ df[df[time_cols].isna().any(axis=1)][dep_cols + arr_cols].sample(10)
 </tbody>
 </table>
 
-</div>
-
 From the rows sample we can see that flights with CRS missing time
 values all have the rest of their departure and arrival information.
 Although we can see from the above value counts that delay variables
@@ -567,22 +548,6 @@ for time_col in time_cols[2:]:
 display(df[['OriginState'] + time_cols[:2] + ['DestState'] + time_cols[2:]].head())
 ```
 
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header" style="text-align: right;">
@@ -644,8 +609,6 @@ display(df[['OriginState'] + time_cols[:2] + ['DestState'] + time_cols[2:]].head
 </tbody>
 </table>
 
-</div>
-
 Now that all times have their corresponding time zones, we can
 accurately calculate the dates for all time variables. We assume that
 the `FlightDate` only applies to the scheduled flight departure.
@@ -706,21 +669,6 @@ display(negative_arr[['OriginState'] + time_cols[:2] + ['DestState'] + time_cols
     There are 0 negative CRSArrTime values: 0.00%
     There are 10307 negative ArrTime values: 0.53%
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header" style="text-align: right;">
@@ -736,22 +684,6 @@ display(negative_arr[['OriginState'] + time_cols[:2] + ['DestState'] + time_cols
 <tbody>
 </tbody>
 </table>
-
-</div>
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -870,8 +802,6 @@ display(negative_arr[['OriginState'] + time_cols[:2] + ['DestState'] + time_cols
 
 <p>10307 rows × 6 columns</p>
 
-</div>
-
 ![](https://www.nationsonline.org/maps/US-timezones-map.jpg)
 
 There seem to be a few flights with arrival times earlier than their
@@ -923,21 +853,6 @@ arr_cols.insert(4, "ArrDelayBinary")
 df[dep_cols + arr_cols].head()
 ```
 
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -1048,8 +963,6 @@ df[dep_cols + arr_cols].head()
 </tbody>
 </table>
 
-</div>
-
 ### Data Cleaning: Changing Data Types
 
 A minor detail we mentioned above is that the numerical variables
@@ -1063,21 +976,6 @@ df[dep_cols[2:] + arr_cols[2:]] = df[dep_cols[2:] + arr_cols[2:]].astype('int')
 df[dep_cols[2:] + arr_cols[2:]].sample(5)
 ```
 
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -1164,8 +1062,6 @@ df[dep_cols[2:] + arr_cols[2:]].sample(5)
 </tbody>
 </table>
 
-</div>
-
 ## Departure and Arrival Variables (updated)
 
 So far, we have explore missing value correlations among departure and
@@ -1239,21 +1135,6 @@ univariate_preview(df, dep_cols[2:] + arr_cols[2:])
 
 
     'Data Preview'
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -1340,24 +1221,7 @@ univariate_preview(df, dep_cols[2:] + arr_cols[2:])
 </tbody>
 </table>
 
-</div>
-
     'Value Counts'
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -1454,24 +1318,7 @@ univariate_preview(df, dep_cols[2:] + arr_cols[2:])
 </tbody>
 </table>
 
-</div>
-
     'Summary Stats'
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -1597,8 +1444,6 @@ univariate_preview(df, dep_cols[2:] + arr_cols[2:])
 </tbody>
 </table>
 
-</div>
-
 The value counts above show several insights about the delay variables.
 `DepDelay` and `ArrDelay` have the highest number of unique values,
 since they are continuous variables that include negative values
@@ -1715,21 +1560,6 @@ univariate_preview(df, sum_cols)
 
     'Data Preview'
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header" style="text-align: right;">
@@ -1785,24 +1615,8 @@ univariate_preview(df, sum_cols)
 </tbody>
 </table>
 
-</div>
-
     'Value Counts'
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -1859,24 +1673,8 @@ univariate_preview(df, sum_cols)
 </tbody>
 </table>
 
-</div>
-
     'Summary Stats'
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -1956,8 +1754,6 @@ univariate_preview(df, sum_cols)
 </tr>
 </tbody>
 </table>
-
-</div>
 
 The value counts shows us that most variables except for `DistanceGroup`
 are numerical variables, thus exhibiting a high number of unique values.
@@ -2062,21 +1858,6 @@ display(df.groupby(['Origin', 'Dest'])['Distance'].max().reset_index().sort_valu
 
     Number of flights greater than 3Q (969): 488141 or 25.05%
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header" style="text-align: right;">
@@ -2150,8 +1931,6 @@ display(df.groupby(['Origin', 'Dest'])['Distance'].max().reset_index().sort_valu
 </tbody>
 </table>
 
-</div>
-
 As suspected, long distances are mostly flights to or from Hawaii. The
 aggregation above shows that the top 10 longest flights are all to or
 from Hawaii, with the longest flight being between Honolulu (HNL) and
@@ -2168,21 +1947,6 @@ long_flights_not_hawaii = long_flights.query("~OriginStateName.str.contains('Haw
 display(long_flights_not_hawaii.groupby(['Origin', 'Dest'])['Distance'].max().drop_duplicates().reset_index().sort_values(by='Distance', ascending=False).head(10))
 ```
 
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -2257,8 +2021,6 @@ display(long_flights_not_hawaii.groupby(['Origin', 'Dest'])['Distance'].max().dr
 </tbody>
 </table>
 
-</div>
-
 As we can see, the longest flights not involving Hawaii are mostly
 flights betwen Alaska (ANC) and east cost cities like Atlanta (ATL),
 Philadelphia (PHL), Newark (EWR) and Chicago (IAH). Interestingly, the
@@ -2276,20 +2038,6 @@ display(long_flights_not_hawaii_alaska.groupby(['Origin', 'Dest'])['Distance'].m
 ```
 
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -2364,8 +2112,6 @@ display(long_flights_not_hawaii_alaska.groupby(['Origin', 'Dest'])['Distance'].m
 </tbody>
 </table>
 
-</div>
-
 ### Data Cleaning: Negative Time Values
 
 In this section, we will explore the issue of negative time values in
@@ -2390,21 +2136,6 @@ display(negative_times.query("AirTime < 0").sample(5))
     Number of negative values in `ActualElapsedTime`: 0
     Number of negative values in `AirTime`: 27
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header" style="text-align: right;">
@@ -2423,21 +2154,6 @@ display(negative_times.query("AirTime < 0").sample(5))
 </tbody>
 </table>
 
-</div>
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -2512,8 +2228,6 @@ display(negative_times.query("AirTime < 0").sample(5))
 </tbody>
 </table>
 
-</div>
-
 The filtered data shows that the number of negative values in these
 columns is extremely small (\<0.01% of the dataset). It is not clear
 from the sample data how are the values for `AirTime` calculated, since
@@ -2565,21 +2279,6 @@ for time_col in time_cols:
 display(df[time_cols + ['OriginState', 'DestState', 'CRSDepTime_UTC', 'DepTime_UTC', 'CRSArrTime_UTC', 'ArrTime_UTC']].head())
 ```
 
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -2666,8 +2365,6 @@ display(df[time_cols + ['OriginState', 'DestState', 'CRSDepTime_UTC', 'DepTime_U
 </tbody>
 </table>
 
-</div>
-
 Now with the time variables in UTC, we can accurately calculate the
 actual elapsed time for the flights. We will recreate the
 `CRSElapsedTime` and `ActualElapsedTime` with the difference between the
@@ -2685,20 +2382,6 @@ display(df[sum_cols].head())
 ```
 
 
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 
 <table class="dataframe" data-quarto-postprocess="true" data-border="1">
 <thead>
@@ -2748,8 +2431,6 @@ display(df[sum_cols].head())
 </tr>
 </tbody>
 </table>
-
-</div>
 
 ### Value Counts (updated)
 

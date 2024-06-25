@@ -1,0 +1,136 @@
+---
+title: Airline On-Time EDA
+subtitle: Exploring Airline Performance from 2 Million Flights across 30 Years
+description: Explore a data-driven journey into predicting and mitigating customer churn with this project on predictive analytics. Leveraging a Random Forest Classifier, discover insights that empower businesses to proactively retain customers and enhance overall satisfaction.
+featured: 2
+image: "![](https://i.dailymail.co.uk/i/pix/2013/05/02/article-2318173-19957F94000005DC-90_964x639.jpg)"
+category: Exploratory Data Analysis
+type: EDA
+skills:
+    - Pandas
+    - NumPy
+    - Matplotlib
+    - Seaborn
+    - Dashboarding
+---
+
+{{< meta image >}}
+
+## Executive Summary
+
+This project analyzes on-time performance trends from 30 years of US domestic flight data, focusing on variations across carriers, routes, airports, and time. The goal is to conduct a comprehensive exploratory data analysis (EDA) to address key industry questions, such as identifying carriers and airports with the highest frequency of flight delays, understanding the impact of departure delays on arrival times, and examining trends in flight delays within the US aviation sector. The findings from the EDA will be translated into an interactive visualization dashboard using Streamlit.
+
+## Dataset
+
+The [Airline Reporting Carrier On-Time Performance Dataset](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FGJ), sourced from the U.S. Department of Transportation's Bureau of Transportation Statistics, contains scheduled and actual departure and arrival times reported by certified U.S. air carriers between 1987 and 2020. The version used in this project, available at [IBM Developer](https://developer.ibm.com/exchanges/data/all/airline/)^[The dataset is available in three sizes: the original dataset of 194,385,636 flights, a 2 million sample version and a 2 thousand sample of flights from LAX to JFK airport. All three versions are available as gzip compressed tar or csv files.], contains a 2 million record sample of the full dataset (<1%).
+
+Key features reported by carriers include scheduled and actual event times, flight dates, carrier, origin and destination information, cancelation and diversion information, as well as summary statistics such as elapsed time, distance and delay causes. A full description of the variables in the dataset can be found [here](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FGJ). Below is a summary of the main variable grouppings.
+
+<details>
+  <summary>Feature glossary</summary>
+
+- **Temporal variables**: `Year`, `Quarter`, `Month`, `DayofMonth`, `DayOfWeek`, `FlightDate`
+- **Flight variables**: `Reporting_Airline`, `Tail_Number`, `Flight_Number_Reporting_Airline`
+- **Origin/Destination variables**: 
+-   `OriginAirportID`, `Origin`, `OriginCityName`, `OriginState`, `OriginStateName`,   
+-   `DestAirportID`, `Dest`, `DestCityName`, `DestState`, `DestStateName`  
+- **Departure/Arrival time variables**: 
+-   `CRSDepTime`, `DepTime`, `DepDelay`, `DepDelayMinutes`, `DepDel15`, `DepartureDelayGroups`  
+-   `CRSArrTime`, `ArrTime`, `ArrDelay`, `ArrDelayMinutes`, `ArrDel15`, `ArrivalDelayGroups`  
+- **Taxi variables**: `TaxiOut`, `WheelsOff`, `WheelsOn`, `TaxiIn`
+- **Cancellation variables**: `Cancelled`, `CancellationCode`, `Diverted`
+- **Flight summary variables**: `CRSElapsedTime`, `ActualElapsedTime`, `AirTime`, `Flights`, `Distance`, `DistanceGroup`
+- **Cause of Delay (Data starts 6/2003)**: `CarrierDelay`, `WeatherDelay`, `NASDelay`, `SecurityDelay`, `LateAircraftDelay`
+
+</details>
+
+## Preprocessing and Feature Engineering
+
+The strategy for preprocessing interleaves *univariate analysis* with *data cleaning and feature engineering* for each variable group, utilizing the former to contextualize preprocessing decisions in the latter. For this project, this approach encompases three major aspects: conducting a general univariate analysis, preprocessing flight info variables, and (re)engineering time variables.
+
+### Univariate Analysis
+
+For each variable group, I conducted a univariate analysis to understand the distribution, spread, and missing values of the variables using two custom functions:
+
+<details class="list">
+  <summary>`df_overview` prints the shape, sample head and tail, and non-null counts.</summary>
+```python
+def df_overview(df):
+    print(f"Shape: {df.shape}\n")
+    print(f"Head and tail preview:")
+    display(df)
+    print(f"Df info:")
+    print(df.info(verbose=True), "\n")
+    print("-"*70)
+```
+</details>
+
+<details class="list">
+<summary>`univariate_preview` provides a compact report with the first five rows, data types, unique values, top 5 values, null value percentage, and summary statistics for continuous variables.</summary>
+
+```python
+def univariate_preview(df, cols, describe=True):
+    display("Data Preview")
+    display(df[cols].head())
+    
+    display("Value Counts")
+    list = []
+    for col in cols:
+        list.append(
+            [col,
+            df[col].dtypes,
+            df[col].nunique(),
+            df[col].value_counts().iloc[:5].index.tolist(),
+            "{:.2f}%".format(df[col].isna().mean()*100)]
+            )
+    display(pd.DataFrame(list, 
+                         columns = ['columns', 'dtypes', 'nunique', 'top5', 'na%']
+                         ).sort_values('nunique', ascending=False))
+    
+    if describe:
+        display("Summary Stats")
+        display(pd.concat([
+            df[cols].describe(),
+            df[cols].skew().to_frame('skewness').T,
+            df[cols].kurtosis().to_frame('kurtosis').T,
+        ]))
+```
+
+</details>
+
+Additionally, I visualized missing values using the `missingno` package^[The `missingno` package offers visualization options such as heatmaps, bar charts, and dendrograms to identify patterns and distributions of missing data.], while certain distributions and value counts I visualized using `matplotlib` and `seaborn`.
+
+### Preprocessing Flight Info Variables
+
+The first half of all preprocessing focused on the flight information variables, including date, flight, origin/destination, and departure/arrival variables. Based on the findings of each univariate analysis, I performed the following preprocessing steps:
+
+- **Data Cleaning**
+  - **`FlightDate` to `datetime64[ns]`**: allowed to perform date operations, aggregations, and visualizations.
+  - **Filling Missing State and State Names**: imputed missing state and state name values to reduce missing data.
+  - **Standardizing City Names**: standardized city names to ensure uniformity and remove single occurrences.
+  - **Dropping Taxi, Cancelled, and Diverted Variables**: removed variables due to high occurrence of missing values.
+- **Feature Engineering**
+  - **Airline Names**: used an airlines dataset to map the airline codes to their respective airline names to provide more readable and insightful information.
+  - **Unique Flight Identifier**: explored creating a unique flight identifier by combining carrier code and flight number, to reduce ambiguity and identify unique flights more easily.
+
+### (Re)Engineering Time Variables
+
+The second phase of preprocessing addresses a critical issue found in the dataset's handling of time-related variables, particularly concerning flight delays. The delay variables were calculated from the raw timestamps, without accounting for time zone discrepancies, daylight savings time, and cross-midnight flights. This required developing an approach to impute time zone information, correct timestamps, and recompute delays accurately.
+
+To address these issues, I implemented the following steps:
+
+1. **Imputing Time Zone Information**: assigned time zones to all timestamps using a dictionary of airport codes and their respective time zones sourced from two datasets.
+2. **Reverse Engineering Arrival Dates**: converted all times to UTC (Coordinated Universal Time), recalculated timestamps based on flight departure dates and time differences, and reconverted times to local time zones.
+3. **Filter Remaining Negative Delays**: removed the remaining negative delays after the reverse engineering process to ensure accurate delay calculations.
+4. **Delay Calculation**: calculated delays based on the difference between scheduled and actual departure and arrival times, accounting for time zone differences and daylight savings time.
+
+In addition to this, I also performed the following data cleaning and feature engineering steps:
+
+- **Data Cleaning**:
+  - **Standardizing 0s, 2400s, and missing values**: converted 0s to Nan values and 2400s to 0s for consistency in time representation.
+  - **Filling Missing CRS Values**: imputed missing values in the CRS (Scheduled) times from the difference between actual times and delay minutes.
+  - **Changing Data Types**: converted data types where necessary to improve computational efficiency.
+- **Feature Engineering**:
+  - **Datetime Conversion**: created UTC versions of time variables for time calculations such as elapsed time.
+  - **Time Recalculations**: using the time zone marked timestamps, recalculated delays and elapsed times more accurately than the original dataset.
+

@@ -47,7 +47,7 @@ The project primarily makes use of the [Resume Dataset](https://www.kaggle.com/d
 
 ## Preprocessing
 
-Data preprocessing primarily involved text preprocessing, as well as data rebalancing for the categories in the resume dataset. 
+Data preprocessing primarily involved two tasks: text preprocessing and data rebalancing.
 
 For text cleaning, I used a custom `preprocessing` function that streamlines multiple text cleaning and preprocessing operations. The function is highly flexible, offering tunable parameters to adapt the preprocessing pipeline to include key operations such as lowercase conversion, HTML decoding, email and URL removal, special character removal, contraction expansion, custom regex cleaning, as well as tokenization, stemming, lemmatization, and stopwords removal. 
 
