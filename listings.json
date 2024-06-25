@@ -2,7 +2,7 @@
   {
     "listing": "/portfolio.html",
     "items": [
-      "/projects/airline.html",
+      "/projects/airline-performance.html",
       "/projects/resume-analyzer.html",
       "/projects/biodiversity.html"
     ]
@@ -11,7 +11,7 @@
     "listing": "/index.html",
     "items": [
       "/projects/resume-analyzer.html",
-      "/projects/airline.html",
+      "/projects/airline-performance.html",
       "/projects/biodiversity.html"
     ]
   }

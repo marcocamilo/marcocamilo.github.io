@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Explore a data-driven journey into predicting and mitigating customer churn with this project on predictive analytics. Leveraging a Random Forest Classifier, discover insights that empower businesses to proactively retain customers and enhance overall satisfaction.">
 
-<title>Portfolio – marcocamilo</title>
+<title>Airline On-Time EDA – marcocamilo</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,29 +21,61 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -70,78 +103,20 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-portfolio-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-description','listing-image',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-file-modified-sort'] },{ data: ['listing-reading-time-sort'] },{ data: ['listing-word-count-sort'] }],
-      
-      searchColumns: ["listing-project","listing-website","listing-format","listing-reference-location","listing-citation-location","listing-language","listing-execute","listing-toc","listing-toc-depth","listing-title","listing-subtitle","listing-description","listing-featured","listing-image","listing-category","listing-type","listing-skills","listing-path","listing-outputHref","listing-author","listing-filename","listing-file-modified","listing-reading-time","listing-word-count"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-portfolio-listing'] = new List('listing-portfolio-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<link rel="stylesheet" href="assets/css/global.css">
+<link rel="stylesheet" href="../assets/css/global.css">
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">marcocamilo</span>
     </a>
   </div>
@@ -152,15 +127,15 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html"> 
+    <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./portfolio.html" aria-current="page"> 
+    <a class="nav-link" href="../portfolio.html"> 
 <span class="menu-text">Portfolio</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
 </ul>
@@ -175,16 +150,36 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#executive-summary" id="toc-executive-summary" class="nav-link active" data-scroll-target="#executive-summary">Executive Summary</a></li>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset">Dataset</a></li>
+  <li><a href="#preprocessing-and-feature-engineering" id="toc-preprocessing-and-feature-engineering" class="nav-link" data-scroll-target="#preprocessing-and-feature-engineering">Preprocessing and Feature Engineering</a>
+  <ul>
+  <li><a href="#univariate-analysis" id="toc-univariate-analysis" class="nav-link" data-scroll-target="#univariate-analysis">Univariate Analysis</a></li>
+  <li><a href="#preprocessing-flight-info-variables" id="toc-preprocessing-flight-info-variables" class="nav-link" data-scroll-target="#preprocessing-flight-info-variables">Preprocessing Flight Info Variables</a></li>
+  <li><a href="#reengineering-time-variables" id="toc-reengineering-time-variables" class="nav-link" data-scroll-target="#reengineering-time-variables">(Re)Engineering Time Variables</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content page-columns page-full" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Portfolio</h1>
-<p class="subtitle lead">A collection of projects in NLP, machine learning and data science</p>
+<h1 class="title">Airline On-Time EDA</h1>
+<p class="subtitle lead">Exploring Airline Performance from 2 Million Flights across 30 Years</p>
 </div>
 
+<div>
+  <div class="description">
+    Explore a data-driven journey into predicting and mitigating customer churn with this project on predictive analytics. Leveraging a Random Forest Classifier, discover insights that empower businesses to proactively retain customers and enhance overall satisfaction.
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -199,118 +194,135 @@ window.Quarto = {
 </header>
 
 
-<div class="grid">
-<div class="g-col-12 g-col-lg-9">
-<div id="listing-portfolio-listing" class="quarto-listing quarto-listing-container-custom">
-<h3 class="anchored">
-NLP
-</h3>
-<ul class="list-unstyled">
-<li>
-<a href="./projects/resume-analyzer.html">
-<h4 class="anchored">
-BERT, Encoders and Linear Models for Resume Text Classification
-</h4>
-</a>
-<div class="badges-container">
-<p>
-<img src="https://img.shields.io/badge/Deep Learning-B31212" alt="Deep Learning">
-</p>
-<p><img src="https://img.shields.io/badge/pytorch-white?logo=pytorch" alt="PyTorch"></p>
-<p><img src="https://img.shields.io/badge/tensorflow-white?logo=tensorflow" alt="Tensorflow"></p>
-<p><img src="https://img.shields.io/badge/HuggingFace-white?logo=huggingface&amp;logoColor=yellow" alt="HuggingFace"></p>
-<p><img src="https://img.shields.io/badge/Scikit--Learn-white?logo=scikit-learn" alt="Scikit-Learn"></p>
-<p><img src="https://img.shields.io/badge/Sentence--Transformers-white?logo=moleculer" alt="SBERT"></p>
-<p><img src="https://img.shields.io/badge/gensim-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI%2FPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI%2BCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMjAwLjAwMDAwMHB0IiBoZWlnaHQ9IjIwMC4wMDAwMDBwdCIgdmlld0JveD0iMCAwIDIwMC4wMDAwMDAgMjAwLjAwMDAwMCIKIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiPgoKPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsMjAwLjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIKZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJub25lIj4KPHBhdGggZD0iTTg3MCAxOTkwIGMtNDA4IC01NyAtNzMzIC0zNDggLTgzNyAtNzQ5IC0zMSAtMTE4IC0zNSAtMzIyIC0xMCAtNDM2CjU0IC0yNDMgMTg3IC00NTMgMzc3IC01OTcgODQgLTY0IDI0MyAtMTQyIDM0NSAtMTcwIDY4IC0xOSAxMDYgLTIyIDI1NSAtMjIKMjAwIDAgMjY2IDEzIDQxNCA4MiAxMTUgNTQgMTk4IDExMiAyODcgMjAxIDEyNCAxMjUgMjE2IDI4MiAyNjAgNDQ2IDMzIDEyMgozOCAzNTAgMTAgNDY3IC00OSAyMDUgLTEzOCAzNjUgLTI4MiA1MDMgLTEzOSAxMzIgLTI3MCAyMDYgLTQ0NiAyNTEgLTEwOCAyNwotMjczIDM4IC0zNzMgMjR6IG0zNzUgLTYxIGMyOTcgLTc1IDU2MCAtMzIwIDY2MSAtNjE2IDU5IC0xNzQgNjIgLTI4MCAxMgotNDMzIC03MiAtMjIyIC0yNDIgLTQxMSAtNDU1IC01MDUgLTE0OSAtNjcgLTM2OSAtODUgLTUyOSAtNDUgLTkzIDIzIC0yNzEKMTA3IC0yNTcgMTIxIDYgNiAyNSAzIDQ5IC03IDUxIC0yMSAxODYgLTMwIDI1MyAtMTUgMTU3IDM0IDI4NyAxNTAgMzQxIDMwNgoyOCA4MSAyNyAyMTQgLTEgMjk3IC03MyAyMTYgLTI5MCAzNDggLTUxMSAzMTAgLTE1NSAtMjcgLTI3NCAtMTE2IC0zNDQgLTI1OAotMzUgLTcwIC0zOSAtODYgLTQyIC0xNzQgLTMgLTcyIDAgLTExMyAxMyAtMTU2IDIwIC02OCAyMCAtNjcgNyAtNzIgLTE1IC01Ci04OSAxNTUgLTExMyAyNDMgLTMwIDExMiAtMzAgMjk3IDAgNDEwIDg0IDMxNSAzMjQgNTQ0IDY0MSA2MTEgNzggMTYgMTY1IDExCjI3NSAtMTd6Ii8%2BCjwvZz4KPC9zdmc%2BCg%3D%3D" alt="Gensim"></p>
-<p><img src="https://img.shields.io/badge/nltk-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI%2FPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI%2BCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMjc4LjAwMDAwMHB0IiBoZWlnaHQ9IjI3NS4wMDAwMDBwdCIgdmlld0JveD0iMCAwIDI3OC4wMDAwMDAgMjc1LjAwMDAwMCIKIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiPgoKPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsMjc1LjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIKZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJub25lIj4KPHBhdGggZD0iTTExODQgMjY0NSBjLTExMyAtMjAgLTI1OCAtNjggLTMyNCAtMTA3IC02NyAtNDEgLTcwIC01MiAtNzMgLTI3OApsLTIgLTE2NSAzNjggLTMgMzY3IC0yIDAgLTMwIDAgLTI5IC01NzIgLTMgLTU3MyAtMyAtNjMgLTI5IGMtMTE0IC01MyAtMTkyCi0xNjEgLTIzNCAtMzI5IC0yOCAtMTA5IC0yMiAtMzE2IDEyIC00MjIgODIgLTI1OSAyNjMgLTQyMiA0OTEgLTQ0MiBsNjUgLTYKMTggMTIyIGM0NiAzMjUgMTAwIDQyNyAyNjUgNDkzIDU0IDIyIDY2IDIzIDQxMSAyNCAzMDIgMSAzNjQgMyA0MTUgMTggODYgMjUKMTE2IDQ1IDE1MyAxMDYgNjggMTEzIDEwMiAyODYgMTAyIDUxNSAwIDM3MCAtNjMgNDg2IC0zMDAgNTU2IC02MyAxOCAtMTA1IDIyCi0yNjAgMjUgLTEyOCAyIC0yMTAgLTEgLTI2NiAtMTF6IG0tNDMgLTE2OSBjMTI1IC04NSA2NCAtMjgxIC04NyAtMjc4IC05MCAxCi0xNjQgODYgLTE0OSAxNzIgMTggMTA5IDE0NyAxNjcgMjM2IDEwNnoiLz4KPHBhdGggZD0iTTIxMTYgMTk4OCBjLTIgLTcgLTkgLTU5IC0xNSAtMTE1IC0zMCAtMjg2IC04MSAtMzk3IC0yMTIgLTQ2MiAtMTAwCi01MCAtMTQ0IC01NCAtNDQ5IC00OCAtNDQ4IDEwIC01MzEgLTEzIC02MDAgLTE2OCAtNTkgLTEzMiAtODUgLTMwNSAtNzcgLTUyNQo4IC0yNTMgNDcgLTM2NyAxNTAgLTQzNCAxMDMgLTY4IDIyOSAtOTYgNDM1IC05NiAxNDQgMCAyMzEgMTAgMzU3IDQyIDg2IDIxCjIzMiA4NSAyNTMgMTEwIDE4IDIyIDMxIDE0NCAzMiAyOTEgbDAgMTI3IC0zNzAgMCAtMzcwIDAgMCAzMCAwIDI5IDU4OCAzIDU4NwozIDUyIDI0IGM2NiAyOSAxNDEgMTA4IDE4MyAxOTAgOTggMTk1IDk1IDQ3OCAtNyA2ODkgLTQ1IDkxIC0xNTggMjEyIC0yNDAKMjU1IC05NyA1MSAtMjg4IDg2IC0yOTcgNTV6IG0tMzQ4IC0xMzc4IGMxMjggLTc4IDczIC0yODQgLTc2IC0yODQgLTE1NiAwCi0yMTMgMTk0IC04MiAyODEgNDMgMjkgMTEyIDMxIDE1OCAzeiIvPgo8L2c%2BCjwvc3ZnPgo%3D" alt="NLTK"></p>
-<p><img src="https://img.shields.io/badge/pyLDAvis-white" alt="PyLDAVis"></p>
-</div>
-<p>
-Explores the performance of advanced NLP models and vectorization techniques on topic modeling, text classification and document similarity.
-</p>
+<p><img src="https://i.dailymail.co.uk/i/pix/2013/05/02/article-2318173-19957F94000005DC-90_964x639.jpg" class="img-fluid"></p>
+<section id="executive-summary" class="level2">
+<h2 class="anchored" data-anchor-id="executive-summary">Executive Summary</h2>
+<p>This project analyzes on-time performance trends from 30 years of US domestic flight data, focusing on variations across carriers, routes, airports, and time. The goal is to conduct a comprehensive exploratory data analysis (EDA) to address key industry questions, such as identifying carriers and airports with the highest frequency of flight delays, understanding the impact of departure delays on arrival times, and examining trends in flight delays within the US aviation sector. The findings from the EDA will be translated into an interactive visualization dashboard using Streamlit.</p>
+</section>
+<section id="dataset" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="dataset">Dataset</h2>
+<p>The <a href="https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FGJ">Airline Reporting Carrier On-Time Performance Dataset</a>, sourced from the U.S. Department of Transportation’s Bureau of Transportation Statistics, contains scheduled and actual departure and arrival times reported by certified U.S. air carriers between 1987 and 2020. The version used in this project, available at <a href="https://developer.ibm.com/exchanges/data/all/airline/">IBM Developer</a><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, contains a 2 million record sample of the full dataset (&lt;1%).</p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;The dataset is available in three sizes: the original dataset of 194,385,636 flights, a 2 million sample version and a 2 thousand sample of flights from LAX to JFK airport. All three versions are available as gzip compressed tar or csv files.</p></div></div><p>Key features reported by carriers include scheduled and actual event times, flight dates, carrier, origin and destination information, cancelation and diversion information, as well as summary statistics such as elapsed time, distance and delay causes. A full description of the variables in the dataset can be found <a href="https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FGJ">here</a>. Below is a summary of the main variable grouppings.</p>
+<details>
+<summary>
+Feature glossary
+</summary>
+<ul>
+<li><strong>Temporal variables</strong>: <code>Year</code>, <code>Quarter</code>, <code>Month</code>, <code>DayofMonth</code>, <code>DayOfWeek</code>, <code>FlightDate</code></li>
+<li><strong>Flight variables</strong>: <code>Reporting_Airline</code>, <code>Tail_Number</code>, <code>Flight_Number_Reporting_Airline</code></li>
+<li><strong>Origin/Destination variables</strong>:</li>
+<li><code>OriginAirportID</code>, <code>Origin</code>, <code>OriginCityName</code>, <code>OriginState</code>, <code>OriginStateName</code>,<br>
 </li>
-</ul>
-<h3 class="anchored">
-Exploratory Data Analysis
-</h3>
-<ul class="list-unstyled">
-<li>
-<a href="./projects/airline-performance.html">
-<h4 class="anchored">
-Airline On-Time EDA
-</h4>
-</a>
-<div class="badges-container">
-<p>
-<img src="https://img.shields.io/badge/EDA-B31212" alt="EDA">
-</p>
-<p><img src="https://img.shields.io/badge/Pandas-white?logo=pandas&amp;logoColor=black" alt="Pandas"></p>
-<p><img src="https://img.shields.io/badge/NumPy-white?logo=Numpy&amp;logoColor=grey" alt="NumPy"></p>
-<p><img src="https://img.shields.io/badge/matplotlib-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiBzdHJva2U9ImdyYXkiPgo8ZyBzdHJva2Utd2lkdGg9IjIiIGZpbGw9IiNGRkYiPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSI4OCIvPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSI2NiIvPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSI0NCIvPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSIyMiIvPgo8cGF0aCBkPSJtOTAsMnYxNzZtNjItMjYtMTI0LTEyNG0xMjQsMC0xMjQsMTI0bTE1MC02MkgyIi8%2BCjwvZz48ZyBvcGFjaXR5PSIuOCI%2BCjxwYXRoIGZpbGw9IiM0NEMiIGQ9Im05MCw5MGgxOGExOCwxOCAwIDAsMCAwLTV6Ii8%2BCjxwYXRoIGZpbGw9IiNCQzMiIGQ9Im05MCw5MCAzNC00M2E1NSw1NSAwIDAsMC0xNS04eiIvPgo8cGF0aCBmaWxsPSIjRDkzIiBkPSJtOTAsOTAtMTYtNzJhNzQsNzQgMCAwLDAtMzEsMTV6Ii8%2BCjxwYXRoIGZpbGw9IiNEQjMiIGQ9Im05MCw5MC01OC0yOGE2NSw2NSAwIDAsMC01LDM5eiIvPgo8cGF0aCBmaWxsPSIjM0JCIiBkPSJtOTAsOTAtMzMsMTZhMzcsMzcgMCAwLDAgMiw1eiIvPgo8cGF0aCBmaWxsPSIjM0M5IiBkPSJtOTAsOTAtMTAsNDVhNDYsNDYgMCAwLDAgMTgsMHoiLz4KPHBhdGggZmlsbD0iI0Q3MyIgZD0ibTkwLDkwIDQ2LDU4YTc0LDc0IDAgMCwwIDEyLTEyeiIvPgo8L2c%2BPC9zdmc%2B" alt="Matplotlib"></p>
-<p><img src="https://img.shields.io/badge/seaborn-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI%2FPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI%2BCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMTg1MC4wMDAwMDBwdCIgaGVpZ2h0PSIxODUwLjAwMDAwMHB0IiB2aWV3Qm94PSIwIDAgMTg1MC4wMDAwMDAgMTg1MC4wMDAwMDAiCiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0Ij4KCjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLDE4NTAuMDAwMDAwKSBzY2FsZSgwLjEwMDAwMCwtMC4xMDAwMDApIgpmaWxsPSIjMDAwMDAwIiBzdHJva2U9Im5vbmUiPgo8cGF0aCBkPSJNODgzOSAxODQ4OSBjLTIxMDMgLTk1IC00MDk2IC04OTggLTU2OTIgLTIyOTEgLTIxMCAtMTg0IC02NjUgLTYzOQotODQ2IC04NDYgLTg2OCAtOTk3IC0xNTAyIC0yMTI5IC0xODg2IC0zMzcyIC0zODkgLTEyNjAgLTUwNSAtMjU4MyAtMzM5Ci0zOTAwIDIxOCAtMTc0MiA5NDAgLTM0MDUgMjA2MyAtNDc1NCA1NjkgLTY4NCAxMjIyIC0xMjczIDE5NTYgLTE3NjYgMTIwMwotODA2IDI1NzIgLTEzMTkgNDAwNSAtMTUwMCA0MTYgLTUyIDQ3OSAtNTUgMTE1NSAtNTUgNjg4IDAgNzQwIDMgMTE5NCA2MQoxNTY5IDIwMSAzMDg4IDgxNyA0MzUxIDE3NjYgMzg1IDI4OSA2NjIgNTI5IDEwMDUgODczIDEwMTUgMTAxNiAxNzY1IDIyMjUKMjIyMCAzNTgwIDI0MCA3MTMgMzcyIDEzNDAgNDUyIDIxNDAgMTUgMTUzIDE4IDI3NyAxOCA4MjAgMCA2NzYgLTMgNzM5IC01NQoxMTU1IC0yOTQgMjMyOSAtMTQ2MCA0NDU4IC0zMjY2IDU5NjEgLTE3NjQgMTQ2OSAtNDAzOCAyMjMzIC02MzM1IDIxMjh6IG05MzEKLTMxOSBjODI2IC01MiAxNjA5IC0yMDYgMjM3MCAtNDY1IDI0MTIgLTgyMyA0MzU2IC0yNjM0IDUzNTEgLTQ5ODMgNTY1IC0xMzMzCjc5OCAtMjgwNCA2NzQgLTQyMzkgLTE0NSAtMTY2OCAtNzUxIC0zMjU2IC0xNzUwIC00NTkyIC0yNzEgLTM2MSAtNTA3IC02MzQKLTg0MCAtOTY2IC0zMzIgLTMzMyAtNjA1IC01NjkgLTk2NiAtODQwIC0xODc5IC0xNDA2IC00MjUyIC0yMDIwIC02NTY0IC0xNjk5Ci0yNzY2IDM4NCAtNTE4MyAyMDIwIC02NTYxIDQ0NDIgLTY3NSAxMTg4IC0xMDY5IDI1MTkgLTExNTQgMzkwMiAtMTMgMjE0IC0xMwo4MDMgMCAxMDIzIDEyMyAyMDU5IDk0NSA0MDA5IDIzMjcgNTUxOSAxNDIgMTU1IDQ3MSA0ODIgNjIzIDYxOSA4OTQgODA4IDE5OTIKMTQ0NiAzMTU1IDE4MzQgNzI5IDI0MyAxNTA2IDM5NCAyMjgwIDQ0NCAxOTEgMTIgODY0IDEzIDEwNTUgMXoiLz4KPHBhdGggZD0iTTY3NTAgMTAxMTMgYy0xMDIwIC0yNCAtMjA4OCAtMjcyIC0zMzYyIC03ODIgLTQ1OCAtMTgzIC04NDkgLTM1MwotMTc0MyAtNzU4IC0zNTcgLTE2MyAtNzMxIC0zMzEgLTgzMCAtMzc1IC05OSAtNDQgLTE4MSAtODEgLTE4MiAtODIgLTMgLTMgMzEKLTIzMCA1OCAtMzgxIDEzNSAtNzgxIDM5NCAtMTU3OCA3NDYgLTIzMDAgbDU4IC0xMjAgMyA0ODggMiA0ODcgMTAwNSAwIDEwMDUKMCAwIDY5NSAwIDY5NSAxMDAwIDAgMTAwMCAwIDAgMTI1IDAgMTI1IDEwNzUgMCAxMDc1IDAgMCAtNTYwIDAgLTU2MCAxMDAwIDAKMTAwMCAwIDAgLTc3MCAwIC03NzAgMTAwNSAwIDEwMDUgMCAwIC01MzAgMCAtNTMwIDEwMDAgMCAxMDAwIDAgMCAtMjI1IDAKLTIyNSAxMDAwIDAgMTAwMCAwIDAgLTE5NyAxIC0xOTggMzIgMzYgYzE4IDIwIDg0IDk3IDE0OCAxNzAgNjI5IDcyOCAxMTM1CjE1NjcgMTQ5NCAyNDc0IDEwMSAyNTcgMjE4IDU5NCAyMTEgNjEyIC0zIDcgLTEzIDEzIC0yMSAxMyAtNTIgMCAtNzk0IDE3NwotMTEzMSAyNzAgLTY2OCAxODQgLTEzNzYgNDI1IC0yMTEwIDcxOCAtNTQ3IDIxOCAtOTY3IDQwMSAtMTk5NCA4NjcgLTEzMzMKNjA1IC0xOTEzIDg0OCAtMjUzNSAxMDYyIC0xMDk5IDM4MCAtMjA3MCA1NDkgLTMwMTUgNTI2eiIvPgo8cGF0aCBkPSJNNTY1OCA0NTU4IGwtMyAtMzIzMyA4NCAtMzggYzQ4NCAtMjE3IDExMjQgLTQyNSAxNjU5IC01NDEgbDExMiAtMjQKMCAzNTM0IDAgMzUzNCAtOTI1IDAgLTkyNSAwIC0yIC0zMjMyeiIvPgo8cGF0aCBkPSJNMzY1MCA1MDY1IGwwIC0yNDc0IDExMyAtOTIgYzQ2NCAtMzgxIDEwNTUgLTc2MyAxNjE2IC0xMDQ0IGwxMzEKLTY1IDAgMzA3NSAwIDMwNzUgLTkzMCAwIC05MzAgMCAwIC0yNDc1eiIvPgo8cGF0aCBkPSJNNzY2MCAzNjgxIGwwIC0yOTg5IDY2IC0xMSBjMjYzIC00NiA1NzQgLTg2IDg2OSAtMTExIDcyIC03IDMwOSAtMTQKNTI4IC0xNyBsMzk3IC02IDAgMzA2MiAwIDMwNjEgLTkzMCAwIC05MzAgMCAwIC0yOTg5eiIvPgo8cGF0aCBkPSJNMTY0OCA1NTg4IGwtMyAtNTUzIDI5IC01NSBjNjEgLTExMiAyMTMgLTM2MSAzMzEgLTU0MCAzNjcgLTU1NiA4MjIKLTEwOTUgMTI5NSAtMTUzNiAxMDAgLTkzIDE4OCAtMTczIDE5NiAtMTc3IDEyIC03IDE0IDIyOSAxNCAxNzAzIGwwIDE3MTAKLTkzMCAwIC05MzAgMCAtMiAtNTUyeiIvPgo8cGF0aCBkPSJNOTY2MCAyODQwIGwwIC0yMjgwIDY4IDAgYzk0IDAgMzgxIDI2IDYxOCA1NSAzNDQgNDMgNjQ0IDk5IDk4NyAxODIKbDE4NyA0NiAwIDIxMzggMCAyMTM5IC05MzAgMCAtOTMwIDAgMCAtMjI4MHoiLz4KPHBhdGggZD0iTTExNjcwIDI0NzUgYzAgLTg3MiA0IC0xNTg1IDggLTE1ODUgNDEgMCA1NzIgMTgyIDgxNyAyODAgMjkxIDExNgo3MzAgMzI0IDk1NSA0NTIgbDc1IDQzIC0zIDExOTggLTIgMTE5NyAtOTI1IDAgLTkyNSAwIDAgLTE1ODV6Ii8%2BCjxwYXRoIGQ9Ik0xMzY3MCAyNjg0IGwwIC05MzYgNDggMjggYzUyOSAzMDcgMTEzNCA3NzMgMTYyNCAxMjUzIGwxODggMTgzIDAKMjA0IDAgMjA0IC05MzAgMCAtOTMwIDAgMCAtOTM2eiIvPgo8L2c%2BCjwvc3ZnPgo%3D" alt="Seaborn"></p>
-<p><img src="https://img.shields.io/badge/Dashboarding-white" alt="Dashboarding"></p>
-</div>
-<p>
-Explore a data-driven journey into predicting and mitigating customer churn with this project on predictive analytics. Leveraging a Random Forest Classifier, discover insights that empower businesses to proactively retain customers and enhance overall satisfaction.
-</p>
+<li><code>DestAirportID</code>, <code>Dest</code>, <code>DestCityName</code>, <code>DestState</code>, <code>DestStateName</code><br>
 </li>
-<li>
-<a href="./projects/biodiversity.html">
-<h4 class="anchored">
-Biodiversity, Endangerement and Conversation in Data from National Parks Service
-</h4>
-</a>
-<div class="badges-container">
-<p>
-<img src="https://img.shields.io/badge/Data Analysis-B31212" alt="Data Analysis">
-</p>
-<p><img src="https://img.shields.io/badge/Pandas-white?logo=pandas&amp;logoColor=black" alt="Pandas"></p>
-<p><img src="https://img.shields.io/badge/NumPy-white?logo=Numpy&amp;logoColor=grey" alt="NumPy"></p>
-<p><img src="https://img.shields.io/badge/matplotlib-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiBzdHJva2U9ImdyYXkiPgo8ZyBzdHJva2Utd2lkdGg9IjIiIGZpbGw9IiNGRkYiPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSI4OCIvPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSI2NiIvPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSI0NCIvPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSIyMiIvPgo8cGF0aCBkPSJtOTAsMnYxNzZtNjItMjYtMTI0LTEyNG0xMjQsMC0xMjQsMTI0bTE1MC02MkgyIi8%2BCjwvZz48ZyBvcGFjaXR5PSIuOCI%2BCjxwYXRoIGZpbGw9IiM0NEMiIGQ9Im05MCw5MGgxOGExOCwxOCAwIDAsMCAwLTV6Ii8%2BCjxwYXRoIGZpbGw9IiNCQzMiIGQ9Im05MCw5MCAzNC00M2E1NSw1NSAwIDAsMC0xNS04eiIvPgo8cGF0aCBmaWxsPSIjRDkzIiBkPSJtOTAsOTAtMTYtNzJhNzQsNzQgMCAwLDAtMzEsMTV6Ii8%2BCjxwYXRoIGZpbGw9IiNEQjMiIGQ9Im05MCw5MC01OC0yOGE2NSw2NSAwIDAsMC01LDM5eiIvPgo8cGF0aCBmaWxsPSIjM0JCIiBkPSJtOTAsOTAtMzMsMTZhMzcsMzcgMCAwLDAgMiw1eiIvPgo8cGF0aCBmaWxsPSIjM0M5IiBkPSJtOTAsOTAtMTAsNDVhNDYsNDYgMCAwLDAgMTgsMHoiLz4KPHBhdGggZmlsbD0iI0Q3MyIgZD0ibTkwLDkwIDQ2LDU4YTc0LDc0IDAgMCwwIDEyLTEyeiIvPgo8L2c%2BPC9zdmc%2B" alt="Matplotlib"></p>
-<p><img src="https://img.shields.io/badge/seaborn-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI%2FPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI%2BCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMTg1MC4wMDAwMDBwdCIgaGVpZ2h0PSIxODUwLjAwMDAwMHB0IiB2aWV3Qm94PSIwIDAgMTg1MC4wMDAwMDAgMTg1MC4wMDAwMDAiCiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0Ij4KCjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLDE4NTAuMDAwMDAwKSBzY2FsZSgwLjEwMDAwMCwtMC4xMDAwMDApIgpmaWxsPSIjMDAwMDAwIiBzdHJva2U9Im5vbmUiPgo8cGF0aCBkPSJNODgzOSAxODQ4OSBjLTIxMDMgLTk1IC00MDk2IC04OTggLTU2OTIgLTIyOTEgLTIxMCAtMTg0IC02NjUgLTYzOQotODQ2IC04NDYgLTg2OCAtOTk3IC0xNTAyIC0yMTI5IC0xODg2IC0zMzcyIC0zODkgLTEyNjAgLTUwNSAtMjU4MyAtMzM5Ci0zOTAwIDIxOCAtMTc0MiA5NDAgLTM0MDUgMjA2MyAtNDc1NCA1NjkgLTY4NCAxMjIyIC0xMjczIDE5NTYgLTE3NjYgMTIwMwotODA2IDI1NzIgLTEzMTkgNDAwNSAtMTUwMCA0MTYgLTUyIDQ3OSAtNTUgMTE1NSAtNTUgNjg4IDAgNzQwIDMgMTE5NCA2MQoxNTY5IDIwMSAzMDg4IDgxNyA0MzUxIDE3NjYgMzg1IDI4OSA2NjIgNTI5IDEwMDUgODczIDEwMTUgMTAxNiAxNzY1IDIyMjUKMjIyMCAzNTgwIDI0MCA3MTMgMzcyIDEzNDAgNDUyIDIxNDAgMTUgMTUzIDE4IDI3NyAxOCA4MjAgMCA2NzYgLTMgNzM5IC01NQoxMTU1IC0yOTQgMjMyOSAtMTQ2MCA0NDU4IC0zMjY2IDU5NjEgLTE3NjQgMTQ2OSAtNDAzOCAyMjMzIC02MzM1IDIxMjh6IG05MzEKLTMxOSBjODI2IC01MiAxNjA5IC0yMDYgMjM3MCAtNDY1IDI0MTIgLTgyMyA0MzU2IC0yNjM0IDUzNTEgLTQ5ODMgNTY1IC0xMzMzCjc5OCAtMjgwNCA2NzQgLTQyMzkgLTE0NSAtMTY2OCAtNzUxIC0zMjU2IC0xNzUwIC00NTkyIC0yNzEgLTM2MSAtNTA3IC02MzQKLTg0MCAtOTY2IC0zMzIgLTMzMyAtNjA1IC01NjkgLTk2NiAtODQwIC0xODc5IC0xNDA2IC00MjUyIC0yMDIwIC02NTY0IC0xNjk5Ci0yNzY2IDM4NCAtNTE4MyAyMDIwIC02NTYxIDQ0NDIgLTY3NSAxMTg4IC0xMDY5IDI1MTkgLTExNTQgMzkwMiAtMTMgMjE0IC0xMwo4MDMgMCAxMDIzIDEyMyAyMDU5IDk0NSA0MDA5IDIzMjcgNTUxOSAxNDIgMTU1IDQ3MSA0ODIgNjIzIDYxOSA4OTQgODA4IDE5OTIKMTQ0NiAzMTU1IDE4MzQgNzI5IDI0MyAxNTA2IDM5NCAyMjgwIDQ0NCAxOTEgMTIgODY0IDEzIDEwNTUgMXoiLz4KPHBhdGggZD0iTTY3NTAgMTAxMTMgYy0xMDIwIC0yNCAtMjA4OCAtMjcyIC0zMzYyIC03ODIgLTQ1OCAtMTgzIC04NDkgLTM1MwotMTc0MyAtNzU4IC0zNTcgLTE2MyAtNzMxIC0zMzEgLTgzMCAtMzc1IC05OSAtNDQgLTE4MSAtODEgLTE4MiAtODIgLTMgLTMgMzEKLTIzMCA1OCAtMzgxIDEzNSAtNzgxIDM5NCAtMTU3OCA3NDYgLTIzMDAgbDU4IC0xMjAgMyA0ODggMiA0ODcgMTAwNSAwIDEwMDUKMCAwIDY5NSAwIDY5NSAxMDAwIDAgMTAwMCAwIDAgMTI1IDAgMTI1IDEwNzUgMCAxMDc1IDAgMCAtNTYwIDAgLTU2MCAxMDAwIDAKMTAwMCAwIDAgLTc3MCAwIC03NzAgMTAwNSAwIDEwMDUgMCAwIC01MzAgMCAtNTMwIDEwMDAgMCAxMDAwIDAgMCAtMjI1IDAKLTIyNSAxMDAwIDAgMTAwMCAwIDAgLTE5NyAxIC0xOTggMzIgMzYgYzE4IDIwIDg0IDk3IDE0OCAxNzAgNjI5IDcyOCAxMTM1CjE1NjcgMTQ5NCAyNDc0IDEwMSAyNTcgMjE4IDU5NCAyMTEgNjEyIC0zIDcgLTEzIDEzIC0yMSAxMyAtNTIgMCAtNzk0IDE3NwotMTEzMSAyNzAgLTY2OCAxODQgLTEzNzYgNDI1IC0yMTEwIDcxOCAtNTQ3IDIxOCAtOTY3IDQwMSAtMTk5NCA4NjcgLTEzMzMKNjA1IC0xOTEzIDg0OCAtMjUzNSAxMDYyIC0xMDk5IDM4MCAtMjA3MCA1NDkgLTMwMTUgNTI2eiIvPgo8cGF0aCBkPSJNNTY1OCA0NTU4IGwtMyAtMzIzMyA4NCAtMzggYzQ4NCAtMjE3IDExMjQgLTQyNSAxNjU5IC01NDEgbDExMiAtMjQKMCAzNTM0IDAgMzUzNCAtOTI1IDAgLTkyNSAwIC0yIC0zMjMyeiIvPgo8cGF0aCBkPSJNMzY1MCA1MDY1IGwwIC0yNDc0IDExMyAtOTIgYzQ2NCAtMzgxIDEwNTUgLTc2MyAxNjE2IC0xMDQ0IGwxMzEKLTY1IDAgMzA3NSAwIDMwNzUgLTkzMCAwIC05MzAgMCAwIC0yNDc1eiIvPgo8cGF0aCBkPSJNNzY2MCAzNjgxIGwwIC0yOTg5IDY2IC0xMSBjMjYzIC00NiA1NzQgLTg2IDg2OSAtMTExIDcyIC03IDMwOSAtMTQKNTI4IC0xNyBsMzk3IC02IDAgMzA2MiAwIDMwNjEgLTkzMCAwIC05MzAgMCAwIC0yOTg5eiIvPgo8cGF0aCBkPSJNMTY0OCA1NTg4IGwtMyAtNTUzIDI5IC01NSBjNjEgLTExMiAyMTMgLTM2MSAzMzEgLTU0MCAzNjcgLTU1NiA4MjIKLTEwOTUgMTI5NSAtMTUzNiAxMDAgLTkzIDE4OCAtMTczIDE5NiAtMTc3IDEyIC03IDE0IDIyOSAxNCAxNzAzIGwwIDE3MTAKLTkzMCAwIC05MzAgMCAtMiAtNTUyeiIvPgo8cGF0aCBkPSJNOTY2MCAyODQwIGwwIC0yMjgwIDY4IDAgYzk0IDAgMzgxIDI2IDYxOCA1NSAzNDQgNDMgNjQ0IDk5IDk4NyAxODIKbDE4NyA0NiAwIDIxMzggMCAyMTM5IC05MzAgMCAtOTMwIDAgMCAtMjI4MHoiLz4KPHBhdGggZD0iTTExNjcwIDI0NzUgYzAgLTg3MiA0IC0xNTg1IDggLTE1ODUgNDEgMCA1NzIgMTgyIDgxNyAyODAgMjkxIDExNgo3MzAgMzI0IDk1NSA0NTIgbDc1IDQzIC0zIDExOTggLTIgMTE5NyAtOTI1IDAgLTkyNSAwIDAgLTE1ODV6Ii8%2BCjxwYXRoIGQ9Ik0xMzY3MCAyNjg0IGwwIC05MzYgNDggMjggYzUyOSAzMDcgMTEzNCA3NzMgMTYyNCAxMjUzIGwxODggMTgzIDAKMjA0IDAgMjA0IC05MzAgMCAtOTMwIDAgMCAtOTM2eiIvPgo8L2c%2BCjwvc3ZnPgo%3D" alt="Seaborn"></p>
-</div>
-<p>
-Embark on a captivating exploration of biodiversity with this data science project, delving into the conservation statuses of endangered species across national parks. Through meticulous analysis, uncover profound insights into the distribution of endangered species, their likelihood of endangerment, and the most frequently spotted species in each park, illuminating the intricate dynamics of wildlife preservation and ecological sustainability.
-</p>
+<li><strong>Departure/Arrival time variables</strong>:</li>
+<li><code>CRSDepTime</code>, <code>DepTime</code>, <code>DepDelay</code>, <code>DepDelayMinutes</code>, <code>DepDel15</code>, <code>DepartureDelayGroups</code><br>
 </li>
+<li><code>CRSArrTime</code>, <code>ArrTime</code>, <code>ArrDelay</code>, <code>ArrDelayMinutes</code>, <code>ArrDel15</code>, <code>ArrivalDelayGroups</code><br>
+</li>
+<li><strong>Taxi variables</strong>: <code>TaxiOut</code>, <code>WheelsOff</code>, <code>WheelsOn</code>, <code>TaxiIn</code></li>
+<li><strong>Cancellation variables</strong>: <code>Cancelled</code>, <code>CancellationCode</code>, <code>Diverted</code></li>
+<li><strong>Flight summary variables</strong>: <code>CRSElapsedTime</code>, <code>ActualElapsedTime</code>, <code>AirTime</code>, <code>Flights</code>, <code>Distance</code>, <code>DistanceGroup</code></li>
+<li><strong>Cause of Delay (Data starts 6/2003)</strong>: <code>CarrierDelay</code>, <code>WeatherDelay</code>, <code>NASDelay</code>, <code>SecurityDelay</code>, <code>LateAircraftDelay</code></li>
 </ul>
-<h3 class="anchored">
-Machine Learning
-</h3>
-<ul class="list-unstyled">
+</details>
+</section>
+<section id="preprocessing-and-feature-engineering" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="preprocessing-and-feature-engineering">Preprocessing and Feature Engineering</h2>
+<p>The strategy for preprocessing interleaves <em>univariate analysis</em> with <em>data cleaning and feature engineering</em> for each variable group, utilizing the former to contextualize preprocessing decisions in the latter. For this project, this approach encompases three major aspects: conducting a general univariate analysis, preprocessing flight info variables, and (re)engineering time variables.</p>
+<section id="univariate-analysis" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="univariate-analysis">Univariate Analysis</h3>
+<p>For each variable group, I conducted a univariate analysis to understand the distribution, spread, and missing values of the variables using two custom functions:</p>
+<details class="list">
+<summary>
+<code>df_overview</code> prints the shape, sample head and tail, and non-null counts.
+</summary>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> df_overview(df):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Shape: </span><span class="sc">{</span>df<span class="sc">.</span>shape<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Head and tail preview:"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    display(df)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Df info:"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(df.info(verbose<span class="op">=</span><span class="va">True</span>), <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"-"</span><span class="op">*</span><span class="dv">70</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<details class="list">
+<summary>
+<code>univariate_preview</code> provides a compact report with the first five rows, data types, unique values, top 5 values, null value percentage, and summary statistics for continuous variables.
+</summary>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> univariate_preview(df, cols, describe<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    display(<span class="st">"Data Preview"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    display(df[cols].head())</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    display(<span class="st">"Value Counts"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">list</span> <span class="op">=</span> []</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> col <span class="kw">in</span> cols:</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">list</span>.append(</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>            [col,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>            df[col].dtypes,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            df[col].nunique(),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>            df[col].value_counts().iloc[:<span class="dv">5</span>].index.tolist(),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"</span><span class="sc">{:.2f}</span><span class="st">%"</span>.<span class="bu">format</span>(df[col].isna().mean()<span class="op">*</span><span class="dv">100</span>)]</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    display(pd.DataFrame(<span class="bu">list</span>, </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                         columns <span class="op">=</span> [<span class="st">'columns'</span>, <span class="st">'dtypes'</span>, <span class="st">'nunique'</span>, <span class="st">'top5'</span>, <span class="st">'na%'</span>]</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                         ).sort_values(<span class="st">'nunique'</span>, ascending<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> describe:</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        display(<span class="st">"Summary Stats"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        display(pd.concat([</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>            df[cols].describe(),</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>            df[cols].skew().to_frame(<span class="st">'skewness'</span>).T,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>            df[cols].kurtosis().to_frame(<span class="st">'kurtosis'</span>).T,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        ]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<p>Additionally, I visualized missing values using the <code>missingno</code> package<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, while certain distributions and value counts I visualized using <code>matplotlib</code> and <code>seaborn</code>.</p>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;The <code>missingno</code> package offers visualization options such as heatmaps, bar charts, and dendrograms to identify patterns and distributions of missing data.</p></div></div></section>
+<section id="preprocessing-flight-info-variables" class="level3">
+<h3 class="anchored" data-anchor-id="preprocessing-flight-info-variables">Preprocessing Flight Info Variables</h3>
+<p>The first half of all preprocessing focused on the flight information variables, including date, flight, origin/destination, and departure/arrival variables. Based on the findings of each univariate analysis, I performed the following preprocessing steps:</p>
+<ul>
+<li><strong>Data Cleaning</strong>
+<ul>
+<li><strong><code>FlightDate</code> to <code>datetime64[ns]</code></strong>: allowed to perform date operations, aggregations, and visualizations.</li>
+<li><strong>Filling Missing State and State Names</strong>: imputed missing state and state name values to reduce missing data.</li>
+<li><strong>Standardizing City Names</strong>: standardized city names to ensure uniformity and remove single occurrences.</li>
+<li><strong>Dropping Taxi, Cancelled, and Diverted Variables</strong>: removed variables due to high occurrence of missing values.</li>
+</ul></li>
+<li><strong>Feature Engineering</strong>
+<ul>
+<li><strong>Airline Names</strong>: used an airlines dataset to map the airline codes to their respective airline names to provide more readable and insightful information.</li>
+<li><strong>Unique Flight Identifier</strong>: explored creating a unique flight identifier by combining carrier code and flight number, to reduce ambiguity and identify unique flights more easily.</li>
+</ul></li>
 </ul>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div>
-</div>
-<div class="g-col-12 g-col-lg-3">
-<div class="profile-sidebar">
-<div>
-<img class="profile" src="./assets/img/profile.png">
-</div>
-<p><strong>I am Marco Camilo,</strong><br>
-an NLP Data Scientist &amp;<br>
-Computational Linguist.</p>
-<div class="about-links">
-<div>
-<a href="https://linkedin.com/in/marcocamilo" class="about-link" rel="" target=""> <i class="bi bi-linkedin"></i> <span class="about-link-text">LinkedIn</span> </a>
-</div>
-<div>
-<a href="https://twitter.com/_marcocamilo" class="about-link" rel="" target=""> <i class="bi bi-twitter"></i> <span class="about-link-text">Twitter</span> </a>
-</div>
-<div>
-<a href="https://github.com/marcocamilo" class="about-link" rel="" target=""> <i class="bi bi-github"></i> <span class="about-link-text">Github</span> </a>
-</div>
-<div>
-<a href="mailto:{{site.email}}" class="about-link" rel="" target=""> <i class="bi bi-envelope-fill"></i> <span class="about-link-text">Email</span> </a>
-</div>
-</div>
-</div>
-</div>
-</div>
+</section>
+<section id="reengineering-time-variables" class="level3">
+<h3 class="anchored" data-anchor-id="reengineering-time-variables">(Re)Engineering Time Variables</h3>
+<p>The second phase of preprocessing addresses a critical issue found in the dataset’s handling of time-related variables, particularly concerning flight delays. The delay variables were calculated from the raw timestamps, without accounting for time zone discrepancies, daylight savings time, and cross-midnight flights. This required developing an approach to impute time zone information, correct timestamps, and recompute delays accurately.</p>
+<p>To address these issues, I implemented the following steps:</p>
+<ol type="1">
+<li><strong>Imputing Time Zone Information</strong>: assigned time zones to all timestamps using a dictionary of airport codes and their respective time zones sourced from two datasets.</li>
+<li><strong>Reverse Engineering Arrival Dates</strong>: converted all times to UTC (Coordinated Universal Time), recalculated timestamps based on flight departure dates and time differences, and reconverted times to local time zones.</li>
+<li><strong>Filter Remaining Negative Delays</strong>: removed the remaining negative delays after the reverse engineering process to ensure accurate delay calculations.</li>
+<li><strong>Delay Calculation</strong>: calculated delays based on the difference between scheduled and actual departure and arrival times, accounting for time zone differences and daylight savings time.</li>
+</ol>
+<p>In addition to this, I also performed the following data cleaning and feature engineering steps:</p>
+<ul>
+<li><strong>Data Cleaning</strong>:
+<ul>
+<li><strong>Standardizing 0s, 2400s, and missing values</strong>: converted 0s to Nan values and 2400s to 0s for consistency in time representation.</li>
+<li><strong>Filling Missing CRS Values</strong>: imputed missing values in the CRS (Scheduled) times from the difference between actual times and delay minutes.</li>
+<li><strong>Changing Data Types</strong>: converted data types where necessary to improve computational efficiency.</li>
+</ul></li>
+<li><strong>Feature Engineering</strong>:
+<ul>
+<li><strong>Datetime Conversion</strong>: created UTC versions of time variables for time calculations such as elapsed time.</li>
+<li><strong>Time Recalculations</strong>: using the time zone marked timestamps, recalculated delays and elapsed times more accurately than the original dataset.</li>
+</ul></li>
+</ul>
 
 
+</section>
+</section>
 
 
 </main> <!-- /main -->
