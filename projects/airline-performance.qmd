@@ -262,9 +262,21 @@ This analysis uses a more accurate metric: the normalized delay frequency. This 
 
 The normalized delay counts shown in the bar plots now provide a more accurate comparison of on-time performance between airlines. According to the data, the airline with the highest proportion of delays at departure is JetBlue Airways, followed by ExpressJet Airlines, Frontier Airlines, Allegiant Air, and Spirit Airlines. On the other hand, the airline with the highest proportion of delays at arrival is Piedmont Airlines, followed Ukraine International Airlines, JetBlue Airways, ExpressJet Airlines, Conair and Frontier Airlines.
 
-#### How do delays vary by route?
+#### How do delays vary by route and airport?
 
-#### How do delays vary by airport?
+Both questions involve an analysis on the frequency of delays utilizing the same metric: flight paths. By visualizing the routes with the highest delays and observing patterns of flight path convergence, we can achieve two key insights:
 
+1. **Routes with Highest Delays**: given by the frequency of delays across a given route.
+2. **Airports with Highest Delays**: given by the convergens of high-delay routes at specific airports.
 
+To tackle this question, I will visualize the routes with the highest departure and arrival delays, respectively, using X. I first aggregated the dataset by flight routes and normalize the total departure and arrival delays by the total number of flights for each route, to provide a more robust metric. I then mapped the routes onto two visualizations: one for departure delays and another for arrival delays. The resulting visualiations are shown below:
 
+:::{.column-page-right}
+<iframe src="_dep-delay-airports.html" width="100%" height="600px"></iframe>
+<figcaption>Departure Delays by Airport (click legend to toggle groups)</figcaption>
+:::
+
+:::{.column-page-right}
+<iframe src="_arr-delay-airports.html" width="100%" height="600px"></iframe>
+<figcaption>Arrival Delays by Airport (click legend to toggle groups)</figcaption>
+:::
