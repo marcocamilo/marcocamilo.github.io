@@ -30,6 +30,7 @@ format:
     #   dark: cyborg
     # css: /assets/css/global.css
     toc: false
+    lightbox: true
     
     # code blocks
     highlight-style: github

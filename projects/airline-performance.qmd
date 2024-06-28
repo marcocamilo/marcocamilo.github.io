@@ -138,7 +138,7 @@ In addition to this, I also performed the following data cleaning and feature en
 
 ## Exploratory Data Analysis
 
-The Exploratory Data Analysis in this project was carried in two modalities: a methodical univariate analysis of each variable during preprocessing and a targeted bivariate and multivariate analysis focused on answering the research questions of the project. I framed the questions around five distinct themes: 
+The Exploratory Data Analysis in this project was carried in two modalities: a methodical univariate analysis of each variable during preprocessing and a targeted bivariate and multivariate analysis focused on answering the research questions of the project^[Most questions in this bivariate analysis adopt a longitudinal perspective, comparing the frequency of delays with different variables across the entire span of the dataset. This approach provides a historical view of delays within the US aviation sector. However, further insights lie within a cross-sectional analysis, which compares the frequency of delays across different variables at specific points in time. This would be more suitable for a multivariate analysis, which I leave for future work.]. I framed the questions around five distinct themes: 
 
 1. **Longitudinal**: How do delays vary across time?
 2. **Corporate**: How do delays vary across carriers? (distribution and longitudinal)
@@ -154,7 +154,7 @@ The univariate analysis revealed several key insights about the dataset:
 
 <details class="list">
 <summary>**Date columns**: The flights span 34 years, with the distribution slightly shifted left (2005), indicating growth in the airline industry in the last 15 years. Other columns such as months, days, and weekdays, show an even distribution.</summary>
-  ![](/assets/projects/airline/date_cols.png)
+  ![](/assets/projects/airline/date_cols.png){.lightbox}
 </details>
 
 <details class="list">
@@ -164,22 +164,22 @@ The univariate analysis revealed several key insights about the dataset:
 
 <details class="list">
   <summary>**Origin/Destination columns**: Flights originate and land in all 50 US states and five overseas territories, including Puerto Rico, US Virgin Islands, and Guam. The top destinations in the dataset are California (CA), Texas (TX), Florida (FL), Illinois (IL), Georgia (GA), and New York (NY).</summary>
-  ![](/assets/projects/airline/state-count.png)
+  ![](/assets/projects/airline/state-count.png){.lightbox}
 </details>
 
 <details class="list">
   <summary>**Time Variables**: Departures are more frequent in the morning hours, while arrivals peak in the evening. The distribution of CRS and actual time variables for departures and arrivals are almost identical, indicating that the average size of flight delays is small across the dataset.</summary>
-  ![](/assets/projects/airline/time-distribution.png)
+  ![](/assets/projects/airline/time-distribution.png){.lightbox}
 </details>
 
 <details class="list">
   <summary>**Delay Variables**: Approximately 80% of flights operate on-time, while around 20% experience delays (as by the industry-defined standard of exceeding 15 minutes). The distribution shows a right skew, with over 40% of flights arriving early by less than 15 minutes and about 30% arriving exactly on time. Out of all delayed flights, most fall within the 15 to 40-minute range.</summary>
-![](/assets/projects/airline/delay-cols.png)
+![](/assets/projects/airline/delay-cols.png){.lightbox}
 </details>
 
 <details class="list">
   <summary>**Flight Summary Variables**: Flights typically cover distances under 1000 miles, with a right-skewed distribution observed in the data. The majority of flights have durations under around 160 minutes or 2 hours and 40 minutes, as indicated by the right-skewed distributions of the elapsed time variables.</summary>
-![](/assets/projects/airline/flight-summary-cols.png)
+  ![](/assets/projects/airline/flight-summary-cols.png){.lightbox}
 </details>
 
 <!-- <details class="list"> -->
