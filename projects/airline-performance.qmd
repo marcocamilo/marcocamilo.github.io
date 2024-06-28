@@ -257,8 +257,9 @@ This is one of the most frequently asked questions in the airline industry, as i
 
 This analysis uses a more accurate metric: the normalized delay frequency. This metric adjusts the delay counts by the total number of flights per carrier^[An alternative approach would be to normalize the counts by the age of the carrier. However, this would require data mapping each carrier to its age in the industry, which at the time of writing this report, was not available for the carriers in this dataset.]. This approach provides a more accurate representation of delay frequency, as it accounts for variations in flight volume and carrier age. Below are the plots of the normalized delay frequencies across carriers.
 
-![](/assets/projects/airline/departure-delays-carrier.png)
-![](/assets/projects/airline/arrival-delays-carrier.png)
+<!-- ![](/assets/projects/airline/departure-delays-carrier.png) -->
+<!-- ![](/assets/projects/airline/arrival-delays-carrier.png) -->
+![](/assets/projects/airline/carrier-delays.png)
 
 The normalized delay counts shown in the bar plots now provide a more accurate comparison of on-time performance between airlines. According to the data, the airline with the highest proportion of delays at departure is JetBlue Airways, followed by ExpressJet Airlines, Frontier Airlines, Allegiant Air, and Spirit Airlines. On the other hand, the airline with the highest proportion of delays at arrival is Piedmont Airlines, followed Ukraine International Airlines, JetBlue Airways, ExpressJet Airlines, Conair and Frontier Airlines.
 
@@ -272,11 +273,12 @@ Both questions involve an analysis on the frequency of delays utilizing the same
 To tackle this question, I will visualize the routes with the highest departure and arrival delays, respectively, using X. I first aggregated the dataset by flight routes and normalize the total departure and arrival delays by the total number of flights for each route, to provide a more robust metric. I then mapped the routes onto two visualizations: one for departure delays and another for arrival delays. The resulting visualiations are shown below:
 
 :::{.column-page-right}
+<p class="text-center mb-0">Departure Delays by Airport (click legend to toggle groups)</p>
 <iframe src="_dep-delay-airports.html" width="100%" height="600px"></iframe>
-<figcaption>Departure Delays by Airport (click legend to toggle groups)</figcaption>
 :::
 
 :::{.column-page-right}
+<p class="text-center mb-0">Arrival Delays by Airport (click legend to toggle groups)</p>
 <iframe src="_arr-delay-airports.html" width="100%" height="600px"></iframe>
-<figcaption>Arrival Delays by Airport (click legend to toggle groups)</figcaption>
 :::
+
