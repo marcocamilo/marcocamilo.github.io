@@ -183,7 +183,7 @@ window.Quarto = {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
@@ -484,7 +484,9 @@ Feature glossary
 <li><strong>Carrier Age</strong>: Older carriers have more historical data, which can also skew the results.</li>
 </ol>
 <p>This analysis uses a more accurate metric: the normalized delay frequency. This metric adjusts the delay counts by the total number of flights per carrier<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>. This approach provides a more accurate representation of delay frequency, as it accounts for variations in flight volume and carrier age. Below are the plots of the normalized delay frequencies across carriers.</p>
-<div class="no-row-height column-margin column-container"><div id="fn6"><p><sup>6</sup>&nbsp;An alternative approach would be to normalize the counts by the age of the carrier. However, this would require data mapping each carrier to its age in the industry, which at the time of writing this report, was not available for the carriers in this dataset.</p></div></div><p><img src="../assets/projects/airline/departure-delays-carrier.png" class="img-fluid"> <img src="../assets/projects/airline/arrival-delays-carrier.png" class="img-fluid"></p>
+<!-- ![](/assets/projects/airline/departure-delays-carrier.png) -->
+<!-- ![](/assets/projects/airline/arrival-delays-carrier.png) -->
+<div class="no-row-height column-margin column-container"><div id="fn6"><p><sup>6</sup>&nbsp;An alternative approach would be to normalize the counts by the age of the carrier. However, this would require data mapping each carrier to its age in the industry, which at the time of writing this report, was not available for the carriers in this dataset.</p></div></div><p><a href="../assets/projects/airline/carrier-delays.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="../assets/projects/airline/carrier-delays.png" class="img-fluid"></a></p>
 <p>The normalized delay counts shown in the bar plots now provide a more accurate comparison of on-time performance between airlines. According to the data, the airline with the highest proportion of delays at departure is JetBlue Airways, followed by ExpressJet Airlines, Frontier Airlines, Allegiant Air, and Spirit Airlines. On the other hand, the airline with the highest proportion of delays at arrival is Piedmont Airlines, followed Ukraine International Airlines, JetBlue Airways, ExpressJet Airlines, Conair and Frontier Airlines.</p>
 </section>
 <section id="how-do-delays-vary-by-route-and-airport" class="level4 page-columns page-full">
@@ -496,18 +498,18 @@ Feature glossary
 </ol>
 <p>To tackle this question, I will visualize the routes with the highest departure and arrival delays, respectively, using X. I first aggregated the dataset by flight routes and normalize the total departure and arrival delays by the total number of flights for each route, to provide a more robust metric. I then mapped the routes onto two visualizations: one for departure delays and another for arrival delays. The resulting visualiations are shown below:</p>
 <div class="column-page-right">
+<p class="text-center mb-0">
+Departure Delays by Airport (click legend to toggle groups)
+</p>
 <iframe src="_dep-delay-airports.html" width="100%" height="600px">
 </iframe>
-<figcaption>
-Departure Delays by Airport (click legend to toggle groups)
-</figcaption>
 </div>
 <div class="column-page-right">
+<p class="text-center mb-0">
+Arrival Delays by Airport (click legend to toggle groups)
+</p>
 <iframe src="_arr-delay-airports.html" width="100%" height="600px">
 </iframe>
-<figcaption>
-Arrival Delays by Airport (click legend to toggle groups)
-</figcaption>
 </div>
 
 
@@ -1095,7 +1097,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
-<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","loop":false,"selector":".lightbox","descPosition":"bottom","openEffect":"zoom"});
+<script>var lightboxQuarto = GLightbox({"selector":".lightbox","loop":false,"closeEffect":"zoom","descPosition":"bottom","openEffect":"zoom"});
 (function() {
   let previousOnload = window.onload;
   window.onload = () => {
