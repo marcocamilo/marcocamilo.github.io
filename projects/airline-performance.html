@@ -200,8 +200,7 @@ window.Quarto = {
   <li><a href="#how-do-delays-vary-across-time" id="toc-how-do-delays-vary-across-time" class="nav-link" data-scroll-target="#how-do-delays-vary-across-time">How do delays vary across time?</a></li>
   <li><a href="#are-departures-delays-correlated-with-arrival-delays" id="toc-are-departures-delays-correlated-with-arrival-delays" class="nav-link" data-scroll-target="#are-departures-delays-correlated-with-arrival-delays">Are departures delays correlated with arrival delays?</a></li>
   <li><a href="#how-do-delays-vary-across-carriers" id="toc-how-do-delays-vary-across-carriers" class="nav-link" data-scroll-target="#how-do-delays-vary-across-carriers">How do delays vary across carriers?</a></li>
-  <li><a href="#how-do-delays-vary-by-route" id="toc-how-do-delays-vary-by-route" class="nav-link" data-scroll-target="#how-do-delays-vary-by-route">How do delays vary by route?</a></li>
-  <li><a href="#how-do-delays-vary-by-airport" id="toc-how-do-delays-vary-by-airport" class="nav-link" data-scroll-target="#how-do-delays-vary-by-airport">How do delays vary by airport?</a></li>
+  <li><a href="#how-do-delays-vary-by-route-and-airport" id="toc-how-do-delays-vary-by-route-and-airport" class="nav-link" data-scroll-target="#how-do-delays-vary-by-route-and-airport">How do delays vary by route and airport?</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -485,11 +484,28 @@ Feature glossary
 <div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;An alternative approach would be to normalize the counts by the age of the carrier. However, this would require data mapping each carrier to its age in the industry, which at the time of writing this report, was not available for the carriers in this dataset.</p></div></div><p><img src="../assets/projects/airline/departure-delays-carrier.png" class="img-fluid"> <img src="../assets/projects/airline/arrival-delays-carrier.png" class="img-fluid"></p>
 <p>The normalized delay counts shown in the bar plots now provide a more accurate comparison of on-time performance between airlines. According to the data, the airline with the highest proportion of delays at departure is JetBlue Airways, followed by ExpressJet Airlines, Frontier Airlines, Allegiant Air, and Spirit Airlines. On the other hand, the airline with the highest proportion of delays at arrival is Piedmont Airlines, followed Ukraine International Airlines, JetBlue Airways, ExpressJet Airlines, Conair and Frontier Airlines.</p>
 </section>
-<section id="how-do-delays-vary-by-route" class="level4">
-<h4 class="anchored" data-anchor-id="how-do-delays-vary-by-route">How do delays vary by route?</h4>
-</section>
-<section id="how-do-delays-vary-by-airport" class="level4">
-<h4 class="anchored" data-anchor-id="how-do-delays-vary-by-airport">How do delays vary by airport?</h4>
+<section id="how-do-delays-vary-by-route-and-airport" class="level4 page-columns page-full">
+<h4 class="anchored" data-anchor-id="how-do-delays-vary-by-route-and-airport">How do delays vary by route and airport?</h4>
+<p>Both questions involve an analysis on the frequency of delays utilizing the same metric: flight paths. By visualizing the routes with the highest delays and observing patterns of flight path convergence, we can achieve two key insights:</p>
+<ol type="1">
+<li><strong>Routes with Highest Delays</strong>: given by the frequency of delays across a given route.</li>
+<li><strong>Airports with Highest Delays</strong>: given by the convergens of high-delay routes at specific airports.</li>
+</ol>
+<p>To tackle this question, I will visualize the routes with the highest departure and arrival delays, respectively, using X. I first aggregated the dataset by flight routes and normalize the total departure and arrival delays by the total number of flights for each route, to provide a more robust metric. I then mapped the routes onto two visualizations: one for departure delays and another for arrival delays. The resulting visualiations are shown below:</p>
+<div class="column-page-right">
+<iframe src="_dep-delay-airports.html" width="100%" height="600px">
+</iframe>
+<figcaption>
+Departure Delays by Airport (click legend to toggle groups)
+</figcaption>
+</div>
+<div class="column-page-right">
+<iframe src="_arr-delay-airports.html" width="100%" height="600px">
+</iframe>
+<figcaption>
+Arrival Delays by Airport (click legend to toggle groups)
+</figcaption>
+</div>
 
 
 </section>
