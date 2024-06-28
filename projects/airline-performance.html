@@ -76,6 +76,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -234,7 +237,7 @@ window.Quarto = {
 </header>
 
 
-<p><img src="https://i.dailymail.co.uk/i/pix/2013/05/02/article-2318173-19957F94000005DC-90_964x639.jpg" class="img-fluid"></p>
+<p><a href="https://i.dailymail.co.uk/i/pix/2013/05/02/article-2318173-19957F94000005DC-90_964x639.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://i.dailymail.co.uk/i/pix/2013/05/02/article-2318173-19957F94000005DC-90_964x639.jpg" class="img-fluid"></a></p>
 <section id="executive-summary" class="level2">
 <h2 class="anchored" data-anchor-id="executive-summary">Executive Summary</h2>
 <p>This project analyzes on-time performance trends from 30 years of US domestic flight data, focusing on variations across carriers, routes, airports, and time. The goal is to conduct a comprehensive exploratory data analysis (EDA) to address key industry questions, such as identifying carriers and airports with the highest frequency of flight delays, understanding the impact of departure delays on arrival times, and examining trends in flight delays within the US aviation sector. The findings from the EDA will be translated into an interactive visualization dashboard using Streamlit.</p>
@@ -364,8 +367,8 @@ Feature glossary
 </section>
 <section id="exploratory-data-analysis" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h2>
-<p>The Exploratory Data Analysis in this project was carried in two modalities: a methodical univariate analysis of each variable during preprocessing and a targeted bivariate and multivariate analysis focused on answering the research questions of the project. I framed the questions around five distinct themes:</p>
-<ol type="1">
+<p>The Exploratory Data Analysis in this project was carried in two modalities: a methodical univariate analysis of each variable during preprocessing and a targeted bivariate and multivariate analysis focused on answering the research questions of the project<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. I framed the questions around five distinct themes:</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;Most questions in this bivariate analysis adopt a longitudinal perspective, comparing the frequency of delays with different variables across the entire span of the dataset. This approach provides a historical view of delays within the US aviation sector. However, further insights lie within a cross-sectional analysis, which compares the frequency of delays across different variables at specific points in time. This would be more suitable for a multivariate analysis, which I leave for future work.</p></div></div><ol type="1">
 <li><strong>Longitudinal</strong>: How do delays vary across time?</li>
 <li><strong>Corporate</strong>: How do delays vary across carriers? (distribution and longitudinal)</li>
 <li><strong>Directional</strong>: How do delays vary by route?</li>
@@ -380,7 +383,7 @@ Feature glossary
 <summary>
 <strong>Date columns</strong>: The flights span 34 years, with the distribution slightly shifted left (2005), indicating growth in the airline industry in the last 15 years. Other columns such as months, days, and weekdays, show an even distribution.
 </summary>
-<img src="../assets/projects/airline/date_cols.png" class="img-fluid">
+<a href="../assets/projects/airline/date_cols.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="../assets/projects/airline/date_cols.png" class="img-fluid"></a>
 </details>
 <details class="list">
 <summary>
@@ -392,25 +395,25 @@ Feature glossary
 <summary>
 <strong>Origin/Destination columns</strong>: Flights originate and land in all 50 US states and five overseas territories, including Puerto Rico, US Virgin Islands, and Guam. The top destinations in the dataset are California (CA), Texas (TX), Florida (FL), Illinois (IL), Georgia (GA), and New York (NY).
 </summary>
-<img src="../assets/projects/airline/state-count.png" class="img-fluid">
+<a href="../assets/projects/airline/state-count.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="../assets/projects/airline/state-count.png" class="img-fluid"></a>
 </details>
 <details class="list">
 <summary>
 <strong>Time Variables</strong>: Departures are more frequent in the morning hours, while arrivals peak in the evening. The distribution of CRS and actual time variables for departures and arrivals are almost identical, indicating that the average size of flight delays is small across the dataset.
 </summary>
-<img src="../assets/projects/airline/time-distribution.png" class="img-fluid">
+<a href="../assets/projects/airline/time-distribution.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="../assets/projects/airline/time-distribution.png" class="img-fluid"></a>
 </details>
 <details class="list">
 <summary>
 <strong>Delay Variables</strong>: Approximately 80% of flights operate on-time, while around 20% experience delays (as by the industry-defined standard of exceeding 15 minutes). The distribution shows a right skew, with over 40% of flights arriving early by less than 15 minutes and about 30% arriving exactly on time. Out of all delayed flights, most fall within the 15 to 40-minute range.
 </summary>
-<img src="../assets/projects/airline/delay-cols.png" class="img-fluid">
+<a href="../assets/projects/airline/delay-cols.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="../assets/projects/airline/delay-cols.png" class="img-fluid"></a>
 </details>
 <details class="list">
 <summary>
 <strong>Flight Summary Variables</strong>: Flights typically cover distances under 1000 miles, with a right-skewed distribution observed in the data. The majority of flights have durations under around 160 minutes or 2 hours and 40 minutes, as indicated by the right-skewed distributions of the elapsed time variables.
 </summary>
-<img src="../assets/projects/airline/flight-summary-cols.png" class="img-fluid">
+<a href="../assets/projects/airline/flight-summary-cols.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="../assets/projects/airline/flight-summary-cols.png" class="img-fluid"></a>
 </details>
 <!-- <details class="list"> -->
 <!-- <summary>**Delay Summary Variables**: The amount of delays across all causes show a right-skewed distribution, with most factors causing delays of less than 200 minutes. The highest recorded delay values approach approximately 1600 minutes, with SecurityDelay showing the smallest maximum delay of 219 minutes.</summary> -->
@@ -423,13 +426,13 @@ Feature glossary
 <p>This question involves a longitudinal analysis of the evolution of delayed flights over 34 years. It compares the continuous variable “number of delayed flights” with the categorical time variable, examining both departure and arrival delays</p>
 <p>To answer this question, I first defined the time step by which to evaluate the evolution of delays. I chose to aggregate the data by month-year date, which provides a balance between granularity, interpretability and computational efficiency. Next, I decided on the metric to evaluate delays. Although the raw sum of delays is intuitive, normalizing the counts by the total flights per month offers a more accurate representation of delay frequency, as it adjusts for variations in monthly flight numbers.</p>
 <p>With these definitions, I began by plotting the evolution in the number of delayed flights per month over the years, as shown in the figure below.</p>
-<p><img src="../assets/projects/airline/evolution-mean-delays.png" class="img-fluid"></p>
+<p><a href="../assets/projects/airline/evolution-mean-delays.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="../assets/projects/airline/evolution-mean-delays.png" class="img-fluid"></a></p>
 <p>The normalized plots above reveal several insights about the evolution of delays from a cross-sectional and longitudinal perspective:</p>
 <ul>
 <li><strong>Cross-sectional observations</strong>:
 <ul>
 <li>The line plot reveals periodic fluctuations in both departure and arrival delays, reflecting seasonal changes in delays within each year.</li>
-<li>A noticeable drop in delays occurs between approximately 2001 and 2003, potentially influenced by external economic factors<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</li>
+<li>A noticeable drop in delays occurs between approximately 2001 and 2003, potentially influenced by external economic factors<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>.</li>
 </ul></li>
 <li><strong>Longitudinal observations</strong>:
 <ul>
@@ -437,14 +440,14 @@ Feature glossary
 <li>The line plot demonstrates a reduction in the volatility of delays over the years, suggesting a slight stabilization in the frequency of delays.</li>
 </ul></li>
 </ul>
-<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;One potential cause for this temporary drop in delays is the contraction in the airline industry that followed 9/11, reducing the amount of delays together with the number of flights (see <a href="https://www.businessinsider.com/how-the-us-airline-industry-has-changed-since-911-2011-9?op=1">this article</a>)</p></div></div><p>This narrowing gap and reduction in delay volatility would have suggested an improvement in airline on-time performance, if it were not for the fact that the reduction is cause by an increase in departure delays rather than a decrease in arrival delays. The regression analysis demonstrates this: arrival delays have decreased only by 1%, while departure delays have risen by over 5% in the span of 30 years. This confirms that airlines have been unable to improve on-time performance at arrivals and have become less efficient in managing departure delays.</p>
+<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;One potential cause for this temporary drop in delays is the contraction in the airline industry that followed 9/11, reducing the amount of delays together with the number of flights (see <a href="https://www.businessinsider.com/how-the-us-airline-industry-has-changed-since-911-2011-9?op=1">this article</a>)</p></div></div><p>This narrowing gap and reduction in delay volatility would have suggested an improvement in airline on-time performance, if it were not for the fact that the reduction is cause by an increase in departure delays rather than a decrease in arrival delays. The regression analysis demonstrates this: arrival delays have decreased only by 1%, while departure delays have risen by over 5% in the span of 30 years. This confirms that airlines have been unable to improve on-time performance at arrivals and have become less efficient in managing departure delays.</p>
 </section>
 <section id="are-departures-delays-correlated-with-arrival-delays" class="level4 page-columns page-full">
 <h4 class="anchored" data-anchor-id="are-departures-delays-correlated-with-arrival-delays">Are departures delays correlated with arrival delays?</h4>
 <p>This question is a correlation analysis examining the connection between the two continuous variables: departure and arrival delays.</p>
-<p>To answer this, I calculated the Pearson correlation coefficient between departure delays and arrival delays for delayed flights<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>. This coefficient ranges from -1 indicating a perfect negative linear relationship, 0 indicating no linear relationship, up to 1 indicating a perfect positive linear relationship. To visualize the relationship, I plot the correlation using a custom <code>jointplot</code> function, which combines a scatter plot with a box plot to show the distribution of the data across both variables. This function also computes and displays the Pearson correlation coefficient.</p>
-<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;I filtered the dataset for flights with delays greater than 15 minutes, the industry standard for defining a delayed flight. This prevents the distribution from factoring in flights that were not delayed, which account for the majority of the dataset and may skew the results.</p></div></div><p>Before plotting the jointplot, I cleaned the data by removing the remaining extreme cases, such as flights with negative delays which, due to times crossing the change to daylight savings time, were not corrected in the preprocessing. After this, I plotted the jointplot, which is shown below.</p>
-<p><img src="../assets/projects/airline/delays-correlation.png" class="img-fluid"></p>
+<p>To answer this, I calculated the Pearson correlation coefficient between departure delays and arrival delays for delayed flights<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>. This coefficient ranges from -1 indicating a perfect negative linear relationship, 0 indicating no linear relationship, up to 1 indicating a perfect positive linear relationship. To visualize the relationship, I plot the correlation using a custom <code>jointplot</code> function, which combines a scatter plot with a box plot to show the distribution of the data across both variables. This function also computes and displays the Pearson correlation coefficient.</p>
+<div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;I filtered the dataset for flights with delays greater than 15 minutes, the industry standard for defining a delayed flight. This prevents the distribution from factoring in flights that were not delayed, which account for the majority of the dataset and may skew the results.</p></div></div><p>Before plotting the jointplot, I cleaned the data by removing the remaining extreme cases, such as flights with negative delays which, due to times crossing the change to daylight savings time, were not corrected in the preprocessing. After this, I plotted the jointplot, which is shown below.</p>
+<p><a href="../assets/projects/airline/delays-correlation.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="../assets/projects/airline/delays-correlation.png" class="img-fluid"></a></p>
 <p>The Pearson correlation coefficient between departure and arrival delays is 0.93, indicating a strong positive linear relationship between the two variables. However, there are three observations that can be made from the jointplot:</p>
 <ol type="1">
 <li><strong>Outliers and Extreme Cases</strong>: The scatter plot exhibits a broad spectrum of outliers that extend well beyond the interquartile range, yet notably adhere to the linear relationship between departure and arrival delays.</li>
@@ -452,10 +455,10 @@ Feature glossary
 <li><strong>Interquartile Rangel</strong>: The interquartile range for both departure and arrival delays is notably narrower compared to the full range of the data, which underscores the concentration of delays within 60 minutes, as seen in the univariate analysis.</li>
 </ol>
 <p>To understand the nature of this relationship for the core of flights, I focused on the interquartile range and adjusted the analysis: recalculating the correlation coefficient and focusing the jointplot on this range.</p>
-<p><img src="../assets/projects/airline/delays-correlation-filtered.png" class="img-fluid"></p>
+<p><a href="../assets/projects/airline/delays-correlation-filtered.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="../assets/projects/airline/delays-correlation-filtered.png" class="img-fluid"></a></p>
 <p>The Pearson correlation coefficient is now 0.67 within the interquartile range, which indicates a weaker but still positive linear relationship between departure and arrival delays. This relationship is depicted in the jointplot by a broader dispersion of data points. The empty square in the lower left corner of the plot represents flights filtered out by the industry standard definition of a delay (&gt;15 minutes). The boxplots along the edges of the scatterplot further confirm the findings from the univariate analysis, namely that the majority of delays range between 15 and 40 minutes.</p>
 <p>The filtered scatterplot has two clear boundaries that define the relationship between departure and arrival delays. I calculated approximate regression lines for these boundaries to understand the relationship more clearly.</p>
-<p><img src="../assets/projects/airline/delays-correlation-filtered-bounds.png" class="img-fluid"></p>
+<p><a href="../assets/projects/airline/delays-correlation-filtered-bounds.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="../assets/projects/airline/delays-correlation-filtered-bounds.png" class="img-fluid"></a></p>
 <p>There are two observations that can be made about the correlation of departure and arrival delays for the interquartile range:</p>
 <ul>
 <li><strong>Shallow Bound</strong>: Indicates the minimum threshold to which arrival delays can be minimized.
@@ -480,8 +483,8 @@ Feature glossary
 <li><strong>Flight Volume</strong>: Carriers with higher flight volumes are more likely to have higher delay counts, which can skew the results.</li>
 <li><strong>Carrier Age</strong>: Older carriers have more historical data, which can also skew the results.</li>
 </ol>
-<p>This analysis uses a more accurate metric: the normalized delay frequency. This metric adjusts the delay counts by the total number of flights per carrier<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>. This approach provides a more accurate representation of delay frequency, as it accounts for variations in flight volume and carrier age. Below are the plots of the normalized delay frequencies across carriers.</p>
-<div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;An alternative approach would be to normalize the counts by the age of the carrier. However, this would require data mapping each carrier to its age in the industry, which at the time of writing this report, was not available for the carriers in this dataset.</p></div></div><p><img src="../assets/projects/airline/departure-delays-carrier.png" class="img-fluid"> <img src="../assets/projects/airline/arrival-delays-carrier.png" class="img-fluid"></p>
+<p>This analysis uses a more accurate metric: the normalized delay frequency. This metric adjusts the delay counts by the total number of flights per carrier<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>. This approach provides a more accurate representation of delay frequency, as it accounts for variations in flight volume and carrier age. Below are the plots of the normalized delay frequencies across carriers.</p>
+<div class="no-row-height column-margin column-container"><div id="fn6"><p><sup>6</sup>&nbsp;An alternative approach would be to normalize the counts by the age of the carrier. However, this would require data mapping each carrier to its age in the industry, which at the time of writing this report, was not available for the carriers in this dataset.</p></div></div><p><img src="../assets/projects/airline/departure-delays-carrier.png" class="img-fluid"> <img src="../assets/projects/airline/arrival-delays-carrier.png" class="img-fluid"></p>
 <p>The normalized delay counts shown in the bar plots now provide a more accurate comparison of on-time performance between airlines. According to the data, the airline with the highest proportion of delays at departure is JetBlue Airways, followed by ExpressJet Airlines, Frontier Airlines, Allegiant Air, and Spirit Airlines. On the other hand, the airline with the highest proportion of delays at arrival is Piedmont Airlines, followed Ukraine International Airlines, JetBlue Airways, ExpressJet Airlines, Conair and Frontier Airlines.</p>
 </section>
 <section id="how-do-delays-vary-by-route-and-airport" class="level4 page-columns page-full">
@@ -1092,6 +1095,38 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","loop":false,"selector":".lightbox","descPosition":"bottom","openEffect":"zoom"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
 
 
 

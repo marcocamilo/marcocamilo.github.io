@@ -76,6 +76,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -912,12 +915,12 @@ Name: count, dtype: int64</pre>
 <p>Furthermore, as <code>observations</code> is a numerical variable, its distribution provides insights into the frequency of species sightings. To better explore this column given its data type, we’ll visualize the distribution using a histogram.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sns.histplot(x<span class="op">=</span><span class="st">'observations'</span>, data<span class="op">=</span>observations, kde<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-13-output-2.png" class="img-fluid"></p>
+<p><a href="assets/projects/biodiversity_files/figure-markdown_strict/cell-13-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-13-output-2.png" class="img-fluid"></a></p>
 <p>The distribution of in the number of observations seems to follow a multimodal distribution, with at least three discernible peaks in the data: one at 80, another at 150, and a third at 250. This may suggest that the overall distribution is a combination of several distributions, grouped by a certain variable. Given the low number of disceernible peaks, this variable might be the <code>park_name</code> variable. That is: the distribution in the number of observations may be influenced by the size of the parks they were made in.</p>
 <p>To confirm this, we’ll plot the distribution of observations per park using the <code>hue</code> parameter in the seaborn histplot function.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>sns.histplot(x<span class="op">=</span><span class="st">'observations'</span>, data<span class="op">=</span>observations, kde<span class="op">=</span><span class="va">True</span>, hue<span class="op">=</span><span class="st">'park_name'</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-14-output-1.png" class="img-fluid"></p>
+<p><a href="assets/projects/biodiversity_files/figure-markdown_strict/cell-14-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-14-output-1.png" class="img-fluid"></a></p>
 <p>As suspected, the distribution of observations is indeed influenced by the park in which they were made. The peaks in the distribution clearly correspond to each of the four parks in the dataset. This proves that the number of observations is influenced by the park in which they were made.</p>
 </section>
 <section id="summary" class="level3">
@@ -1114,7 +1117,7 @@ Name: count, dtype: int64</pre>
 </tr>
 </tbody>
 </table>
-<p><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-15-output-3.png" class="img-fluid"></p>
+<p><a href="assets/projects/biodiversity_files/figure-markdown_strict/cell-15-output-3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-15-output-3.png" class="img-fluid"></a></p>
 <p>The table and stacked bar chart above reveal several insights about the distribution of conservation status among different categories of species.</p>
 <p>Firstly, the only animal <em>in recovery</em> are birds, of which there are 3 species making up 100% of this status. This points to the fact that birds are the only species in recovery at the time of the dataset. Moreover, mammals, birds and fish are the most <em>endangered</em> species in the dataset, making more than 85% of all endangered species. Furthermore, more than 70% of <em>species of concern</em> consist of birds and vascular plants. Lastly, the <em>threatened</em> status is almost equally distributed among all species categories, except birds, nonvascular plants and reptiles.</p>
 <p>Overall, the distribution of animals among conservations statuses support the following conclusions:</p>
@@ -1191,7 +1194,7 @@ Name: count, dtype: int64</pre>
 </tr>
 </tbody>
 </table>
-<p><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-16-output-2.png" class="img-fluid"></p>
+<p><a href="assets/projects/biodiversity_files/figure-markdown_strict/cell-16-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-16-output-2.png" class="img-fluid"></a></p>
 <p>Based on the information from the bar chart, we can see that mammals and birds have the highest percentage of no protection, with roughly 17% and 15% of species exhibiting some level of engangered, respectively. This suggests that mammals and birds are the most likely to be endangered among the categories.</p>
 </section>
 <section id="q-are-the-differences-between-species-and-their-conservation-status-significant" class="level3">
@@ -1226,7 +1229,7 @@ Name: count, dtype: int64</pre>
 <span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>plt.xticks(rotation<span class="op">=</span><span class="dv">45</span>)</span>
 <span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>ax.bar_label(ax.containers[<span class="dv">0</span>], fmt<span class="op">=</span><span class="st">"</span><span class="sc">%0.2f%%</span><span class="st">"</span>)</span>
 <span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-17-output-1.png" class="img-fluid"></p>
+<p><a href="assets/projects/biodiversity_files/figure-markdown_strict/cell-17-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-17-output-1.png" class="img-fluid"></a></p>
 <p>The above graph illustrates the p-values for the chi-square tests performed for each animal category against mammals. Given an alpha of 5%, the analysis shows that birds and amphibians display no statistically significant differences in their conservations statuses compared with mammals. However, all other categories such as reptiles, fishes and plants show statistically significant differences in their conservation statuses when comapred to mammals. This means that the conservation statuses of these categories are significantly different from mammals.</p>
 </section>
 <section id="q-which-species-were-spotted-the-most-at-each-park" class="level3">
@@ -1892,6 +1895,38 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
+<script>var lightboxQuarto = GLightbox({"loop":false,"descPosition":"bottom","closeEffect":"zoom","openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
 
 
 
