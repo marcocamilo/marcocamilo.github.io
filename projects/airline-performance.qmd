@@ -223,7 +223,7 @@ The Pearson correlation coefficient between departure and arrival delays is 0.93
 
 1. **Outliers and Extreme Cases**: The scatter plot exhibits a broad spectrum of outliers that extend well beyond the interquartile range, yet notably adhere to the linear relationship between departure and arrival delays.
 2. **Linear Relationship**: The distribution shows that the relationship follows a more linear pattern the more extreme their values are, whereas the relationship becomes more dispersed as delays become less extreme.
-3. **Interquartile Rangel**: The interquartile range for both departure and arrival delays is notably narrower compared to the full range of the data, which underscores the concentration of delays within 60 minutes, as seen in the univariate analysis.
+3. **Interquartile Range**: The interquartile range for both departure and arrival delays is notably narrower compared to the full range of the data, which underscores the concentration of delays within 60 minutes, as seen in the univariate analysis.
 
 To understand the nature of this relationship for the core of flights, I focused on the interquartile range and adjusted the analysis: recalculating the correlation coefficient and focusing the jointplot on this range.
 
@@ -246,39 +246,85 @@ There are two observations that can be made about the correlation of departure a
   * Reflects that arrival delays can significantly exceed departure delays due to extrenal factors like diversions, weather, or arrival airport congestion.
   * Bound shows an upper limit of 250 minutes for on-time departures (see first scatterplot), then progressively aligning with the general trend as departure delays increase.
 
-In conclusion, the correlation analysis reveals a moderately positive linear relationship between departure and arrival delays when focusing on the interquartile range. The broad dispersion of data points suggests variability influenced by external factors affecting arrival delays relative to departure delays. This dispersion is marked by two boundaries: arrival delays can be minimized by up to 45 minutes relative to departure delays, yet can exceed them by up to 250 minutes. Otherwise, when considering the full range of data, the analysis demonstrates a strong positive linear relationship between departure and arrival delays.
+In conclusion, the correlation analysis reveals a moderately positive linear relationship between departure and arrival delays when focusing on the interquartile range. The broad dispersion of data points within the interquartile range points to the influence external factors affecting arrival delays relative to departure delays. This dispersion is marked by two boundaries: arrival delays can be minimized by up to 45 minutes relative to departure delays, yet can exceed them by up to 250 minutes. Otherwise, when considering the full range of data, the analysis demonstrates a strong positive linear relationship between departure and arrival delays.
 
 #### How do delays vary across carriers?
 
-This is one of the most frequently asked questions in the airline industry, as it provides insights into the performance of individual carriers. It requires a bivariate analysis comparing the frequency of delays across carriers. Most reports approach this question by comparing the total number of delays per carrier, but this approach can be misleading for two reasons:
+This is one of the most frequently asked questions in the airline industry, as it provides insights into the performance of individual carriers and their overall competitiveness in the market. It requires a bivariate analysis comparing the frequency of delays across carriers. Most reports approach this question by comparing the total number of delays per carrier, but this approach can be misleading for two reasons:
 
 1. **Flight Volume**: Carriers with higher flight volumes are more likely to have higher delay counts, which can skew the results.
 2. **Carrier Age**: Older carriers have more historical data, which can also skew the results.
 
-This analysis uses a more accurate metric: the normalized delay frequency. This metric adjusts the delay counts by the total number of flights per carrier^[An alternative approach would be to normalize the counts by the age of the carrier. However, this would require data mapping each carrier to its age in the industry, which at the time of writing this report, was not available for the carriers in this dataset.]. This approach provides a more accurate representation of delay frequency, as it accounts for variations in flight volume and carrier age. Below are the plots of the normalized delay frequencies across carriers.
+This analysis uses a more accurate metric: the normalized delay frequency. This metric adjusts the delay counts by the total number of flights per carrier^[An alternative approach would be to normalize the counts by the age of the carrier. However, this would require data mapping each carrier to its age in the industry, which, at the time of writing this report, was not available for the carriers in this dataset.]. This approach provides a more accurate representation of delay frequency, as it accounts for variations in flight volume and, to some extent, carrier age. Below are the plots of the normalized delay frequencies across carriers.
 
 <!-- ![](/assets/projects/airline/departure-delays-carrier.png) -->
 <!-- ![](/assets/projects/airline/arrival-delays-carrier.png) -->
 ![](/assets/projects/airline/carrier-delays.png)
 
-The normalized delay counts shown in the bar plots now provide a more accurate comparison of on-time performance between airlines. According to the data, the airline with the highest proportion of delays at departure is JetBlue Airways, followed by ExpressJet Airlines, Frontier Airlines, Allegiant Air, and Spirit Airlines. On the other hand, the airline with the highest proportion of delays at arrival is Piedmont Airlines, followed Ukraine International Airlines, JetBlue Airways, ExpressJet Airlines, Conair and Frontier Airlines.
+The normalized delay counts show a more robust comparison of on-time performance between airlines, even among those with higher flight volumes or varying ages. Each plot reveals several insights about carrier performance, however, the most revealing insights come from comparing the rankings of carriers across both departure and arrival delays. 
 
-#### How do delays vary by route and airport?
+- **Consistent Rankings**: JetBlue Airways, ExpressJet Airlines, and Frontier Airlines consistently rank among the top carriers with the highest frequency of delays, both at departure and arrival.
+- **Top Departure Delays**: JetBlue Airways, ExpressJet Airlines, Frontier Airlines, Allegiant Air, and Southwest Airlines have the highest proportion of delays at departure.
+- **Top Arrival Delays**: Piedmont Airlines, JetBlue Airways, ExpressJet Airlines, Conair, and Frontier Airlines have the highest proportion of delays at arrival.
+- **Lowest Delays**: carriers with the lowest frequency of delays are either historical carriers with shorter operational histories recorded in the dataset, such as Pan American World Airways (operating long before the dataset's start date), Midway Airlines, and Northwest Airlines, or regional carriers such as Hawaiian Airlines, Aloha Air Cargo, Endeavor Air, and SkyWest Airlines.
+- **Largest Differences**: the largest difference between departure and arrival delays is observed for Southwest Airlines, which ranks 5th in departure delays but 20th in arrival delays. 
+ 
+For measuring carrier performance, the proportion of departure delays is probably the most relevant metric for several reasons. Departure delays are more under the carrier's control, as they are influenced by factors such as boarding, fueling, and maintenance, which are all managed by the carrier. Furthermore, as confirmed by the correlation analysis, departure delays have a positive linear relationship with arrival delays, thus making them more likely to cascade into arrival delays. This causes colinearity between the two metrics, which can be misleading when comparing carriers. In addition to this, arrival delays are more influenced by external factors such as weather, air traffic control, and airport congestion, which are beyond the carrier's control. Even with these factors aside, a carrier may still be able to mitigate arrival delays, making the metric less indicative of carrier performance.
 
-Both questions involve an analysis on the frequency of delays utilizing the same metric: flight paths. By visualizing the routes with the highest delays and observing patterns of flight path convergence, we can achieve two key insights:
+Considering these factors, the carriers with the highest proportion of departure delays, which are also consistent across arrival delays, are JetBlue Airways, ExpressJet Airlines, and Frontier Airlines.
 
-1. **Routes with Highest Delays**: given by the frequency of delays across a given route.
-2. **Airports with Highest Delays**: given by the convergens of high-delay routes at specific airports.
+#### How do delays vary by airport?
 
-To tackle this question, I will visualize the routes with the highest departure and arrival delays, respectively, using X. I first aggregated the dataset by flight routes and normalize the total departure and arrival delays by the total number of flights for each route, to provide a more robust metric. I then mapped the routes onto two visualizations: one for departure delays and another for arrival delays. The resulting visualiations are shown below:
+Similar to the carrier analysis, this question involves comparing delay frequencies across airports. Also as one of the most posed questions in the airline industry, the goal is to identify airports with the highest frequency of delays, which can provide insights into the airport performance and their impact on the overall aviation sector.
+
+There are two available metrics to evaluate delay frequencies across airports: total delays and normalized delay frequency. However, choosing a metric to answer this particular question proves challenging, as each metric reveals a completely different answer due to the univariate distribution of each metric. 
+
+1. **Total delays are skewed towards airport size**: larger airports have more flights and thus more delays, which skews the distribution by airport size.
+  - Provides a more differentiated view of airport performance.
+  - Biased towards larger airports.
+2. **Mean delays show high kurtosis**: the distribution of delays across airports is highly concentrated around the mean, with most airports having a similar frequency of delays, which makes it difficult to distinguish between them when visualizing the data.
+  - Provides a more accurate representation of delay frequency.
+  - Fails to distinguish airports close to the mean and may maximize the effects of airports with few flights.
+
+![](/assets/projects/airline/airport-delay-distributions.png)
+
+For the purposes of visualizing the data, I chose to use the total delay counts for arrival delays due to several reasons. Firstly, it provides a more differentiated view of airport performance. Moreover, the question is usually posed in terms of identifying the most known airports with the highest frequency of delays, a question better answered by the total delay counts, which already favor larger airports. Furthermore, the choice of considering only arrival delays responds to the fact that departure delays are more susceptible to carrier operations^[According to the [Airline On-Time Statistics and Delay Causes](https://transtats.bts.gov/ot_delay/OT_DelayCause1.asp?20=E), air carrier delays accounted for nearly 25% of national delays from January 2010 to March 2020], whereas arrival delays are more influenced by external factors, including airport operations. This makes arrival delays a better metric for evaluating airport performance^[Of course, as stated in the previous section, airport management is not the only cause for arrival delays. There is also a moderate correlation between departure and arrival delays which increases after as certain threshold of departure delays. However, when comparing airports, arrival delays abstract the role of the carrier and focus on the external factors, *among which* is airport management.]. Below are the plots of the total delay counts across airports. 
 
 :::{.column-page-right}
-<p class="text-center mb-0">Departure Delays by Airport (click legend to toggle groups)</p>
-<iframe src="_dep-delay-airports.html" width="100%" height="600px"></iframe>
+<p class="text-center">Arrival Delays by Airport</p>
+<iframe src='/projects/_arr-delay-airports.html' width=100%, height="600px"></iframe>
 :::
 
-:::{.column-page-right}
-<p class="text-center mb-0">Arrival Delays by Airport (click legend to toggle groups)</p>
-<iframe src="_arr-delay-airports.html" width="100%" height="600px"></iframe>
-:::
+The bubble map shows the distribution of arrival delays across airports, with the size of the bubble representing the total number of delays. Given the nature of the metric, the size of the bubbles favor larger airports, which have higher flight volumes and correspondingly higher delay counts. Several observations can be made from the visualization:
 
+- **Top Airports**: the top five airports with the highest total delay counts are Chicago O'Hare International Airport (ORD), Hartsfield-Jackson Atlanta International Airport (ATL), Dallas/Fort Worth International Airport (DFW), Los Angeles International Airport (LAX), and San Francisco International Airport (SFO).
+- **Costal Airports**: coastal airports such as Los Angeles (LAX), San Francisco (SFO), Newark (EWR), and Boston (BOS) also rank high among the top 15 airports, randing from 13783 to 8297.
+- **New York Area Congestion**: Newark (EWR) and LaGuardia (LGA) are among the top ten, with 11,119 (7th) and 8,723 (9th) delays respectively. This underscores the heavy congestion and operational difficulties in the New York metropolitan area.
+- **Geographical Spread**: the top 20 airports with the highest total delay counts are spread across the country,showing that delays are a widespread issue. 
+- **JFK**: insteresingly, JFK ranks 20th with 6095 delays, which is significantly lower than the top airports including those in the New York Metropolitan area. The causes of this difference would be an interesting question for further analysis.
+
+Overall, analyzing arrival delays across airports reveals crucial insights into the distribution and frequency of delays within the aviation network. Larger airports such as Chicago O'Hare International Airport, Hartsfield-Jackson Atlanta International Airport, and Dallas/Fort Worth International Airport have the highest total delay counts, which is expected due to their higher flight volumes. Coastal airports and those in the New York area also show significant delay counts, highlighting congestion and operational challenges in these regions. The geographical spread of the top 20 airports indicates that delays are not confined to specific areas but are a nationwide issue. Overall, this analysis underscores the importance of addressing delays at both major hubs and regional airports to improve the efficiency of the U.S. aviation system.
+
+## Conclusion
+
+In this project, I analyzed 30 years of US domestic flight data to uncover trends in on-time performance across carriers, airports, and time. The analysis aimed to address four key questions: how delays vary over time, the correlation between departure and arrival delays, how delays differ among carriers, and how delays are distributed across airports. The analysis yielded the following findings:
+
+- **Longitudinal Analysis**
+  * The evolution of delays over 34 years shows a narrowing gap between departure and arrival delays, driven by an increase in departure delays rather than a decrease in arrival delays.
+  * The volatility of delays has slightly decreased over the years, suggesting a stabilization in the seasonal patterns of delays.
+  * Arrival delays have decreased by only 1%, while departure delays have increased by over 5% in 34 years, confirming that airlines and airports have been unable to improve on-time performance.
+- **Correlation Analysis**
+  * Departure and arrival delays exhibit a strong positive linear relationship, with a Pearson correlation coefficient of 0.93.
+  * The relationship is more dispersed within the interquartile range, with a weaker correlation coefficient of 0.67.
+  * The dispersion in delays is bounded by two linear trends: arrival delays can be minimized by up to 45 minutes relative to departure delays, yet can exceed them by up to 250 minutes.
+  * The disparity in the correlation responds to a difference in the causes of delays: while departure delays are more under the carrier's control, arrival delays are more influenced by external factors, including weather, diversion, or airport congestion.
+- **Carrier Analysis**
+  * JetBlue Airways, ExpressJet Airlines, and Frontier Airlines consistently rank among the top carriers with the highest frequency of delays both at departure and arrival.
+  * Southwest Airlines has the largest difference between departure and arrival delays, ranking 5th in departure delays but 20th in arrival delays.
+  * Departure delays are more indicative of carrier performance, as they are more under the carrier's control, influenced by factors such as boarding, fueling, and maintenance.
+- **Airport Analysis**
+  * The top five airports with the highest total delay counts are Chicago O'Hare International Airport, Hartsfield-Jackson Atlanta International Airport, Dallas/Fort Worth International Airport, Los Angeles International Airport, and San Francisco International Airport.
+  * Coastal airports such as Los Angeles, San Francisco, Newark, and Boston also rank high among the top 15 airports, indicating congestion and operational difficulties in these regions.
+  * The geographical spread of the top 20 airports indicates that delays are not confined to specific areas but are a nationwide issue.
+
+This analysis highlights ongoing challenges in improving on-time performance, particularly with departure delays. The strong correlation between departure and arrival delays emphasizes the importance of addressing issues at the departure stage to enhance overall punctuality. Significant variations in delay frequencies across carriers and routes suggest that tailored strategies are needed for different airlines and specific airports The findings from this project have been effectively translated into an interactive visualization dashboard, providing valuable insights for stakeholders to inform decision-making and improve operational efficiency in the aviation industry.
