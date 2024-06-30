@@ -72,7 +72,9 @@ img:not(.profile) {
   background-color: white !important;
 }
 
-details {
+details.list {
+  color: white;
+
   summary {
     color: white;
   }
