@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.45">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Embark on a captivating exploration of biodiversity with this data science project, delving into the conservation statuses of endangered species across national parks. Through meticulous analysis, uncover profound insights into the distribution of endangered species, their likelihood of endangerment, and the most frequently spotted species in each park, illuminating the intricate dynamics of wildlife preservation and ecological sustainability.">
+
+<title>Biodiversity, Endangerement and Conversation in Data from National Parks Service – marcocamilo</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<link rel="stylesheet" href="../assets/css/global.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marcocamilo</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../portfolio.html"> 
+<span class="menu-text">Portfolio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul>
+  <li><a href="#project-goals" id="toc-project-goals" class="nav-link" data-scroll-target="#project-goals">Project Goals</a></li>
+  <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">Data</a></li>
+  <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">Analysis</a></li>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation">Evaluation</a></li>
+  </ul></li>
+  <li><a href="#importing-modules-and-data-from-files" id="toc-importing-modules-and-data-from-files" class="nav-link" data-scroll-target="#importing-modules-and-data-from-files">Importing Modules and Data from Files</a></li>
+  <li><a href="#preview-the-data" id="toc-preview-the-data" class="nav-link" data-scroll-target="#preview-the-data">Preview the Data</a>
+  <ul>
+  <li><a href="#species.csv" id="toc-species.csv" class="nav-link" data-scroll-target="#species.csv"><code>species.csv</code></a></li>
+  <li><a href="#observations.csv" id="toc-observations.csv" class="nav-link" data-scroll-target="#observations.csv"><code>observations.csv</code></a></li>
+  </ul></li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis">Exploratory Data Analysis</a>
+  <ul>
+  <li><a href="#species.csv-1" id="toc-species.csv-1" class="nav-link" data-scroll-target="#species.csv-1"><code>species.csv</code></a></li>
+  <li><a href="#observations.csv-1" id="toc-observations.csv-1" class="nav-link" data-scroll-target="#observations.csv-1"><code>observations.csv</code></a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a>
+  <ul class="collapse">
+  <li><a href="#species" id="toc-species" class="nav-link" data-scroll-target="#species"><code>species</code></a></li>
+  <li><a href="#observations" id="toc-observations" class="nav-link" data-scroll-target="#observations"><code>observations</code></a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#analysis-1" id="toc-analysis-1" class="nav-link" data-scroll-target="#analysis-1">Analysis</a>
+  <ul>
+  <li><a href="#q-what-is-the-distribution-of-conservation-status-for-animals" id="toc-q-what-is-the-distribution-of-conservation-status-for-animals" class="nav-link" data-scroll-target="#q-what-is-the-distribution-of-conservation-status-for-animals">Q: What is the distribution of conservation status for animals?</a></li>
+  <li><a href="#q-are-certain-types-of-species-more-likely-to-be-endangered" id="toc-q-are-certain-types-of-species-more-likely-to-be-endangered" class="nav-link" data-scroll-target="#q-are-certain-types-of-species-more-likely-to-be-endangered">Q: Are certain types of species more likely to be endangered?</a></li>
+  <li><a href="#q-are-the-differences-between-species-and-their-conservation-status-significant" id="toc-q-are-the-differences-between-species-and-their-conservation-status-significant" class="nav-link" data-scroll-target="#q-are-the-differences-between-species-and-their-conservation-status-significant">Q: Are the differences between species and their conservation status significant?</a></li>
+  <li><a href="#q-which-species-were-spotted-the-most-at-each-park" id="toc-q-which-species-were-spotted-the-most-at-each-park" class="nav-link" data-scroll-target="#q-which-species-were-spotted-the-most-at-each-park">Q: Which species were spotted the most at each park?</a></li>
+  </ul></li>
+  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">Conclusions</a>
+  <ul>
+  <li><a href="#distribution-of-conservation-statuses" id="toc-distribution-of-conservation-statuses" class="nav-link" data-scroll-target="#distribution-of-conservation-statuses">Distribution of Conservation Statuses</a></li>
+  <li><a href="#likelihood-of-species-endangerment" id="toc-likelihood-of-species-endangerment" class="nav-link" data-scroll-target="#likelihood-of-species-endangerment">Likelihood of Species Endangerment</a></li>
+  <li><a href="#significance-of-conservation-status-differences" id="toc-significance-of-conservation-status-differences" class="nav-link" data-scroll-target="#significance-of-conservation-status-differences">Significance of Conservation Status Differences</a></li>
+  <li><a href="#most-frequently-spotted-species" id="toc-most-frequently-spotted-species" class="nav-link" data-scroll-target="#most-frequently-spotted-species">Most Frequently Spotted Species</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Biodiversity, Endangerement and Conversation in Data from National Parks Service</h1>
+</div>
+
+<div>
+  <div class="description">
+    Embark on a captivating exploration of biodiversity with this data science project, delving into the conservation statuses of endangered species across national parks. Through meticulous analysis, uncover profound insights into the distribution of endangered species, their likelihood of endangerment, and the most frequently spotted species in each park, illuminating the intricate dynamics of wildlife preservation and ecological sustainability.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>This project explores biodiversity data from the National Parks Service about endangered species in various parks. In particular, the project delves into the conservation statuses of endangered species to see if there are any patterns regarding the type of species the become endangered. The goal of this project will be to perform an Exploratory Data Analysis and explain findings from the analysis in a meaningful way.</p>
+<p><strong>Sources:</strong> Both <code>Observations.csv</code> and <code>Species_info.csv</code> was provided by <a href="https://www.codecademy.com">Codecademy.com</a>.</p>
+<section id="project-goals" class="level3">
+<h3 class="anchored" data-anchor-id="project-goals">Project Goals</h3>
+<p>The project will analyze data from the National Parks Service, with the goal of understanding characteristics about species and their conservations status, and the relationship between those species and the national parks they inhabit.</p>
+<p>Some of the questions to be tackled include:</p>
+<ul>
+<li>What is the distribution of conservation status for animals?</li>
+<li>Are certain types of species more likely to be endangered?</li>
+<li>Are the differences between species and their conservation status significant?</li>
+<li>Which species were spotted the most at each park?</li>
+</ul>
+</section>
+<section id="data" class="level3">
+<h3 class="anchored" data-anchor-id="data">Data</h3>
+<p>The project makes use of two datasets. The first dataset contains data about different species and their conservation statuses. The second dataset holds recorded sightings of different species at several national parks for 7 days.</p>
+</section>
+<section id="analysis" class="level3">
+<h3 class="anchored" data-anchor-id="analysis">Analysis</h3>
+<p>The analysis consists of the use of descriptive statistics and data visualization techniques to understand the data. Some of the key metrics that will be computed include:</p>
+<ol type="1">
+<li>What is the distribution of conservation status for animals?</li>
+<li>Are certain types of species more likely to be endangered?</li>
+<li>Are the differences between species and their conservation status significant?</li>
+<li>Which species were spotted the most at each park?</li>
+</ol>
+</section>
+<section id="evaluation" class="level3">
+<h3 class="anchored" data-anchor-id="evaluation">Evaluation</h3>
+<p>Lastly, the project will revisit its initial goals and summarize the findings using the research questions. This section will also suggest additional questions which may expand on limitations in the current analysis and further guide future analyses on the subject.</p>
+</section>
+</section>
+<section id="importing-modules-and-data-from-files" class="level2">
+<h2 class="anchored" data-anchor-id="importing-modules-and-data-from-files">Importing Modules and Data from Files</h2>
+<p>First, we will import the preliminary modules for this project, along with the data from the two separate files provided for this analysis.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> chi2_contingency</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Set default figure size</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># figsize = (15,9)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>figsize <span class="op">=</span> (<span class="dv">10</span>,<span class="dv">6</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">'figure.figsize'</span>] <span class="op">=</span> figsize</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>sns.<span class="bu">set</span>(rc<span class="op">=</span>{<span class="st">'figure.figsize'</span>:figsize})</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Set default float size</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>pd.set_option(<span class="st">'display.float_format'</span>, <span class="kw">lambda</span> x: <span class="st">'</span><span class="sc">%.2f</span><span class="st">'</span> <span class="op">%</span> x)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>observations <span class="op">=</span> pd.read_csv(<span class="st">'observations.csv'</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>species <span class="op">=</span> pd.read_csv(<span class="st">'species_info.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>Import successful</code></pre>
+</section>
+<section id="preview-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="preview-the-data">Preview the Data</h2>
+<p>To prepare for our exploratory data analysis, we’ll first conduct an initial preview of the data. This will involve sampling a subset of the data and inspecting its structure and characteristics.</p>
+<section id="species.csv" class="level3">
+<h3 class="anchored" data-anchor-id="species.csv"><code>species.csv</code></h3>
+<p>Let’s begin by examening the <code>species</code> dataset.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>display(<span class="st">"SAMPLE OF SPECIES DATASET:"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>display(species.sample(<span class="dv">5</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>display(<span class="st">"INFORMATION ABOUT THE SPECIES DATASET:"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>display(species.info())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>'SAMPLE OF SPECIES DATASET:'</code></pre>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 20%">
+<col style="width: 26%">
+<col style="width: 25%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>category</th>
+<th>scientific_name</th>
+<th>common_names</th>
+<th>conservation_status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>718</td>
+<td>Vascular Plant</td>
+<td>Pogonia ophioglossoides</td>
+<td>Pogonia, Rose Pogonia</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td>1361</td>
+<td>Vascular Plant</td>
+<td>Lespedeza stuevei</td>
+<td>Tall Lespedeza</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td>4725</td>
+<td>Vascular Plant</td>
+<td>Calycadenia mollis</td>
+<td>Soft Western Rosinweed</td>
+<td>NaN</td>
+</tr>
+<tr class="even">
+<td>2912</td>
+<td>Nonvascular Plant</td>
+<td>Thuidium allenii</td>
+<td>Allen's Thuidium Moss</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td>1929</td>
+<td>Vascular Plant</td>
+<td>Picea abies</td>
+<td>Norway Spruce</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+<pre><code>'INFORMATION ABOUT THE SPECIES DATASET:'
+
+&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 5824 entries, 0 to 5823
+Data columns (total 4 columns):
+ #   Column               Non-Null Count  Dtype 
+---  ------               --------------  ----- 
+ 0   category             5824 non-null   object
+ 1   scientific_name      5824 non-null   object
+ 2   common_names         5824 non-null   object
+ 3   conservation_status  191 non-null    object
+dtypes: object(4)
+memory usage: 182.1+ KB
+
+None</code></pre>
+<p>The <code>species</code> dataset shows 5824 entries with four variables:</p>
+<ul>
+<li><strong>category</strong>: taxonomy for each species.</li>
+<li><strong>scientific_name</strong>: scientific name of each species.</li>
+<li><strong>common_names</strong>: common names of each species.</li>
+<li><strong>conservation_status</strong>: species’ conservation status.</li>
+</ul>
+<p>Upon inspection with .info(), we observe that the conservation_status column contains 191 non-null entries, indicating a high presence of missing values. While the majority of columns may retain their data type as objects, an argument could be made for converting conservation_status to an ordinal variable. However, due to the presence of incomplete conservation statuses and the ambiguity surrounding the ordinal nature of <code>in recovery</code>, we’ll retain it as an object.</p>
+</section>
+<section id="observations.csv" class="level3">
+<h3 class="anchored" data-anchor-id="observations.csv"><code>observations.csv</code></h3>
+<p>We’ll now move on to the <code>observations</code> dataset.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>display(<span class="st">"SAMPLE OF SPECIES DATASET:"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>display(observations.sample(<span class="dv">5</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>display(<span class="st">"INFORMATION ABOUT THE SPECIES DATASET:"</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>display(observations.info())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre>'SAMPLE OF SPECIES DATASET:'</pre>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 31%">
+<col style="width: 38%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>scientific_name</th>
+<th>park_name</th>
+<th>observations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>21462</td>
+<td>Lepomis humilis</td>
+<td>Yellowstone National Park</td>
+<td>222</td>
+</tr>
+<tr class="even">
+<td>1305</td>
+<td>Saxifraga odontoloma</td>
+<td>Yosemite National Park</td>
+<td>116</td>
+</tr>
+<tr class="odd">
+<td>1307</td>
+<td>Perdix perdix</td>
+<td>Yosemite National Park</td>
+<td>162</td>
+</tr>
+<tr class="even">
+<td>20947</td>
+<td>Fraxinus profunda</td>
+<td>Bryce National Park</td>
+<td>129</td>
+</tr>
+<tr class="odd">
+<td>10240</td>
+<td>Muhlenbergia andina</td>
+<td>Yellowstone National Park</td>
+<td>235</td>
+</tr>
+</tbody>
+</table>
+<pre>'INFORMATION ABOUT THE SPECIES DATASET:'
+
+<class 'pandas.core.frame.dataframe'="">
+RangeIndex: 23296 entries, 0 to 23295
+Data columns (total 3 columns):
+ #   Column           Non-Null Count  Dtype 
+---  ------           --------------  ----- 
+ 0   scientific_name  23296 non-null  object
+ 1   park_name        23296 non-null  object
+ 2   observations     23296 non-null  int64 
+dtypes: int64(1), object(2)
+memory usage: 546.1+ KB
+
+None</class></pre>
+<p>The <code>observations</code> dataset consists of three columns:</p>
+<ul>
+<li><strong>scientific_name</strong>: scientific name of each species.</li>
+<li><strong>park_name</strong>: name of the national park species are located in.</li>
+<li><strong>observations</strong>: number of observations in the past 7 days.</li>
+</ul>
+<p>Based on the information above, the columns don’t show any missing data, and the data types seem to be appropriate for the analysis.</p>
+</section>
+</section>
+<section id="exploratory-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h2>
+<section id="species.csv-1" class="level3">
+<h3 class="anchored" data-anchor-id="species.csv-1"><code>species.csv</code></h3>
+<p>Let’s delve deeper into the species dataset to gain insights into its characteristics and identify any anomalies or patterns. We’ll begin by employing a custom function <code>column_eda()</code> to analyze each column:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> column_eda(dataset):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    cols <span class="op">=</span> <span class="bu">list</span>(dataset.columns)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> col <span class="kw">in</span> cols:</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f'---------------</span><span class="sc">{</span>col<span class="sc">}</span><span class="ss">---------------'</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f'Unique values:'</span>, dataset[col].nunique(), </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>              <span class="ss">f'Non-null values: </span><span class="sc">{</span>dataset[col]<span class="sc">.</span>notnull()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">'</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>              <span class="ss">f'Missing values: </span><span class="sc">{</span>dataset[col]<span class="sc">.</span>isnull()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ch">\n</span><span class="ss">'</span>, </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>              sep<span class="op">=</span><span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(dataset[col].value_counts().head(<span class="dv">4</span>))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>column_eda(species)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre>---------------category---------------
+Unique values:
+7
+Non-null values: 5824
+Missing values: 0
+
+category
+Vascular Plant       4470
+Bird                  521
+Nonvascular Plant     333
+Mammal                214
+Name: count, dtype: int64
+---------------scientific_name---------------
+Unique values:
+5541
+Non-null values: 5824
+Missing values: 0
+
+scientific_name
+Castor canadensis       3
+Canis lupus             3
+Hypochaeris radicata    3
+Columba livia           3
+Name: count, dtype: int64
+---------------common_names---------------
+Unique values:
+5504
+Non-null values: 5824
+Missing values: 0
+
+common_names
+Brachythecium Moss    7
+Dicranum Moss         7
+Panic Grass           6
+Bryum Moss            6
+Name: count, dtype: int64
+---------------conservation_status---------------
+Unique values:
+4
+Non-null values: 191
+Missing values: 5633
+
+conservation_status
+Species of Concern    161
+Endangered             16
+Threatened             10
+In Recovery             4
+Name: count, dtype: int64</pre>
+<p>The function shows there are 7 categories of species, 5541 species, 5504 common names and 4 conservation statuses. From the analysis, several insights emerge:</p>
+<ol type="1">
+<li><strong>Missing Conversation Statuses</strong>: the <code>conservation_status</code> column exhibits a high number of <code>nan</code> values (5633), which could be interpreted as ‘species of no concern’ or requiring ‘no intervention’.</li>
+</ol>
+<p>To address this, we’ll impute the missing values with “No intervention”, expanding the conservation status categories to five.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Old conservation status:</span><span class="ch">\n</span><span class="st">'</span>, <span class="bu">list</span>(species.conservation_status.unique()))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>species.conservation_status <span class="op">=</span> species.conservation_status.fillna(<span class="st">'No intervention'</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'New conservation status:</span><span class="ch">\n</span><span class="st">'</span>, <span class="bu">list</span>(species.conservation_status.unique()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre>Old conservation status:
+ [nan, 'Species of Concern', 'Endangered', 'Threatened', 'In Recovery']
+New conservation status:
+ ['No intervention', 'Species of Concern', 'Endangered', 'Threatened', 'In Recovery']</pre>
+<p>{:start=“2”} 2. <strong>Duplicate Entries</strong>: there is a discrepancy between the number of unique values of <code>scientific_name</code> and <code>common_names</code> despite all entries having non-null values. This points to the presence of duplicate common names for different species.</p>
+<p>We’ll confirm this by identifying and examining these duplicates.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>duplicates <span class="op">=</span> species.duplicated().<span class="bu">sum</span>()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Overall duplicates (rows): </span><span class="sc">{</span>duplicates<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>repeated_scientific_names <span class="op">=</span> species.duplicated(subset<span class="op">=</span>[<span class="st">'scientific_name'</span>]).<span class="bu">sum</span>()</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Duplicated scientific names: </span><span class="sc">{</span>repeated_scientific_names<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>repeated_common_names <span class="op">=</span> species.duplicated(subset<span class="op">=</span>[<span class="st">'common_names'</span>]).<span class="bu">sum</span>()</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Duplicated common names: </span><span class="sc">{</span>repeated_common_names<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre>Overall duplicates (rows): 0
+Duplicated scientific names: 283
+Duplicated common names: 320</pre>
+<p>To illustrate, we’ll display the most frequent common name alongside its associated scientific names.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>display(species.common_names.value_counts().reset_index()[:<span class="dv">5</span>])</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>display(species.query(<span class="st">"common_names == 'Brachythecium Moss'"</span>)[[<span class="st">'common_names'</span>, <span class="st">'scientific_name'</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>common_names</th>
+<th>count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>Brachythecium Moss</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>Dicranum Moss</td>
+<td>7</td>
+</tr>
+<tr class="odd">
+<td>2</td>
+<td>Panic Grass</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td>3</td>
+<td>Bryum Moss</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td>4</td>
+<td>Sphagnum</td>
+<td>6</td>
+</tr>
+</tbody>
+</table>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>common_names</th>
+<th>scientific_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2812</td>
+<td>Brachythecium Moss</td>
+<td>Brachythecium digastrum</td>
+</tr>
+<tr class="even">
+<td>2813</td>
+<td>Brachythecium Moss</td>
+<td>Brachythecium oedipodium</td>
+</tr>
+<tr class="odd">
+<td>2814</td>
+<td>Brachythecium Moss</td>
+<td>Brachythecium oxycladon</td>
+</tr>
+<tr class="even">
+<td>2815</td>
+<td>Brachythecium Moss</td>
+<td>Brachythecium plumosum</td>
+</tr>
+<tr class="odd">
+<td>2816</td>
+<td>Brachythecium Moss</td>
+<td>Brachythecium rivulare</td>
+</tr>
+<tr class="even">
+<td>2817</td>
+<td>Brachythecium Moss</td>
+<td>Brachythecium rutabulum</td>
+</tr>
+<tr class="odd">
+<td>2818</td>
+<td>Brachythecium Moss</td>
+<td>Brachythecium salebrosum</td>
+</tr>
+</tbody>
+</table>
+<p>As seen above, the most frequent common name is <em>Brachythecium Moss</em>, with a total of 7 different species identified with this name. Organisms in this example all share the same genus (i.e.&nbsp;<em>brachythecium</em>, a genus of moss), but differ in species, thus the different scientific names.</p>
+<p>This demonstrates instances where multiple species share identical common names but differ in scientific nomenclature.</p>
+<p>{:start=“3”} 3. <strong>Duplicate Scientific Names</strong>: the presence of duplicate scientific names suggests repeated observations of the same species, since the dataset should report the conservation status of each species, thus one observation per species.</p>
+<p>Since there are no overall duplicates in the dataset (see above), these duplicate names must have some difference at the row level. To confirm this, we’ll print out a sample of duplicates and inspect three random duplicates species, to see what kind of differences are there within the rows themselves.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>duplicated_species <span class="op">=</span> species[species[<span class="st">'scientific_name'</span>].duplicated(keep<span class="op">=</span><span class="va">False</span>)]</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>display(<span class="st">'-------Sample of duplicated scientific names-------'</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>display(duplicated_species.head())</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> display_duplicated_species(scientific_name):</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    duplicated_entries <span class="op">=</span> duplicated_species[duplicated_species[<span class="st">'scientific_name'</span>] <span class="op">==</span> scientific_name]</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    display(<span class="ss">f'-------Duplicated </span><span class="ch">\'</span><span class="sc">{</span>scientific_name<span class="sc">}</span><span class="ch">\'</span><span class="ss">-------'</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    display(duplicated_entries)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>scientific_names_to_check <span class="op">=</span> [<span class="st">'Cervus elaphus'</span>, <span class="st">'Canis lupus'</span>, <span class="st">'Odocoileus virginianus'</span>]</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> scientific_name <span class="kw">in</span> scientific_names_to_check:</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    display_duplicated_species(scientific_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre>'-------Sample of duplicated scientific names-------'</pre>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 11%">
+<col style="width: 29%">
+<col style="width: 30%">
+<col style="width: 23%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>category</th>
+<th>scientific_name</th>
+<th>common_names</th>
+<th>conservation_status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>4</td>
+<td>Mammal</td>
+<td>Cervus elaphus</td>
+<td>Wapiti Or Elk</td>
+<td>No intervention</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>Mammal</td>
+<td>Odocoileus virginianus</td>
+<td>White-Tailed Deer</td>
+<td>No intervention</td>
+</tr>
+<tr class="odd">
+<td>6</td>
+<td>Mammal</td>
+<td>Sus scrofa</td>
+<td>Feral Hog, Wild Pig</td>
+<td>No intervention</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Mammal</td>
+<td>Canis lupus</td>
+<td>Gray Wolf</td>
+<td>Endangered</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td>Mammal</td>
+<td>Urocyon cinereoargenteus</td>
+<td>Common Gray Fox, Gray Fox</td>
+<td>No intervention</td>
+</tr>
+</tbody>
+</table>
+<pre>"-------Duplicated 'Cervus elaphus'-------"</pre>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 13%">
+<col style="width: 22%">
+<col style="width: 27%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>category</th>
+<th>scientific_name</th>
+<th>common_names</th>
+<th>conservation_status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>4</td>
+<td>Mammal</td>
+<td>Cervus elaphus</td>
+<td>Wapiti Or Elk</td>
+<td>No intervention</td>
+</tr>
+<tr class="even">
+<td>3017</td>
+<td>Mammal</td>
+<td>Cervus elaphus</td>
+<td>Rocky Mountain Elk</td>
+<td>No intervention</td>
+</tr>
+</tbody>
+</table>
+<pre>"-------Duplicated 'Canis lupus'-------"</pre>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 14%">
+<col style="width: 23%">
+<col style="width: 23%">
+<col style="width: 29%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>category</th>
+<th>scientific_name</th>
+<th>common_names</th>
+<th>conservation_status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>8</td>
+<td>Mammal</td>
+<td>Canis lupus</td>
+<td>Gray Wolf</td>
+<td>Endangered</td>
+</tr>
+<tr class="even">
+<td>3020</td>
+<td>Mammal</td>
+<td>Canis lupus</td>
+<td>Gray Wolf, Wolf</td>
+<td>In Recovery</td>
+</tr>
+<tr class="odd">
+<td>4448</td>
+<td>Mammal</td>
+<td>Canis lupus</td>
+<td>Gray Wolf, Wolf</td>
+<td>Endangered</td>
+</tr>
+</tbody>
+</table>
+<pre>"-------Duplicated 'Odocoileus virginianus'-------"</pre>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 10%">
+<col style="width: 24%">
+<col style="width: 38%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>category</th>
+<th>scientific_name</th>
+<th>common_names</th>
+<th>conservation_status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>5</td>
+<td>Mammal</td>
+<td>Odocoileus virginianus</td>
+<td>White-Tailed Deer</td>
+<td>No intervention</td>
+</tr>
+<tr class="even">
+<td>3019</td>
+<td>Mammal</td>
+<td>Odocoileus virginianus</td>
+<td>White-Tailed Deer, White-Tailed Deer</td>
+<td>No intervention</td>
+</tr>
+</tbody>
+</table>
+<p>It seems that both the number of common names and the types of conservation statuses are different for duplicate observations. That is, the same species exhibits both different common names, as well as conservation statuses. To solve the question of duplicates, given the differences in conversation statuses do not affect our question on the likelihood of endangerment given a species’ protection status, I’ll retain the first instance of these duplicates.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>species <span class="op">=</span> species.drop_duplicates(subset<span class="op">=</span>[<span class="st">'scientific_name'</span>], keep<span class="op">=</span><span class="st">'first'</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>repeated_scientific_names <span class="op">=</span> species.scientific_name[species.scientific_name.duplicated()]</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Duplicated scientific names: </span><span class="sc">{</span><span class="bu">len</span>(repeated_scientific_names)<span class="sc">}</span><span class="ch">\n</span><span class="ss">'</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'-------Previously duplicated examples (now clean)-------'</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>scientific_names_to_check <span class="op">=</span> [<span class="st">'Cervus elaphus'</span>, <span class="st">'Canis lupus'</span>, <span class="st">'Odocoileus virginianus'</span>]</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>display(species[species[<span class="st">'scientific_name'</span>].isin(scientific_names_to_check)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre>Duplicated scientific names: 0
+
+-------Previously duplicated examples (now clean)-------</pre>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 12%">
+<col style="width: 30%">
+<col style="width: 24%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>category</th>
+<th>scientific_name</th>
+<th>common_names</th>
+<th>conservation_status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>4</td>
+<td>Mammal</td>
+<td>Cervus elaphus</td>
+<td>Wapiti Or Elk</td>
+<td>No intervention</td>
+</tr>
+<tr class="even">
+<td>5</td>
+<td>Mammal</td>
+<td>Odocoileus virginianus</td>
+<td>White-Tailed Deer</td>
+<td>No intervention</td>
+</tr>
+<tr class="odd">
+<td>8</td>
+<td>Mammal</td>
+<td>Canis lupus</td>
+<td>Gray Wolf</td>
+<td>Endangered</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="observations.csv-1" class="level3">
+<h3 class="anchored" data-anchor-id="observations.csv-1"><code>observations.csv</code></h3>
+<p>Let’s extend our exploratory analysis to the observations dataset, mirroring the approach applied to the species dataset. We’ll begin by employing the <code>column_eda()</code> function to analyze each column.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>column_eda(observations)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre>---------------scientific_name---------------
+Unique values:
+5541
+Non-null values: 23296
+Missing values: 0
+
+scientific_name
+Myotis lucifugus        12
+Puma concolor           12
+Hypochaeris radicata    12
+Holcus lanatus          12
+Name: count, dtype: int64
+---------------park_name---------------
+Unique values:
+4
+Non-null values: 23296
+Missing values: 0
+
+park_name
+Great Smoky Mountains National Park    5824
+Yosemite National Park                 5824
+Bryce National Park                    5824
+Yellowstone National Park              5824
+Name: count, dtype: int64
+---------------observations---------------
+Unique values:
+304
+Non-null values: 23296
+Missing values: 0
+
+observations
+84    220
+85    210
+91    206
+92    203
+Name: count, dtype: int64</pre>
+<p>The column analysis revelas the following insights. There are 23296 observations of 5541 unique species documented in 4 parks. The number of species (<code>scientific_name</code>) in the <code>observations</code> datset coincides with the number of species in the <code>species</code> dataset. This suggest that the <code>observations</code> dataset contains observations of all species in the <code>species</code> dataset. To confirm this, we’ll check if the <code>scientific_name</code> column in the <code>observations</code> dataset is a subset of the <code>scientific_name</code> column in the <code>species</code> dataset.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>species_names <span class="op">=</span> species.scientific_name</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>observations_names <span class="op">=</span> observations.scientific_name</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Is the observations dataset a subset of the species dataset? </span><span class="sc">{</span>observations_names<span class="sc">.</span>isin(species_names)<span class="sc">.</span><span class="bu">all</span>()<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre>Is the observations dataset a subset of the species dataset? True</pre>
+<p>The result confirms that the <code>observations</code> dataset is a subset of the <code>species</code> dataset, as all species in the <code>observations</code> dataset are also present in the <code>species</code> dataset.</p>
+<p>Furthermore, as <code>observations</code> is a numerical variable, its distribution provides insights into the frequency of species sightings. To better explore this column given its data type, we’ll visualize the distribution using a histogram.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sns.histplot(x<span class="op">=</span><span class="st">'observations'</span>, data<span class="op">=</span>observations, kde<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><a href="assets/projects/biodiversity_files/figure-markdown_strict/cell-13-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-13-output-2.png" class="img-fluid"></a></p>
+<p>The distribution of in the number of observations seems to follow a multimodal distribution, with at least three discernible peaks in the data: one at 80, another at 150, and a third at 250. This may suggest that the overall distribution is a combination of several distributions, grouped by a certain variable. Given the low number of disceernible peaks, this variable might be the <code>park_name</code> variable. That is: the distribution in the number of observations may be influenced by the size of the parks they were made in.</p>
+<p>To confirm this, we’ll plot the distribution of observations per park using the <code>hue</code> parameter in the seaborn histplot function.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>sns.histplot(x<span class="op">=</span><span class="st">'observations'</span>, data<span class="op">=</span>observations, kde<span class="op">=</span><span class="va">True</span>, hue<span class="op">=</span><span class="st">'park_name'</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><a href="assets/projects/biodiversity_files/figure-markdown_strict/cell-14-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-14-output-1.png" class="img-fluid"></a></p>
+<p>As suspected, the distribution of observations is indeed influenced by the park in which they were made. The peaks in the distribution clearly correspond to each of the four parks in the dataset. This proves that the number of observations is influenced by the park in which they were made.</p>
+</section>
+<section id="summary" class="level3">
+<h3 class="anchored" data-anchor-id="summary">Summary</h3>
+<p>To encapsulate the insights obtained from our Exploratory Data Analysis (EDA), we present the key characteristics of both datasets.</p>
+<section id="species" class="level4">
+<h4 class="anchored" data-anchor-id="species"><code>species</code></h4>
+<ul>
+<li><strong>Dataset Overview</strong>: the data comprises 5,824 entries with 4 variables—category, scientific_name, common_names, and conservation_status—offering a diverse array of taxonomic information.</li>
+<li><strong>Missing Values</strong>: the conservation_status column contains 5,633 missing values, which were imputed with “No intervention” to account for species not under any conservation status.</li>
+<li><strong>Duplicates</strong>: the dataset contains no overall duplicates, but does exhibit duplicate scientific names, which were resolved by retaining the first instance of each duplicate.</li>
+<li><strong>Common Names</strong>: the dataset contains 5541 species, with some sharing identical common names but differing in scientific nomenclature.</li>
+<li><strong>Conservation Status</strong>: the dataset reports 5 conservation statuses, with most species not under any conservation status.</li>
+</ul>
+</section>
+<section id="observations" class="level4">
+<h4 class="anchored" data-anchor-id="observations"><code>observations</code></h4>
+<ul>
+<li><strong>Dataset Overview</strong>: the data consists of 23,296 entries with 3 variables—scientific_name, park_name, and observations—documenting species sightings in 4 national parks over 7 days.</li>
+<li><strong>Unique Species</strong>: the dataset contains observations of 5,541 unique species, all of which are present in the <code>species</code> dataset.</li>
+<li><strong>Missing Values</strong>: the dataset contains no missing values, with all columns having non-null entries.</li>
+<li><strong>Distribution</strong>: the number of observations followed a multimodal distribution, which was influenced by the park in which observations were conducted.</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="analysis-1" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-1">Analysis</h2>
+<p>In this section, we aim to address the questions posed earlier by analyzing the <code>species</code> dataset and later exploring the <code>observations</code> dataset.</p>
+<section id="q-what-is-the-distribution-of-conservation-status-for-animals" class="level3">
+<h3 class="anchored" data-anchor-id="q-what-is-the-distribution-of-conservation-status-for-animals">Q: What is the distribution of conservation status for animals?</h3>
+<p>To gain insights into the distribution of conservation statuses among animal categories, we begin by aggregating the conservations statuses per species category and calculating both discrete and normalized counts. We then visualize the normalized counts using a stacked bar chart.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>category_conservation <span class="op">=</span> pd.crosstab(species[<span class="st">'conservation_status'</span>], species[<span class="st">'category'</span>]).drop(index<span class="op">=</span><span class="st">'No intervention'</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>display(category_conservation)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>category_conservation_norm <span class="op">=</span> pd.crosstab(species[<span class="st">'conservation_status'</span>], species[<span class="st">'category'</span>], normalize<span class="op">=</span><span class="st">'index'</span>).drop(index<span class="op">=</span><span class="st">'No intervention'</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>display(category_conservation_norm.style.background_gradient(cmap<span class="op">=</span><span class="st">'Blues'</span>, axis<span class="op">=</span><span class="dv">1</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>))</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> category_conservation_norm.plot(kind<span class="op">=</span><span class="st">'bar'</span>, stacked<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">'Conservation Status'</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'Number of Species'</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>ax.legend(bbox_to_anchor<span class="op">=</span>(<span class="fl">1.05</span>, <span class="dv">1</span>), loc<span class="op">=</span><span class="st">'upper left'</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Distribution of Species Among Conservation Statuses"</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 11%">
+<col style="width: 6%">
+<col style="width: 6%">
+<col style="width: 8%">
+<col style="width: 19%">
+<col style="width: 9%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>category</th>
+<th>Amphibian</th>
+<th>Bird</th>
+<th>Fish</th>
+<th>Mammal</th>
+<th>Nonvascular Plant</th>
+<th>Reptile</th>
+<th>Vascular Plant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>conservation_status</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Endangered</td>
+<td>1</td>
+<td>4</td>
+<td>3</td>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td>In Recovery</td>
+<td>0</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td>Species of Concern</td>
+<td>4</td>
+<td>68</td>
+<td>4</td>
+<td>22</td>
+<td>5</td>
+<td>5</td>
+<td>43</td>
+</tr>
+<tr class="odd">
+<td>Threatened</td>
+<td>2</td>
+<td>0</td>
+<td>3</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 17%">
+<col style="width: 9%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>category</th>
+<th>Amphibian</th>
+<th>Bird</th>
+<th>Fish</th>
+<th>Mammal</th>
+<th>Nonvascular Plant</th>
+<th>Reptile</th>
+<th>Vascular Plant</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>conservation_status</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="even">
+<td>Endangered</td>
+<td>0.066667</td>
+<td>0.266667</td>
+<td>0.200000</td>
+<td>0.400000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.066667</td>
+</tr>
+<tr class="odd">
+<td>In Recovery</td>
+<td>0.000000</td>
+<td>1.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<td>Species of Concern</td>
+<td>0.026490</td>
+<td>0.450331</td>
+<td>0.026490</td>
+<td>0.145695</td>
+<td>0.033113</td>
+<td>0.033113</td>
+<td>0.284768</td>
+</tr>
+<tr class="odd">
+<td>Threatened</td>
+<td>0.222222</td>
+<td>0.000000</td>
+<td>0.333333</td>
+<td>0.222222</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.222222</td>
+</tr>
+</tbody>
+</table>
+<p><a href="assets/projects/biodiversity_files/figure-markdown_strict/cell-15-output-3.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-15-output-3.png" class="img-fluid"></a></p>
+<p>The table and stacked bar chart above reveal several insights about the distribution of conservation status among different categories of species.</p>
+<p>Firstly, the only animal <em>in recovery</em> are birds, of which there are 3 species making up 100% of this status. This points to the fact that birds are the only species in recovery at the time of the dataset. Moreover, mammals, birds and fish are the most <em>endangered</em> species in the dataset, making more than 85% of all endangered species. Furthermore, more than 70% of <em>species of concern</em> consist of birds and vascular plants. Lastly, the <em>threatened</em> status is almost equally distributed among all species categories, except birds, nonvascular plants and reptiles.</p>
+<p>Overall, the distribution of animals among conservations statuses support the following conclusions:</p>
+<ul>
+<li>The most endangered animals in the dataset consist of mammals, birds and fishes.</li>
+<li>Birds are the only species in recovery, with only 3 species documented.</li>
+<li>The most common conservation status is <em>species of concern</em>, with birds and vascular plants making up the majority of this category.</li>
+<li>The <em>threatened</em> status is almost equally distributed among amphibians, fish, mammals and vascular plants.</li>
+</ul>
+</section>
+<section id="q-are-certain-types-of-species-more-likely-to-be-endangered" class="level3">
+<h3 class="anchored" data-anchor-id="q-are-certain-types-of-species-more-likely-to-be-endangered">Q: Are certain types of species more likely to be endangered?</h3>
+<p>The next question concerns the relation between species and their conservation status. To answer this question requires establishing a definition of likelihood for endangerment. Given protection measures are not documented in the dataset, we can only establish a definition based on the available variables. Therefore, we consider species to be more likely to be engangered if they are classified as <em>endangered</em>, <em>threatened</em>, or <em>species of concern</em> and if no protection measures are placed in response to their endangerment.</p>
+<p>To answer this question, we create a new <code>protected</code> column with True for all conservations statuses that are not <em>No intervention</em> nor <em>In recovery</em>. We then calculate the relative frequencies of protected and protected species per category. We visualize the results then using a bar chart.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>species[<span class="st">'protected'</span>] <span class="op">=</span> species.conservation_status.isin([<span class="st">'No intervention'</span>, <span class="st">'In Recovery'</span>])</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>category_protections <span class="op">=</span> pd.crosstab(species[<span class="st">'category'</span>], species[<span class="st">'protected'</span>], normalize<span class="op">=</span><span class="st">'index'</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>display(category_protections)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.barplot(data <span class="op">=</span> category_protections, y <span class="op">=</span> category_protections.iloc[:, <span class="dv">0</span>]<span class="op">*</span><span class="dv">100</span>, x <span class="op">=</span> <span class="st">'category'</span>)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>ax.bar_label(ax.containers[<span class="dv">0</span>], fmt<span class="op">=</span><span class="st">"</span><span class="sc">%0.2f%%</span><span class="st">"</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Percentage of Likely Endangerement per Species Category'</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Percentage Not Protected'</span>)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Category'</span>)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>protected</th>
+<th>False</th>
+<th>True</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>category</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Amphibian</td>
+<td>0.09</td>
+<td>0.91</td>
+</tr>
+<tr class="odd">
+<td>Bird</td>
+<td>0.15</td>
+<td>0.85</td>
+</tr>
+<tr class="even">
+<td>Fish</td>
+<td>0.08</td>
+<td>0.92</td>
+</tr>
+<tr class="odd">
+<td>Mammal</td>
+<td>0.17</td>
+<td>0.83</td>
+</tr>
+<tr class="even">
+<td>Nonvascular Plant</td>
+<td>0.02</td>
+<td>0.98</td>
+</tr>
+<tr class="odd">
+<td>Reptile</td>
+<td>0.06</td>
+<td>0.94</td>
+</tr>
+<tr class="even">
+<td>Vascular Plant</td>
+<td>0.01</td>
+<td>0.99</td>
+</tr>
+</tbody>
+</table>
+<p><a href="assets/projects/biodiversity_files/figure-markdown_strict/cell-16-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-16-output-2.png" class="img-fluid"></a></p>
+<p>Based on the information from the bar chart, we can see that mammals and birds have the highest percentage of no protection, with roughly 17% and 15% of species exhibiting some level of engangered, respectively. This suggests that mammals and birds are the most likely to be endangered among the categories.</p>
+</section>
+<section id="q-are-the-differences-between-species-and-their-conservation-status-significant" class="level3">
+<h3 class="anchored" data-anchor-id="q-are-the-differences-between-species-and-their-conservation-status-significant">Q: Are the differences between species and their conservation status significant?</h3>
+<p>The question of statistical significance for categorical variables is answered in statistics by use of the chi-square test.</p>
+<p>Crosstabulating both variables would yield a complex result, thus it’s better to break down the question into pairs of species categories. Since based on the previous question mammals are the most likely category to be endangered, we’ll compare the significance of other category differences with mammals.</p>
+<p>We’ll start by permutating the pairs of categories with mammals. Then I’ll loop over this list to perform the chi-square tests for each pair and plot the p-values to find the statistically significant differences among category pairs.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>categories <span class="op">=</span> <span class="bu">list</span>(species.category.unique())</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>combinations_mammal <span class="op">=</span> [[<span class="st">'Mammal'</span>, i] <span class="cf">for</span> i <span class="kw">in</span> categories][<span class="dv">1</span>:]</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>category_protections_counts <span class="op">=</span> pd.crosstab(species[<span class="st">'category'</span>], species[<span class="st">'protected'</span>])</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>significance_data <span class="op">=</span> {<span class="st">'Animal Pair'</span>: [], <span class="st">'p-value'</span>: []}</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> pair <span class="kw">in</span> combinations_mammal:</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  contingency_table <span class="op">=</span> category_protections_counts.loc[pair]</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  chi2, pval, dof, expected <span class="op">=</span> chi2_contingency(contingency_table)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  significance_data[<span class="st">'Animal Pair'</span>].append(<span class="ss">f'</span><span class="sc">{</span>pair[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> vs </span><span class="sc">{</span>pair[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  significance_data[<span class="st">'p-value'</span>].append(pval)</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>sign_data <span class="op">=</span> pd.DataFrame(significance_data)</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>sign_data[<span class="st">'p-value'</span>] <span class="op">=</span> sign_data[<span class="st">'p-value'</span>]<span class="op">*</span><span class="dv">100</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="co"># display(sign_data)</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot</span></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">5</span>))</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span>sns.barplot(data <span class="op">=</span> sign_data, x <span class="op">=</span> <span class="st">'Animal Pair'</span>, y <span class="op">=</span> <span class="st">'p-value'</span>)</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Statistical Significance of Protection Statuses per Animal</span><span class="ch">\n</span><span class="st">(difference with mammals)'</span>)</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>plt.axhline(<span class="dv">5</span>, color<span class="op">=</span><span class="st">'red'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>)</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">""</span>)</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">'p-value</span><span class="ch">\n</span><span class="st">(alpha = 5%)'</span>)</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>plt.xticks(rotation<span class="op">=</span><span class="dv">45</span>)</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>ax.bar_label(ax.containers[<span class="dv">0</span>], fmt<span class="op">=</span><span class="st">"</span><span class="sc">%0.2f%%</span><span class="st">"</span>)</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><a href="assets/projects/biodiversity_files/figure-markdown_strict/cell-17-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="assets/projects/biodiversity_files/figure-markdown_strict/cell-17-output-1.png" class="img-fluid"></a></p>
+<p>The above graph illustrates the p-values for the chi-square tests performed for each animal category against mammals. Given an alpha of 5%, the analysis shows that birds and amphibians display no statistically significant differences in their conservations statuses compared with mammals. However, all other categories such as reptiles, fishes and plants show statistically significant differences in their conservation statuses when comapred to mammals. This means that the conservation statuses of these categories are significantly different from mammals.</p>
+</section>
+<section id="q-which-species-were-spotted-the-most-at-each-park" class="level3">
+<h3 class="anchored" data-anchor-id="q-which-species-were-spotted-the-most-at-each-park">Q: Which species were spotted the most at each park?</h3>
+<p>Lastly, we explore the <code>observations</code> dataset to identify the most frequently spotted species in each park.</p>
+<p>Since the dataset doesn’t include common names, we’ll map the common names from the <code>species</code> dataset to the scientific names in the <code>observations</code> dataset. Then, we’ll aggregate the data by park and by species, summing their observations to identify the most frequently spotted species in each park.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>merged_df <span class="op">=</span> observations.merge(species[[<span class="st">'category'</span>, <span class="st">'scientific_name'</span>, <span class="st">'common_names'</span>]], how<span class="op">=</span><span class="st">'left'</span>).drop_duplicates()</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>merged_df_grouped <span class="op">=</span> merged_df.groupby([<span class="st">'park_name'</span>, <span class="st">'scientific_name'</span>, <span class="st">'common_names'</span>]).observations.<span class="bu">sum</span>().reset_index()</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>merged_df_grouped <span class="op">=</span> merged_df_grouped.loc[merged_df_grouped.groupby(<span class="st">'park_name'</span>)[<span class="st">'observations'</span>].idxmax()].sort_values(by <span class="op">=</span> <span class="st">'observations'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>display(merged_df_grouped.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 32%">
+<col style="width: 20%">
+<col style="width: 29%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>park_name</th>
+<th>scientific_name</th>
+<th>common_names</th>
+<th>observations</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>13534</td>
+<td>Yellowstone National Park</td>
+<td>Holcus lanatus</td>
+<td>Common Velvet Grass, Velvetgrass</td>
+<td>805</td>
+</tr>
+<tr class="even">
+<td>19178</td>
+<td>Yosemite National Park</td>
+<td>Hypochaeris radicata</td>
+<td>Cat's Ear, Spotted Cat's-Ear</td>
+<td>505</td>
+</tr>
+<tr class="odd">
+<td>1359</td>
+<td>Bryce National Park</td>
+<td>Columba livia</td>
+<td>Rock Dove</td>
+<td>339</td>
+</tr>
+<tr class="even">
+<td>10534</td>
+<td>Great Smoky Mountains National Park</td>
+<td>Streptopelia decaocto</td>
+<td>Eurasian Collared-Dove</td>
+<td>256</td>
+</tr>
+</tbody>
+</table>
+<p>Based on the aggregation above, in Yellowstone National Park, the species Holcus lanatus was the most commonly observed, with a total of 805 sightings. Meanwhile, Hypochaeris radicata was the predominant species in Yosemite National Park, with 505 observations. In Bryce National Park, Columba livia garnered the highest number of sightings, totaling 339. Finally, in Great Smoky Mountains National Park, Streptopelia decaocto was the most frequently spotted species, with 256 observations.</p>
+</section>
+</section>
+<section id="conclusions" class="level2">
+<h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
+<p>This project set out to explore biodiversity data from the National Parks Service, focusing on endangered species and their conservation statuses. Through a detailed exploratory data analysis, several key findings emerged, shedding light on the distribution of conservation statuses among different species categories, the likelihood of species endangerment, the significance of differences in conservation statuses among species categories, and the most frequently spotted species in each national park.</p>
+<section id="distribution-of-conservation-statuses" class="level3">
+<h3 class="anchored" data-anchor-id="distribution-of-conservation-statuses">Distribution of Conservation Statuses</h3>
+<p>The analysis revealed that mammals, birds, and fishes are the most endangered species categories, making up the majority of the <em>endangered</em> conservation status. Birds were the only category with species classified as <em>in recovery</em>, indicating a unique conservation status among all the categories. Out of 178 species marked with some conservation status other than <em>no intervention</em>, most species are under the status of species of concern, especially birds and vascular plants.</p>
+</section>
+<section id="likelihood-of-species-endangerment" class="level3">
+<h3 class="anchored" data-anchor-id="likelihood-of-species-endangerment">Likelihood of Species Endangerment</h3>
+<p>Mammals and birds emerged as the most likely categories to be endangered, with approximately 17% and 15% of species not classified as either <em>in recovery</em> or <em>no intervention</em>. Without any protection measures, this suggests a higher vulnerability to endangerment among mammals and birds compared to other species categories.</p>
+</section>
+<section id="significance-of-conservation-status-differences" class="level3">
+<h3 class="anchored" data-anchor-id="significance-of-conservation-status-differences">Significance of Conservation Status Differences</h3>
+<p>Statistical significance testing showed that birds and amphibians did not exhibit statistically significant differences in their conservation statuses compared with mammals. However, all other categories, including reptiles, fishes, and plants, displayed significant differences in conservation statuses compared with mammals. This highlights the importance of considering species-specific conservation measures based on their unique characteristics.</p>
+</section>
+<section id="most-frequently-spotted-species" class="level3">
+<h3 class="anchored" data-anchor-id="most-frequently-spotted-species">Most Frequently Spotted Species</h3>
+<p>The analysis identified the most frequently spotted species in each national park. Species such as common velvet grass, a vascular plant, in Yellowstome National Park. Moreover, doves were the most commonly observed species both in Bryce and Great Smoky Mountains National Parks. Furthermore, the most observed species Yosemite National Park was the cat’s ear plant. This findings are examples of the rich biodiversity present in national parks.</p>
+<p>In conclusion, this project contributes to our understanding of endangered species and their conservation statuses, highlighting the need for targeted conservation efforts to protect vulnerable species and preserve biodiversity in national parks. Further research could explore additional factors influencing species endangerment and conservation strategies tailored to specific species categories. By understanding and honoring the unique needs of each species category, we can forge a path towards sustainable coexistence and ensure the enduring legacy of our national parks for generations to come.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/marcocamilo\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2024 Marco-Andrés Camilo-Pietri</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"openEffect":"zoom","selector":".lightbox","loop":false,"descPosition":"bottom","closeEffect":"zoom"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+</body></html>

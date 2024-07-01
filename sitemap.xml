@@ -2,26 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://marcocamilo.com/portfolio.html</loc>
-    <lastmod>2024-06-23T22:39:03.337Z</lastmod>
+    <lastmod>2024-07-01T20:23:33.331Z</lastmod>
   </url>
   <url>
-    <loc>https://marcocamilo.com/index.html</loc>
-    <lastmod>2024-06-23T22:39:03.336Z</lastmod>
-  </url>
-  <url>
-    <loc>https://marcocamilo.com/projects/resume-analyzer.html</loc>
-    <lastmod>2024-06-25T03:10:06.227Z</lastmod>
-  </url>
-  <url>
-    <loc>https://marcocamilo.com/projects/airline-performance.html</loc>
+    <loc>https://marcocamilo.com/portfolio/airline-performance.html</loc>
     <lastmod>2024-06-30T22:48:01.141Z</lastmod>
-  </url>
-  <url>
-    <loc>https://marcocamilo.com/projects/biodiversity.html</loc>
-    <lastmod>2024-06-23T22:39:03.344Z</lastmod>
   </url>
   <url>
     <loc>https://marcocamilo.com/about.html</loc>
     <lastmod>2024-06-24T17:13:23.760Z</lastmod>
+  </url>
+  <url>
+    <loc>https://marcocamilo.com/index.html</loc>
+    <lastmod>2024-07-01T20:26:14.205Z</lastmod>
+  </url>
+  <url>
+    <loc>https://marcocamilo.com/portfolio/resume-classifier.html</loc>
+    <lastmod>2024-07-01T02:38:57.578Z</lastmod>
+  </url>
+  <url>
+    <loc>https://marcocamilo.com/portfolio/biodiversity.html</loc>
+    <lastmod>2024-06-23T22:39:03.344Z</lastmod>
   </url>
 </urlset>

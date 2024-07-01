@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.45">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="This project analyzes on-time performance trends from 34 years of US domestic flight data, focusing on variations across carriers, routes, airports, and time. The goal is to conduct a comprehensive exploratory data analysis (EDA) to address key industry questions and translate the findings into an interactive visualization dashboard.">
+
+<title>Airline On-Time Performance – marcocamilo</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../assets/css/global.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marcocamilo</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../portfolio.html"> 
+<span class="menu-text">Portfolio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#executive-summary" id="toc-executive-summary" class="nav-link active" data-scroll-target="#executive-summary">Executive Summary</a></li>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset">Dataset</a></li>
+  <li><a href="#preprocessing-and-feature-engineering" id="toc-preprocessing-and-feature-engineering" class="nav-link" data-scroll-target="#preprocessing-and-feature-engineering">Preprocessing and Feature Engineering</a>
+  <ul>
+  <li><a href="#univariate-analysis" id="toc-univariate-analysis" class="nav-link" data-scroll-target="#univariate-analysis">Univariate Analysis</a></li>
+  <li><a href="#preprocessing-flight-info-variables" id="toc-preprocessing-flight-info-variables" class="nav-link" data-scroll-target="#preprocessing-flight-info-variables">Preprocessing Flight Info Variables</a></li>
+  <li><a href="#reengineering-time-variables" id="toc-reengineering-time-variables" class="nav-link" data-scroll-target="#reengineering-time-variables">(Re)Engineering Time Variables</a></li>
+  </ul></li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis">Exploratory Data Analysis</a>
+  <ul>
+  <li><a href="#univariate-analysis-1" id="toc-univariate-analysis-1" class="nav-link" data-scroll-target="#univariate-analysis-1">Univariate Analysis</a></li>
+  <li><a href="#bivariate-analysis" id="toc-bivariate-analysis" class="nav-link" data-scroll-target="#bivariate-analysis">Bivariate Analysis</a>
+  <ul class="collapse">
+  <li><a href="#how-do-delays-vary-across-time" id="toc-how-do-delays-vary-across-time" class="nav-link" data-scroll-target="#how-do-delays-vary-across-time">How do delays vary across time?</a></li>
+  <li><a href="#are-departures-delays-correlated-with-arrival-delays" id="toc-are-departures-delays-correlated-with-arrival-delays" class="nav-link" data-scroll-target="#are-departures-delays-correlated-with-arrival-delays">Are departures delays correlated with arrival delays?</a></li>
+  <li><a href="#how-do-delays-vary-across-carriers" id="toc-how-do-delays-vary-across-carriers" class="nav-link" data-scroll-target="#how-do-delays-vary-across-carriers">How do delays vary across carriers?</a></li>
+  <li><a href="#how-do-delays-vary-by-airport" id="toc-how-do-delays-vary-by-airport" class="nav-link" data-scroll-target="#how-do-delays-vary-by-airport">How do delays vary by airport?</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Airline On-Time Performance</h1>
+<p class="subtitle lead">Longitudinal Trends, Carrier Delays, and Geographic Patterns in the US Airline Industry</p>
+</div>
+
+<div>
+  <div class="description">
+    This project analyzes on-time performance trends from 34 years of US domestic flight data, focusing on variations across carriers, routes, airports, and time. The goal is to conduct a comprehensive exploratory data analysis (EDA) to address key industry questions and translate the findings into an interactive visualization dashboard.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="https://i.dailymail.co.uk/i/pix/2013/05/02/article-2318173-19957F94000005DC-90_964x639.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="https://i.dailymail.co.uk/i/pix/2013/05/02/article-2318173-19957F94000005DC-90_964x639.jpg" class="img-fluid"></a></p>
+<section id="executive-summary" class="level2">
+<h2 class="anchored" data-anchor-id="executive-summary">Executive Summary</h2>
+<p>This project analyzes on-time performance trends from 30 years of US domestic flight data, focusing on variations across carriers, routes, airports, and time. The goal is to conduct a comprehensive exploratory data analysis (EDA) to address key industry questions, such as identifying carriers and airports with the highest frequency of flight delays, understanding the impact of departure delays on arrival times, and examining trends in flight delays within the US aviation sector. The findings from the EDA will be translated into an interactive visualization dashboard using Streamlit.</p>
+</section>
+<section id="dataset" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="dataset">Dataset</h2>
+<p>The <a href="https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FGJ">Airline Reporting Carrier On-Time Performance Dataset</a>, sourced from the U.S. Department of Transportation’s Bureau of Transportation Statistics, contains scheduled and actual departure and arrival times reported by certified U.S. air carriers between 1987 and 2020. The version used in this project, available at <a href="https://developer.ibm.com/exchanges/data/all/airline/">IBM Developer</a><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, contains a 2 million record sample of the full dataset (&lt;1%).</p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;The dataset is available in three sizes: the original dataset of 194,385,636 flights, a 2 million sample version and a 2 thousand sample of flights from LAX to JFK airport. All three versions are available as gzip compressed tar or csv files.</p></div></div><p>Key features reported by carriers include scheduled and actual event times, flight dates, carrier, origin and destination information, cancelation and diversion information, as well as summary statistics such as elapsed time, distance and delay causes. A full description of the variables in the dataset can be found <a href="https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FGJ">here</a>. Below is a summary of the main variable grouppings.</p>
+<details>
+<summary>
+Feature glossary
+</summary>
+<ul>
+<li><strong>Temporal variables</strong>: <code>Year</code>, <code>Quarter</code>, <code>Month</code>, <code>DayofMonth</code>, <code>DayOfWeek</code>, <code>FlightDate</code></li>
+<li><strong>Flight variables</strong>: <code>Reporting_Airline</code>, <code>Tail_Number</code>, <code>Flight_Number_Reporting_Airline</code></li>
+<li><strong>Origin/Destination variables</strong>:</li>
+<li><code>OriginAirportID</code>, <code>Origin</code>, <code>OriginCityName</code>, <code>OriginState</code>, <code>OriginStateName</code>,<br>
+</li>
+<li><code>DestAirportID</code>, <code>Dest</code>, <code>DestCityName</code>, <code>DestState</code>, <code>DestStateName</code><br>
+</li>
+<li><strong>Departure/Arrival time variables</strong>:</li>
+<li><code>CRSDepTime</code>, <code>DepTime</code>, <code>DepDelay</code>, <code>DepDelayMinutes</code>, <code>DepDel15</code>, <code>DepartureDelayGroups</code><br>
+</li>
+<li><code>CRSArrTime</code>, <code>ArrTime</code>, <code>ArrDelay</code>, <code>ArrDelayMinutes</code>, <code>ArrDel15</code>, <code>ArrivalDelayGroups</code><br>
+</li>
+<li><strong>Taxi variables</strong>: <code>TaxiOut</code>, <code>WheelsOff</code>, <code>WheelsOn</code>, <code>TaxiIn</code></li>
+<li><strong>Cancellation variables</strong>: <code>Cancelled</code>, <code>CancellationCode</code>, <code>Diverted</code></li>
+<li><strong>Flight summary variables</strong>: <code>CRSElapsedTime</code>, <code>ActualElapsedTime</code>, <code>AirTime</code>, <code>Flights</code>, <code>Distance</code>, <code>DistanceGroup</code></li>
+<li><strong>Cause of Delay (Data starts 6/2003)</strong>: <code>CarrierDelay</code>, <code>WeatherDelay</code>, <code>NASDelay</code>, <code>SecurityDelay</code>, <code>LateAircraftDelay</code></li>
+</ul>
+</details>
+</section>
+<section id="preprocessing-and-feature-engineering" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="preprocessing-and-feature-engineering">Preprocessing and Feature Engineering</h2>
+<p>The strategy for preprocessing interleaves <em>univariate analysis</em> with <em>data cleaning and feature engineering</em> for each variable group, utilizing the former to contextualize preprocessing decisions in the latter. For this project, this approach encompases three major aspects: conducting a general univariate analysis, preprocessing flight info variables, and (re)engineering time variables.</p>
+<section id="univariate-analysis" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="univariate-analysis">Univariate Analysis</h3>
+<p>For each variable group, I conducted a univariate analysis to understand the distribution, spread, and missing values of the variables using two custom functions:</p>
+<details class="list">
+<summary>
+<code>df_overview</code> prints the shape, sample head and tail, and non-null counts.
+</summary>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> df_overview(df):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Shape: </span><span class="sc">{</span>df<span class="sc">.</span>shape<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Head and tail preview:"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    display(df)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Df info:"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(df.info(verbose<span class="op">=</span><span class="va">True</span>), <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"-"</span><span class="op">*</span><span class="dv">70</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<details class="list">
+<summary>
+<code>univariate_preview</code> provides a compact report with the first five rows, data types, unique values, top 5 values, null value percentage, and summary statistics for continuous variables.
+</summary>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> univariate_preview(df, cols, describe<span class="op">=</span><span class="va">True</span>):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    display(<span class="st">"Data Preview"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    display(df[cols].head())</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    display(<span class="st">"Value Counts"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">list</span> <span class="op">=</span> []</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> col <span class="kw">in</span> cols:</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">list</span>.append(</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>            [col,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>            df[col].dtypes,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            df[col].nunique(),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>            df[col].value_counts().iloc[:<span class="dv">5</span>].index.tolist(),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"</span><span class="sc">{:.2f}</span><span class="st">%"</span>.<span class="bu">format</span>(df[col].isna().mean()<span class="op">*</span><span class="dv">100</span>)]</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    display(pd.DataFrame(<span class="bu">list</span>, </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                         columns <span class="op">=</span> [<span class="st">'columns'</span>, <span class="st">'dtypes'</span>, <span class="st">'nunique'</span>, <span class="st">'top5'</span>, <span class="st">'na%'</span>]</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                         ).sort_values(<span class="st">'nunique'</span>, ascending<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> describe:</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        display(<span class="st">"Summary Stats"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        display(pd.concat([</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>            df[cols].describe(),</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>            df[cols].skew().to_frame(<span class="st">'skewness'</span>).T,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>            df[cols].kurtosis().to_frame(<span class="st">'kurtosis'</span>).T,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        ]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<p>Additionally, I visualized missing values using the <code>missingno</code> package<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>, while certain distributions and value counts I visualized using <code>matplotlib</code> and <code>seaborn</code>.</p>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;The <code>missingno</code> package offers visualization options such as heatmaps, bar charts, and dendrograms to identify patterns and distributions of missing data.</p></div></div></section>
+<section id="preprocessing-flight-info-variables" class="level3">
+<h3 class="anchored" data-anchor-id="preprocessing-flight-info-variables">Preprocessing Flight Info Variables</h3>
+<p>The first half of all preprocessing focused on the flight information variables, including date, flight, origin/destination, and departure/arrival variables. Based on the findings of each univariate analysis, I performed the following preprocessing steps:</p>
+<ul>
+<li><strong>Data Cleaning</strong>
+<ul>
+<li><strong><code>FlightDate</code> to <code>datetime64[ns]</code></strong>: allowed to perform date operations, aggregations, and visualizations.</li>
+<li><strong>Filling Missing State and State Names</strong>: imputed missing state and state name values to reduce missing data.</li>
+<li><strong>Standardizing City Names</strong>: standardized city names to ensure uniformity and remove single occurrences.</li>
+<li><strong>Dropping Taxi, Cancelled, and Diverted Variables</strong>: removed variables due to high occurrence of missing values.</li>
+</ul></li>
+<li><strong>Feature Engineering</strong>
+<ul>
+<li><strong>Airline Names</strong>: used an airlines dataset to map the airline codes to their respective airline names to provide more readable and insightful information.</li>
+<li><strong>Unique Flight Identifier</strong>: explored creating a unique flight identifier by combining carrier code and flight number, to reduce ambiguity and identify unique flights more easily.</li>
+</ul></li>
+</ul>
+</section>
+<section id="reengineering-time-variables" class="level3">
+<h3 class="anchored" data-anchor-id="reengineering-time-variables">(Re)Engineering Time Variables</h3>
+<p>The second phase of preprocessing addresses a critical issue found in the dataset’s handling of time-related variables, particularly concerning flight delays. The delay variables were calculated from the raw timestamps, without accounting for time zone discrepancies, daylight savings time, and cross-midnight flights. This required developing an approach to impute time zone information, correct timestamps, and recompute delays accurately.</p>
+<p>To address these issues, I implemented the following steps:</p>
+<ol type="1">
+<li><strong>Imputing Time Zone Information</strong>: assigned time zones to all timestamps using a dictionary of airport codes and their respective time zones sourced from two datasets.</li>
+<li><strong>Reverse Engineering Arrival Dates</strong>: converted all times to UTC (Coordinated Universal Time), recalculated timestamps based on flight departure dates and time differences, and reconverted times to local time zones.</li>
+<li><strong>Filter Remaining Negative Delays</strong>: removed the remaining negative delays after the reverse engineering process to ensure accurate delay calculations.</li>
+<li><strong>Delay Calculation</strong>: calculated delays based on the difference between scheduled and actual departure and arrival times, accounting for time zone differences and daylight savings time.</li>
+</ol>
+<p>In addition to this, I also performed the following data cleaning and feature engineering steps:</p>
+<ul>
+<li><strong>Data Cleaning</strong>:
+<ul>
+<li><strong>Standardizing 0s, 2400s, and missing values</strong>: converted 0s to Nan values and 2400s to 0s for consistency in time representation.</li>
+<li><strong>Filling Missing CRS Values</strong>: imputed missing values in the CRS (Scheduled) times from the difference between actual times and delay minutes.</li>
+<li><strong>Changing Data Types</strong>: converted data types where necessary to improve computational efficiency.</li>
+</ul></li>
+<li><strong>Feature Engineering</strong>:
+<ul>
+<li><strong>Datetime Conversion</strong>: created UTC versions of time variables for time calculations such as elapsed time.</li>
+<li><strong>Time Recalculations</strong>: using the time zone marked timestamps, recalculated delays and elapsed times more accurately than the original dataset.</li>
+</ul></li>
+</ul>
+<!-- Explain why discrepancies still remained and say these will be removed later in the analysis -->
+</section>
+</section>
+<section id="exploratory-data-analysis" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h2>
+<p>The Exploratory Data Analysis in this project was carried in two modalities: a methodical univariate analysis of each variable during preprocessing and a targeted bivariate and multivariate analysis focused on answering the research questions of the project<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. I framed the questions around five distinct themes:</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;Most questions in this bivariate analysis adopt a longitudinal perspective, comparing the frequency of delays with different variables across the entire span of the dataset. This approach provides a historical view of delays within the US aviation sector. However, further insights lie within a cross-sectional analysis, which compares the frequency of delays across different variables at specific points in time. This would be more suitable for a multivariate analysis, which I leave for future work.</p></div></div><ol type="1">
+<li><strong>Longitudinal</strong>: How do delays vary across time?</li>
+<li><strong>Corporate</strong>: How do delays vary across carriers? (distribution and longitudinal)</li>
+<li><strong>Directional</strong>: How do delays vary by route?</li>
+<li><strong>Geographical</strong>: how do delays vary by airport?</li>
+<li><strong>Correlation</strong>: are departures delays correlated with arrival delays? (or how frequent do flights make up for late departures?)</li>
+</ol>
+<p>Before diving into the findings for each question, I will provide a brief overview of the findings from the univariate analysis.</p>
+<section id="univariate-analysis-1" class="level3">
+<h3 class="anchored" data-anchor-id="univariate-analysis-1">Univariate Analysis</h3>
+<p>The univariate analysis revealed several key insights about the dataset:</p>
+<details class="list">
+<summary>
+<strong>Date columns</strong>: The flights span 34 years, with the distribution slightly shifted left (2005), indicating growth in the airline industry in the last 15 years. Other columns such as months, days, and weekdays, show an even distribution.
+</summary>
+<a href="../assets/projects/airline/date_cols.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="../assets/projects/airline/date_cols.png" class="img-fluid"></a>
+</details>
+<details class="list">
+<summary>
+<strong>Flight info columns</strong>: The dataset includes 33 unique carriers, with Southwest Airlines (WN), Delta Air Lines (DL), and American Airlines (AA) being the most frequent.
+</summary>
+<img src="../assets/projects/airline/carrier-count.png" class="img-fluid">
+</details>
+<details class="list">
+<summary>
+<strong>Origin/Destination columns</strong>: Flights originate and land in all 50 US states and five overseas territories, including Puerto Rico, US Virgin Islands, and Guam. The top destinations in the dataset are California (CA), Texas (TX), Florida (FL), Illinois (IL), Georgia (GA), and New York (NY).
+</summary>
+<a href="../assets/projects/airline/state-count.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3"><img src="../assets/projects/airline/state-count.png" class="img-fluid"></a>
+</details>
+<details class="list">
+<summary>
+<strong>Time Variables</strong>: Departures are more frequent in the morning hours, while arrivals peak in the evening. The distribution of CRS and actual time variables for departures and arrivals are almost identical, indicating that the average size of flight delays is small across the dataset.
+</summary>
+<a href="../assets/projects/airline/time-distribution.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4"><img src="../assets/projects/airline/time-distribution.png" class="img-fluid"></a>
+</details>
+<details class="list">
+<summary>
+<strong>Delay Variables</strong>: Approximately 80% of flights operate on-time, while around 20% experience delays (as by the industry-defined standard of exceeding 15 minutes). The distribution shows a right skew, with over 40% of flights arriving early by less than 15 minutes and about 30% arriving exactly on time. Out of all delayed flights, most fall within the 15 to 40-minute range.
+</summary>
+<a href="../assets/projects/airline/delay-cols.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="../assets/projects/airline/delay-cols.png" class="img-fluid"></a>
+</details>
+<details class="list">
+<summary>
+<strong>Flight Summary Variables</strong>: Flights typically cover distances under 1000 miles, with a right-skewed distribution observed in the data. The majority of flights have durations under around 160 minutes or 2 hours and 40 minutes, as indicated by the right-skewed distributions of the elapsed time variables.
+</summary>
+<a href="../assets/projects/airline/flight-summary-cols.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="../assets/projects/airline/flight-summary-cols.png" class="img-fluid"></a>
+</details>
+<!-- <details class="list"> -->
+<!-- <summary>**Delay Summary Variables**: The amount of delays across all causes show a right-skewed distribution, with most factors causing delays of less than 200 minutes. The highest recorded delay values approach approximately 1600 minutes, with SecurityDelay showing the smallest maximum delay of 219 minutes.</summary> -->
+<!-- </details> -->
+</section>
+<section id="bivariate-analysis" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="bivariate-analysis">Bivariate Analysis</h3>
+<section id="how-do-delays-vary-across-time" class="level4 page-columns page-full">
+<h4 class="anchored" data-anchor-id="how-do-delays-vary-across-time">How do delays vary across time?</h4>
+<p>This question involves a longitudinal analysis of the evolution of delayed flights over 34 years. It compares the continuous variable “number of delayed flights” with the categorical time variable, examining both departure and arrival delays</p>
+<p>To answer this question, I first defined the time step by which to evaluate the evolution of delays. I chose to aggregate the data by month-year date, which provides a balance between granularity, interpretability and computational efficiency. Next, I decided on the metric to evaluate delays. Although the raw sum of delays is intuitive, normalizing the counts by the total flights per month offers a more accurate representation of delay frequency, as it adjusts for variations in monthly flight numbers.</p>
+<p>With these definitions, I began by plotting the evolution in the number of delayed flights per month over the years, as shown in the figure below.</p>
+<p><a href="../assets/projects/airline/evolution-mean-delays.png" class="lightbox" data-gallery="quarto-lightbox-gallery-7"><img src="../assets/projects/airline/evolution-mean-delays.png" class="img-fluid"></a></p>
+<p>The normalized plots above reveal several insights about the evolution of delays from a cross-sectional and longitudinal perspective:</p>
+<ul>
+<li><strong>Cross-sectional observations</strong>:
+<ul>
+<li>The line plot reveals periodic fluctuations in both departure and arrival delays, reflecting seasonal changes in delays within each year.</li>
+<li>A noticeable drop in delays occurs between approximately 2001 and 2003, potentially influenced by external economic factors<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>.</li>
+</ul></li>
+<li><strong>Longitudinal observations</strong>:
+<ul>
+<li>The regression plot shows an initial gap between departure and arrival delays, which converges over time to approximately 20% by the end of the dataset.</li>
+<li>The line plot demonstrates a reduction in the volatility of delays over the years, suggesting a slight stabilization in the frequency of delays.</li>
+</ul></li>
+</ul>
+<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;One potential cause for this temporary drop in delays is the contraction in the airline industry that followed 9/11, reducing the amount of delays together with the number of flights (see <a href="https://www.businessinsider.com/how-the-us-airline-industry-has-changed-since-911-2011-9?op=1">this article</a>)</p></div></div><p>This narrowing gap and reduction in delay volatility would have suggested an improvement in airline on-time performance, if it were not for the fact that the reduction is cause by an increase in departure delays rather than a decrease in arrival delays. The regression analysis demonstrates this: arrival delays have decreased only by 1%, while departure delays have risen by over 5% in the span of 30 years. This confirms that airlines have been unable to improve on-time performance at arrivals and have become less efficient in managing departure delays.</p>
+</section>
+<section id="are-departures-delays-correlated-with-arrival-delays" class="level4 page-columns page-full">
+<h4 class="anchored" data-anchor-id="are-departures-delays-correlated-with-arrival-delays">Are departures delays correlated with arrival delays?</h4>
+<p>This question is a correlation analysis examining the connection between the two continuous variables: departure and arrival delays.</p>
+<p>To answer this, I calculated the Pearson correlation coefficient between departure delays and arrival delays for delayed flights<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>. This coefficient ranges from -1 indicating a perfect negative linear relationship, 0 indicating no linear relationship, up to 1 indicating a perfect positive linear relationship. To visualize the relationship, I plot the correlation using a custom <code>jointplot</code> function, which combines a scatter plot with a box plot to show the distribution of the data across both variables. This function also computes and displays the Pearson correlation coefficient.</p>
+<div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;I filtered the dataset for flights with delays greater than 15 minutes, the industry standard for defining a delayed flight. This prevents the distribution from factoring in flights that were not delayed, which account for the majority of the dataset and may skew the results.</p></div></div><p>Before plotting the jointplot, I cleaned the data by removing the remaining extreme cases, such as flights with negative delays which, due to times crossing the change to daylight savings time, were not corrected in the preprocessing. After this, I plotted the jointplot, which is shown below.</p>
+<p><a href="../assets/projects/airline/delays-correlation.png" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="../assets/projects/airline/delays-correlation.png" class="img-fluid"></a></p>
+<p>The Pearson correlation coefficient between departure and arrival delays is 0.93, indicating a strong positive linear relationship between the two variables. However, there are three observations that can be made from the jointplot:</p>
+<ol type="1">
+<li><strong>Outliers and Extreme Cases</strong>: The scatter plot exhibits a broad spectrum of outliers that extend well beyond the interquartile range, yet notably adhere to the linear relationship between departure and arrival delays.</li>
+<li><strong>Linear Relationship</strong>: The distribution shows that the relationship follows a more linear pattern the more extreme their values are, whereas the relationship becomes more dispersed as delays become less extreme.</li>
+<li><strong>Interquartile Range</strong>: The interquartile range for both departure and arrival delays is notably narrower compared to the full range of the data, which underscores the concentration of delays within 60 minutes, as seen in the univariate analysis.</li>
+</ol>
+<p>To understand the nature of this relationship for the core of flights, I focused on the interquartile range and adjusted the analysis: recalculating the correlation coefficient and focusing the jointplot on this range.</p>
+<p><a href="../assets/projects/airline/delays-correlation-filtered.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="../assets/projects/airline/delays-correlation-filtered.png" class="img-fluid"></a></p>
+<p>The Pearson correlation coefficient is now 0.67 within the interquartile range, which indicates a weaker but still positive linear relationship between departure and arrival delays. This relationship is depicted in the jointplot by a broader dispersion of data points. The empty square in the lower left corner of the plot represents flights filtered out by the industry standard definition of a delay (&gt;15 minutes). The boxplots along the edges of the scatterplot further confirm the findings from the univariate analysis, namely that the majority of delays range between 15 and 40 minutes.</p>
+<p>The filtered scatterplot has two clear boundaries that define the relationship between departure and arrival delays. I calculated approximate regression lines for these boundaries to understand the relationship more clearly.</p>
+<p><a href="../assets/projects/airline/delays-correlation-filtered-bounds.png" class="lightbox" data-gallery="quarto-lightbox-gallery-10"><img src="../assets/projects/airline/delays-correlation-filtered-bounds.png" class="img-fluid"></a></p>
+<p>There are two observations that can be made about the correlation of departure and arrival delays for the interquartile range:</p>
+<ul>
+<li><strong>Shallow Bound</strong>: Indicates the minimum threshold to which arrival delays can be minimized.
+<ul>
+<li>Follows a linear relationship: <span class="math inline">\(y = 1.15x - 45\)</span>, where <span class="math inline">\(y\)</span> is the arrival delay and <span class="math inline">\(x\)</span> is the departure delay.</li>
+<li>Implies that the arrival delay can only be reduced by up to 45 minutes relative to a departure delay.</li>
+<li>Highlights a practical limit: minimizing arrival delays becomes increasingly constrained as departure delays increase.</li>
+</ul></li>
+<li><strong>Steep Bound</strong>: Indicates how arrival delays can increase relative to departure delays.
+<ul>
+<li>Follows a steeper linear trend: <span class="math inline">\(y = 6.5x + 120\)</span>, where <span class="math inline">\(y\)</span> is the arrival delay and <span class="math inline">\(x\)</span> is the departure delay.</li>
+<li>Reflects that arrival delays can significantly exceed departure delays due to extrenal factors like diversions, weather, or arrival airport congestion.</li>
+<li>Bound shows an upper limit of 250 minutes for on-time departures (see first scatterplot), then progressively aligning with the general trend as departure delays increase.</li>
+</ul></li>
+</ul>
+<p>In conclusion, the correlation analysis reveals a moderately positive linear relationship between departure and arrival delays when focusing on the interquartile range. The broad dispersion of data points within the interquartile range points to the influence external factors affecting arrival delays relative to departure delays. This dispersion is marked by two boundaries: arrival delays can be minimized by up to 45 minutes relative to departure delays, yet can exceed them by up to 250 minutes. Otherwise, when considering the full range of data, the analysis demonstrates a strong positive linear relationship between departure and arrival delays.</p>
+</section>
+<section id="how-do-delays-vary-across-carriers" class="level4 page-columns page-full">
+<h4 class="anchored" data-anchor-id="how-do-delays-vary-across-carriers">How do delays vary across carriers?</h4>
+<p>This is one of the most frequently asked questions in the airline industry, as it provides insights into the performance of individual carriers and their overall competitiveness in the market. It requires a bivariate analysis comparing the frequency of delays across carriers. Most reports approach this question by comparing the total number of delays per carrier, but this approach can be misleading for two reasons:</p>
+<ol type="1">
+<li><strong>Flight Volume</strong>: Carriers with higher flight volumes are more likely to have higher delay counts, which can skew the results.</li>
+<li><strong>Carrier Age</strong>: Older carriers have more historical data, which can also skew the results.</li>
+</ol>
+<p>This analysis uses a more accurate metric: the normalized delay frequency. This metric adjusts the delay counts by the total number of flights per carrier<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>. This approach provides a more accurate representation of delay frequency, as it accounts for variations in flight volume and, to some extent, carrier age. Below are the plots of the normalized delay frequencies across carriers.</p>
+<!-- ![](/assets/projects/airline/departure-delays-carrier.png) -->
+<!-- ![](/assets/projects/airline/arrival-delays-carrier.png) -->
+<div class="no-row-height column-margin column-container"><div id="fn6"><p><sup>6</sup>&nbsp;An alternative approach would be to normalize the counts by the age of the carrier. However, this would require data mapping each carrier to its age in the industry, which, at the time of writing this report, was not available for the carriers in this dataset.</p></div></div><p><a href="../assets/projects/airline/carrier-delays.png" class="lightbox" data-gallery="quarto-lightbox-gallery-11"><img src="../assets/projects/airline/carrier-delays.png" class="img-fluid"></a></p>
+<p>The normalized delay counts show a more robust comparison of on-time performance between airlines, even among those with higher flight volumes or varying ages. Each plot reveals several insights about carrier performance, however, the most revealing insights come from comparing the rankings of carriers across both departure and arrival delays.</p>
+<ul>
+<li><strong>Consistent Rankings</strong>: JetBlue Airways, ExpressJet Airlines, and Frontier Airlines consistently rank among the top carriers with the highest frequency of delays, both at departure and arrival.</li>
+<li><strong>Top Departure Delays</strong>: JetBlue Airways, ExpressJet Airlines, Frontier Airlines, Allegiant Air, and Southwest Airlines have the highest proportion of delays at departure.</li>
+<li><strong>Top Arrival Delays</strong>: Piedmont Airlines, JetBlue Airways, ExpressJet Airlines, Conair, and Frontier Airlines have the highest proportion of delays at arrival.</li>
+<li><strong>Lowest Delays</strong>: carriers with the lowest frequency of delays are either historical carriers with shorter operational histories recorded in the dataset, such as Pan American World Airways (operating long before the dataset’s start date), Midway Airlines, and Northwest Airlines, or regional carriers such as Hawaiian Airlines, Aloha Air Cargo, Endeavor Air, and SkyWest Airlines.</li>
+<li><strong>Largest Differences</strong>: the largest difference between departure and arrival delays is observed for Southwest Airlines, which ranks 5th in departure delays but 20th in arrival delays.</li>
+</ul>
+<p>For measuring carrier performance, the proportion of departure delays is probably the most relevant metric for several reasons. Departure delays are more under the carrier’s control, as they are influenced by factors such as boarding, fueling, and maintenance, which are all managed by the carrier. Furthermore, as confirmed by the correlation analysis, departure delays have a positive linear relationship with arrival delays, thus making them more likely to cascade into arrival delays. This causes colinearity between the two metrics, which can be misleading when comparing carriers. In addition to this, arrival delays are more influenced by external factors such as weather, air traffic control, and airport congestion, which are beyond the carrier’s control. Even with these factors aside, a carrier may still be able to mitigate arrival delays, making the metric less indicative of carrier performance.</p>
+<p>Considering these factors, the carriers with the highest proportion of departure delays, which are also consistent across arrival delays, are JetBlue Airways, ExpressJet Airlines, and Frontier Airlines.</p>
+</section>
+<section id="how-do-delays-vary-by-airport" class="level4 page-columns page-full">
+<h4 class="anchored" data-anchor-id="how-do-delays-vary-by-airport">How do delays vary by airport?</h4>
+<p>Similar to the carrier analysis, this question involves comparing delay frequencies across airports. Also as one of the most posed questions in the airline industry, the goal is to identify airports with the highest frequency of delays, which can provide insights into the airport performance and their impact on the overall aviation sector.</p>
+<p>There are two available metrics to evaluate delay frequencies across airports: total delays and normalized delay frequency. However, choosing a metric to answer this particular question proves challenging, as each metric reveals a completely different answer due to the univariate distribution of each metric.</p>
+<ol type="1">
+<li><strong>Total delays are skewed towards airport size</strong>: larger airports have more flights and thus more delays, which skews the distribution by airport size.</li>
+</ol>
+<ul>
+<li>Provides a more differentiated view of airport performance.</li>
+<li>Biased towards larger airports.</li>
+</ul>
+<ol start="2" type="1">
+<li><strong>Mean delays show high kurtosis</strong>: the distribution of delays across airports is highly concentrated around the mean, with most airports having a similar frequency of delays, which makes it difficult to distinguish between them when visualizing the data.</li>
+</ol>
+<ul>
+<li>Provides a more accurate representation of delay frequency.</li>
+<li>Fails to distinguish airports close to the mean and may maximize the effects of airports with few flights.</li>
+</ul>
+<p><a href="../assets/projects/airline/airport-delay-distributions.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="../assets/projects/airline/airport-delay-distributions.png" class="img-fluid"></a></p>
+<p>For the purposes of visualizing the data, I chose to use the total delay counts for arrival delays due to several reasons. Firstly, it provides a more differentiated view of airport performance. Moreover, the question is usually posed in terms of identifying the most known airports with the highest frequency of delays, a question better answered by the total delay counts, which already favor larger airports. Furthermore, the choice of considering only arrival delays responds to the fact that departure delays are more susceptible to carrier operations<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a>, whereas arrival delays are more influenced by external factors, including airport operations. This makes arrival delays a better metric for evaluating airport performance<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a>. Below are the plots of the total delay counts across airports.</p>
+<div class="no-row-height column-margin column-container"><div id="fn7"><p><sup>7</sup>&nbsp;According to the <a href="https://transtats.bts.gov/ot_delay/OT_DelayCause1.asp?20=E">Airline On-Time Statistics and Delay Causes</a>, air carrier delays accounted for nearly 25% of national delays from January 2010 to March 2020</p></div><div id="fn8"><p><sup>8</sup>&nbsp;Of course, as stated in the previous section, airport management is not the only cause for arrival delays. There is also a moderate correlation between departure and arrival delays which increases after as certain threshold of departure delays. However, when comparing airports, arrival delays abstract the role of the carrier and focus on the external factors, <em>among which</em> is airport management.</p></div></div><div class="column-page-right">
+<p class="text-center">
+Arrival Delays by Airport
+</p>
+<iframe src="../projects/_arr-delay-airports.html" width="100%," height="600px">
+</iframe>
+</div>
+<p>The bubble map shows the distribution of arrival delays across airports, with the size of the bubble representing the total number of delays. Given the nature of the metric, the size of the bubbles favor larger airports, which have higher flight volumes and correspondingly higher delay counts. Several observations can be made from the visualization:</p>
+<ul>
+<li><strong>Top Airports</strong>: the top five airports with the highest total delay counts are Chicago O’Hare International Airport (ORD), Hartsfield-Jackson Atlanta International Airport (ATL), Dallas/Fort Worth International Airport (DFW), Los Angeles International Airport (LAX), and San Francisco International Airport (SFO).</li>
+<li><strong>Costal Airports</strong>: coastal airports such as Los Angeles (LAX), San Francisco (SFO), Newark (EWR), and Boston (BOS) also rank high among the top 15 airports, randing from 13783 to 8297.</li>
+<li><strong>New York Area Congestion</strong>: Newark (EWR) and LaGuardia (LGA) are among the top ten, with 11,119 (7th) and 8,723 (9th) delays respectively. This underscores the heavy congestion and operational difficulties in the New York metropolitan area.</li>
+<li><strong>Geographical Spread</strong>: the top 20 airports with the highest total delay counts are spread across the country,showing that delays are a widespread issue.</li>
+<li><strong>JFK</strong>: insteresingly, JFK ranks 20th with 6095 delays, which is significantly lower than the top airports including those in the New York Metropolitan area. The causes of this difference would be an interesting question for further analysis.</li>
+</ul>
+<p>Overall, analyzing arrival delays across airports reveals crucial insights into the distribution and frequency of delays within the aviation network. Larger airports such as Chicago O’Hare International Airport, Hartsfield-Jackson Atlanta International Airport, and Dallas/Fort Worth International Airport have the highest total delay counts, which is expected due to their higher flight volumes. Coastal airports and those in the New York area also show significant delay counts, highlighting congestion and operational challenges in these regions. The geographical spread of the top 20 airports indicates that delays are not confined to specific areas but are a nationwide issue. Overall, this analysis underscores the importance of addressing delays at both major hubs and regional airports to improve the efficiency of the U.S. aviation system.</p>
+</section>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>In this project, I analyzed 30 years of US domestic flight data to uncover trends in on-time performance across carriers, airports, and time. The analysis aimed to address four key questions: how delays vary over time, the correlation between departure and arrival delays, how delays differ among carriers, and how delays are distributed across airports. The analysis yielded the following findings:</p>
+<ul>
+<li><strong>Longitudinal Analysis</strong>
+<ul>
+<li>The evolution of delays over 34 years shows a narrowing gap between departure and arrival delays, driven by an increase in departure delays rather than a decrease in arrival delays.</li>
+<li>The volatility of delays has slightly decreased over the years, suggesting a stabilization in the seasonal patterns of delays.</li>
+<li>Arrival delays have decreased by only 1%, while departure delays have increased by over 5% in 34 years, confirming that airlines and airports have been unable to improve on-time performance.</li>
+</ul></li>
+<li><strong>Correlation Analysis</strong>
+<ul>
+<li>Departure and arrival delays exhibit a strong positive linear relationship, with a Pearson correlation coefficient of 0.93.</li>
+<li>The relationship is more dispersed within the interquartile range, with a weaker correlation coefficient of 0.67.</li>
+<li>The dispersion in delays is bounded by two linear trends: arrival delays can be minimized by up to 45 minutes relative to departure delays, yet can exceed them by up to 250 minutes.</li>
+<li>The disparity in the correlation responds to a difference in the causes of delays: while departure delays are more under the carrier’s control, arrival delays are more influenced by external factors, including weather, diversion, or airport congestion.</li>
+</ul></li>
+<li><strong>Carrier Analysis</strong>
+<ul>
+<li>JetBlue Airways, ExpressJet Airlines, and Frontier Airlines consistently rank among the top carriers with the highest frequency of delays both at departure and arrival.</li>
+<li>Southwest Airlines has the largest difference between departure and arrival delays, ranking 5th in departure delays but 20th in arrival delays.</li>
+<li>Departure delays are more indicative of carrier performance, as they are more under the carrier’s control, influenced by factors such as boarding, fueling, and maintenance.</li>
+</ul></li>
+<li><strong>Airport Analysis</strong>
+<ul>
+<li>The top five airports with the highest total delay counts are Chicago O’Hare International Airport, Hartsfield-Jackson Atlanta International Airport, Dallas/Fort Worth International Airport, Los Angeles International Airport, and San Francisco International Airport.</li>
+<li>Coastal airports such as Los Angeles, San Francisco, Newark, and Boston also rank high among the top 15 airports, indicating congestion and operational difficulties in these regions.</li>
+<li>The geographical spread of the top 20 airports indicates that delays are not confined to specific areas but are a nationwide issue.</li>
+</ul></li>
+</ul>
+<p>This analysis highlights ongoing challenges in improving on-time performance, particularly with departure delays. The strong correlation between departure and arrival delays emphasizes the importance of addressing issues at the departure stage to enhance overall punctuality. Significant variations in delay frequencies across carriers and routes suggest that tailored strategies are needed for different airlines and specific airports The findings from this project have been effectively translated into an interactive visualization dashboard, providing valuable insights for stakeholders to inform decision-making and improve operational efficiency in the aviation industry.</p>
+
+
+</section>
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/marcocamilo\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2024 Marco-Andrés Camilo-Pietri</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"loop":false,"descPosition":"bottom","selector":".lightbox","openEffect":"zoom","closeEffect":"zoom"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+</body></html>

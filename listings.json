@@ -2,17 +2,17 @@
   {
     "listing": "/portfolio.html",
     "items": [
-      "/projects/airline-performance.html",
-      "/projects/resume-analyzer.html",
-      "/projects/biodiversity.html"
+      "/portfolio/airline-performance.html",
+      "/portfolio/resume-classifier.html",
+      "/portfolio/biodiversity.html"
     ]
   },
   {
     "listing": "/index.html",
     "items": [
-      "/projects/resume-analyzer.html",
-      "/projects/airline-performance.html",
-      "/projects/biodiversity.html"
+      "/portfolio/resume-classifier.html",
+      "/portfolio/airline-performance.html",
+      "/portfolio/biodiversity.html"
     ]
   }
 ]
