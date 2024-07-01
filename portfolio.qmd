@@ -3,7 +3,7 @@ title: Portfolio
 subtitle: A collection of projects in NLP, machine learning and data science
 listing:
   id: portfolio-listing
-  contents: projects
+  contents: portfolio
   fields: [title, description, image]
   template: _templates/listing.ejs
 ---

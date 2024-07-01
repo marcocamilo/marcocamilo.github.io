@@ -2,7 +2,7 @@
 title: BERT, Encoders and Linear Models for Resume Text Classification
 subtitle: Exploring Performance of Advanced NLP Algorithms for Text Classification
 image: /assets/projects/resume-analyzer/resume-analyzer.jpg
-description: Explores the performance of advanced NLP models and vectorization techniques on topic modeling, text classification and document similarity.
+description: The project explores the performance of advanced NLP models and vectorization techniques for text classification using a dataset of resumes from various job sectors. The algorithms tested include Linear SVC, FNN, Encoder models, and BERT, implemented with Scikit-Learn and PyTorch, to compare their performance and effectiveness in analyzing text data. 
 featured: 1
 category: NLP
 type: Deep Learning

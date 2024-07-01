@@ -3,7 +3,7 @@ title: ""
 include-before-body: _includes/loop.html
 listing:
   id: portfolio-listing
-  contents: projects
+  contents: portfolio
   sort: "featured"
   fields: [title, description, featured]
   template: _templates/featured.ejs
