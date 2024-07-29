@@ -1,0 +1,17 @@
+---
+title: Sentiment-Optimized Stock Price Forecasting Using Modern RNNs
+subtitle: Evaluating the Impact of Sentiment Analysis on LSTM, GRU, and Attention-CNN-LSTM Models
+# image: /assets/projects/resume-analyzer/resume-analyzer.jpg
+description: This project focuses on optimizing the predictive capabilities of modern RNN models for stock price movements of TSLA, AAPL, and GOOG. The goal is to enhance forecasting accuracy by utilizing historical stock data and news sentiment data. The analysis evaluates the performance of LSTM, GRU, and Attention-CNN-LSTM models, tested with and without sentiment data, to determine their effectiveness in stock price prediction.
+featured: 3
+category: NLP
+type: Deep Learning
+skills:
+    - Tensorflow
+    - HuggingFace
+    - Scikit-Learn
+    - Gensim
+    - NLTK
+---
+
+(This write up is currently in progress. In the meantime, please visit the GitHub repo for this project [here](https://github.com/marcocamilo/stock-sentiment-prediction))
