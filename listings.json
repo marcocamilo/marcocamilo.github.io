@@ -4,7 +4,8 @@
     "items": [
       "/portfolio/airline-performance.html",
       "/portfolio/resume-classifier.html",
-      "/portfolio/biodiversity.html"
+      "/portfolio/biodiversity.html",
+      "/portfolio/stock-sentiment-prediction.html"
     ]
   },
   {
@@ -12,6 +13,7 @@
     "items": [
       "/portfolio/resume-classifier.html",
       "/portfolio/airline-performance.html",
+      "/portfolio/stock-sentiment-prediction.html",
       "/portfolio/biodiversity.html"
     ]
   }
