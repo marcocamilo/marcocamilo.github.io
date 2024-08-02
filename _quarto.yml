@@ -16,6 +16,7 @@ website:
   page-footer: 
     left: "© 2024 Marco-Andrés Camilo-Pietri"
   bread-crumbs: false
+  google-analytics: "G-QQJ3PCTWK5"
 
 format:
   html:
