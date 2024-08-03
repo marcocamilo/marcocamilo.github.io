@@ -2,8 +2,8 @@
 <div><img class="profile" src="/assets/img/profile.png" /></div>
 
 **I am Marco Camilo,**  
-an NLP Data Scientist &  
-Computational Linguist.
+an NLP Engineer &  
+Data Scientist.
 
 <div class="about-links">
   <div><a href="https://linkedin.com/in/marcocamilo" class="about-link" rel="" target="">
