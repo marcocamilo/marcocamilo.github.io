@@ -1,7 +1,7 @@
 ---
 title: Airline On-Time Performance
 subtitle: Longitudinal Trends, Carrier Delays, and Geographic Patterns in the US Airline Industry
-description: This project analyzes on-time performance trends from 34 years of US domestic flight data, focusing on variations across carriers, routes, airports, and time. The goal is to conduct a comprehensive exploratory data analysis (EDA) to address key industry questions and translate the findings into an interactive visualization dashboard.
+description: The project explores on-time performance trends from 34 years of US domestic flight data, focusing on variations across carriers, routes, airports, and time.  The exploratory data analysis (EDA) resulted in a comprehensive report with 35+ data insights and 25+ visualizations, converted into an interactive Streamlit dashboard. The analysis demonstrates how to extract critical performance trends from historical data, enabling stakeholders to make informed decisions and significantly boost operational efficiency in the aviation industry.
 featured: 2
 image: "![](https://i.dailymail.co.uk/i/pix/2013/05/02/article-2318173-19957F94000005DC-90_964x639.jpg)"
 category: Exploratory Data Analysis
@@ -16,15 +16,17 @@ skills:
 
 {{< meta image >}}
 
-## Executive Summary
-
-This project analyzes on-time performance trends from 30 years of US domestic flight data, focusing on variations across carriers, routes, airports, and time. The goal is to conduct a comprehensive exploratory data analysis (EDA) to address key industry questions, such as identifying carriers and airports with the highest frequency of flight delays, understanding the impact of departure delays on arrival times, and examining trends in flight delays within the US aviation sector. The findings from the EDA will be translated into an interactive visualization dashboard using Streamlit.
+### Key Findings
+- **Stagnation in On-Time Performance**: Despite a slight decrease in delay volatility, the analysis reveals that arrival delays have only decreased by 1% over 34 years, while departure delays have increased by 5%. This highlights a persistent challenge in improving overall on-time performance.
+- **Limitations in Delay Optimization**: Arrival delays can be minimized by up to 45 minutes relative to departure delays, but can also exceed them by up to 250 minutes. This highlights significant variability in delay patterns and emphasizes the need for targeted strategies to manage both types of delays effectively.
+- **Top Delayed Carriers**: JetBlue Airways, ExpressJet Airlines, and Frontier Airlines consistently rank among the top carriers with the highest frequency of delays, both at departure and arrival.
+- **Airports with Highest Delay Counts**: The top three airports with the highest total delay counts are Chicago O'Hare International Airport, Hartsfield-Jackson Atlanta International Airport, and Dallas/Fort Worth International Airport.
 
 ## Dataset
 
-The [Airline Reporting Carrier On-Time Performance Dataset](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FGJ), sourced from the U.S. Department of Transportation's Bureau of Transportation Statistics, contains scheduled and actual departure and arrival times reported by certified U.S. air carriers between 1987 and 2020. The version used in this project, available at [IBM Developer](https://developer.ibm.com/exchanges/data/all/airline/)^[The dataset is available in three sizes: the original dataset of 194,385,636 flights, a 2 million sample version and a 2 thousand sample of flights from LAX to JFK airport. All three versions are available as gzip compressed tar or csv files.], contains a 2 million record sample of the full dataset (<1%).
+The [Airline Reporting Carrier On-Time Performance Dataset](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FGJ), provided by the U.S. Department of Transportation's Bureau of Transportation Statistics, contains scheduled and actual departure and arrival times reported by U.S. air carriers between 1987 and 2020. For this project, I used a 2 million-flight sample from the dataset, which represents less than 1% of the full dataset available through [IBM Developer](https://developer.ibm.com/exchanges/data/all/airline/)^[The dataset is available in three sizes: the original dataset of 194,385,636 flights, a 2 million sample version and a 2 thousand sample of flights from LAX to JFK airport. All three versions are available as gzip compressed tar or csv files.].
 
-Key features reported by carriers include scheduled and actual event times, flight dates, carrier, origin and destination information, cancelation and diversion information, as well as summary statistics such as elapsed time, distance and delay causes. A full description of the variables in the dataset can be found [here](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FGJ). Below is a summary of the main variable grouppings.
+Key features include scheduled and actual flight times, dates, carrier information, origin and destination details, and cancellation or diversion statuses. The dataset also provides summary statistics such as elapsed time, distance, and delay causes. For a comprehensive list of variables, refer to the full [here](https://www.transtats.bts.gov/Fields.asp?gnoyr_VQ=FGJ). Below is a summary of the main variable groupings:
 
 <details>
   <summary>Feature glossary</summary>
@@ -46,14 +48,14 @@ Key features reported by carriers include scheduled and actual event times, flig
 
 ## Preprocessing and Feature Engineering
 
-The strategy for preprocessing interleaves *univariate analysis* with *data cleaning and feature engineering* for each variable group, utilizing the former to contextualize preprocessing decisions in the latter. For this project, this approach encompases three major aspects: conducting a general univariate analysis, preprocessing flight info variables, and (re)engineering time variables.
+The strategy for preprocessing interleaved *univariate analysis* with *data cleaning and feature engineering* for each variable grouping, using univariate insights to guide the preprocessing steps. This approach encompasses three key areas: conducting univariate analysis, preprocessing flight-related variables, and (re)engineering time-related features.
 
 ### Univariate Analysis
 
-For each variable group, I conducted a univariate analysis to understand the distribution, spread, and missing values of the variables using two custom functions:
+I performed univariate analysis on each variable group to assess distributions, variability, and missing values. This involved:
 
 <details class="list">
-  <summary>`df_overview` prints the shape, sample head and tail, and non-null counts.</summary>
+<summary>`df_overview`: Provides a snapshot of the dataset, including its shape, sample head and tail, and non-null counts.</summary>
 ```python
 def df_overview(df):
     print(f"Shape: {df.shape}\n")
@@ -66,7 +68,7 @@ def df_overview(df):
 </details>
 
 <details class="list">
-<summary>`univariate_preview` provides a compact report with the first five rows, data types, unique values, top 5 values, null value percentage, and summary statistics for continuous variables.</summary>
+<summary>`univariate_preview`: Generates a compact report with data types, unique values, top values, null value percentages, and summary statistics for selected columns.</summary>
 
 ```python
 def univariate_preview(df, cols, describe=True):
@@ -98,233 +100,222 @@ def univariate_preview(df, cols, describe=True):
 
 </details>
 
-Additionally, I visualized missing values using the `missingno` package^[The `missingno` package offers visualization options such as heatmaps, bar charts, and dendrograms to identify patterns and distributions of missing data.], while certain distributions and value counts I visualized using `matplotlib` and `seaborn`.
+I also visualized missing values using the `missingno` package^[The `missingno` package offers tools for visualizing missing data patterns through heatmaps, bar charts, and dendrograms.], and analyzed distributions and value counts with `matplotlib` and `seaborn`.
 
 ### Preprocessing Flight Info Variables
 
-The first half of all preprocessing focused on the flight information variables, including date, flight, origin/destination, and departure/arrival variables. Based on the findings of each univariate analysis, I performed the following preprocessing steps:
+The initial preprocessing phase focused on flight information variables, such as dates, flight numbers, and origin/destination details. Based on the insights from each univariate analysis, I performed the following preprocessing steps:
 
 - **Data Cleaning**
-  - **`FlightDate` to `datetime64[ns]`**: allowed to perform date operations, aggregations, and visualizations.
-  - **Filling Missing State and State Names**: imputed missing state and state name values to reduce missing data.
-  - **Standardizing City Names**: standardized city names to ensure uniformity and remove single occurrences.
-  - **Dropping Taxi, Cancelled, and Diverted Variables**: removed variables due to high occurrence of missing values.
+  - **Converted `FlightDate` to `datetime64[ns]`**: Enabled efficient date operations, aggregations, and visualizations.
+  - **Imputed Missing State and State Names**: Addressed missing data to improve dataset completeness.
+  - **Standardized City Names**: Unified city names to ensure consistency and eliminate outliers.
+  - **Removed Taxi, Cancelled, and Diverted Variables**: Dropped these variables due to high missing data rates.
 - **Feature Engineering**
-  - **Airline Names**: used an airlines dataset to map the airline codes to their respective airline names to provide more readable and insightful information.
-  - **Unique Flight Identifier**: explored creating a unique flight identifier by combining carrier code and flight number, to reduce ambiguity and identify unique flights more easily.
+  - **Mapped Airline Codes**: Used an airline dataset to convert codes to names for better readability and insight.
+  - **Created Unique Flight Identifier**: Combined carrier codes and flight numbers to reduce ambiguity and uniquely identify flights.
 
 ### (Re)Engineering Time Variables
 
-The second phase of preprocessing addresses a critical issue found in the dataset's handling of time-related variables, particularly concerning flight delays. The delay variables were calculated from the raw timestamps, without accounting for time zone discrepancies, daylight savings time, and cross-midnight flights. This required developing an approach to impute time zone information, correct timestamps, and recompute delays accurately.
+The second phase of preprocessing addressed a critical issue with time-related variables, especially concerning flight delays. The delay variables were calculated from the raw timestamps, without accounting for time zone discrepancies, daylight savings time, and cross-midnight flights. To address these, I developed a method to impute time zone information, correct timestamps, and accurately recompute delays. The steps are the following:
 
-To address these issues, I implemented the following steps:
+1. **Imputed Time Zone Information**: Assigned time zones to timestamps using a dictionary of airport codes and time zones.
+2. **Reverse Engineered Arrival Dates**: Standardized times to UTC, recalculated timestamps based on flight departure dates and time differences, and converted back to local time zones.
+3. **Removed Remaining Negative Delays**: Filtered out negative delay values to maintain accurate delay calculations.
+4. **Recalculated Delays**: Adjusted delays based on scheduled versus actual times, accounting for time zone differences and daylight savings time.
 
-1. **Imputing Time Zone Information**: assigned time zones to all timestamps using a dictionary of airport codes and their respective time zones sourced from two datasets.
-2. **Reverse Engineering Arrival Dates**: converted all times to UTC (Coordinated Universal Time), recalculated timestamps based on flight departure dates and time differences, and reconverted times to local time zones.
-3. **Filter Remaining Negative Delays**: removed the remaining negative delays after the reverse engineering process to ensure accurate delay calculations.
-4. **Delay Calculation**: calculated delays based on the difference between scheduled and actual departure and arrival times, accounting for time zone differences and daylight savings time.
+Additional cleaning and engineering included:
 
-In addition to this, I also performed the following data cleaning and feature engineering steps:
-
-- **Data Cleaning**:
-  - **Standardizing 0s, 2400s, and missing values**: converted 0s to Nan values and 2400s to 0s for consistency in time representation.
-  - **Filling Missing CRS Values**: imputed missing values in the CRS (Scheduled) times from the difference between actual times and delay minutes.
-  - **Changing Data Types**: converted data types where necessary to improve computational efficiency.
-- **Feature Engineering**:
-  - **Datetime Conversion**: created UTC versions of time variables for time calculations such as elapsed time.
-  - **Time Recalculations**: using the time zone marked timestamps, recalculated delays and elapsed times more accurately than the original dataset.
-
-<!-- Explain why discrepancies still remained and say these will be removed later in the analysis -->
+- **Standardized Time Representations**: Converted 0s to NaN and 2400s to 0s for consistency.
+- **Imputed Missing CRS Values**: Filled in missing scheduled times using differences between actual times and delays.
+- **Optimized Data Types**: Improved computational efficiency by adjusting data types.
+- **Datetime Recalculations**: Created UTC versions of time variables and recalculated delays and elapsed times more accurately than the original dataset.
 
 ## Exploratory Data Analysis
 
-The Exploratory Data Analysis in this project was carried in two modalities: a methodical univariate analysis of each variable during preprocessing and a targeted bivariate and multivariate analysis focused on answering the research questions of the project^[Most questions in this bivariate analysis adopt a longitudinal perspective, comparing the frequency of delays with different variables across the entire span of the dataset. This approach provides a historical view of delays within the US aviation sector. However, further insights lie within a cross-sectional analysis, which compares the frequency of delays across different variables at specific points in time. This would be more suitable for a multivariate analysis, which I leave for future work.]. I framed the questions around five distinct themes: 
+The Exploratory Data Analysis (EDA) for this project employed two approaches: a systematic univariate analysis during preprocessing and a targeted bivariate and multivariate analysis to address each research question^[While the bivariate analysis adopts a longitudinal perspective to compare delay frequencies over time, a cross-sectional approach could further enhance insights by examining delays at specific points in time. This advanced analysis is planned for future work.]. The investigation was organized around four main themes:
 
-1. **Longitudinal**: How do delays vary across time?
-2. **Corporate**: How do delays vary across carriers? (distribution and longitudinal)
-3. **Directional**: How do delays vary by route?
-4. **Geographical**: how do delays vary by airport?
-5. **Correlation**: are departures delays correlated with arrival delays? (or how frequent do flights make up for late departures?)
+1. **Longitudinal**: Examining how delays vary over time.
+2. **Correlational**: Investigating the relationship between departure and arrival delays.
+3. **Corporate**: Analyzing delay patterns across different carriers.
+4. **Geographical**: Assessing how delays vary by airport.
 
-Before diving into the findings for each question, I will provide a brief overview of the findings from the univariate analysis. 
+Before answering these questions, I will first summarize the findings from the univariate analysis
 
 ### Univariate Analysis
 
 The univariate analysis revealed several key insights about the dataset:
 
 <details class="list">
-<summary>**Date columns**: The flights span 34 years, with the distribution slightly shifted left (2005), indicating growth in the airline industry in the last 15 years. Other columns such as months, days, and weekdays, show an even distribution.</summary>
+<summary>**Date Columns**: The flights span 34 years, with the distribution mean slightly shifted left (2005), suggesting industry growth specially in the past 15 years. Other temporal variables such as months, days, and weekdays are evenly distributed.</summary>
   ![](/assets/projects/airline/date_cols.png){.lightbox}
 </details>
 
 <details class="list">
-<summary>**Flight info columns**: The dataset includes 33 unique carriers, with Southwest Airlines (WN), Delta Air Lines (DL), and American Airlines (AA) being the most frequent.</summary>
+<summary>**Flight Information**: Among the 33 unique carriers, Southwest Airlines (WN), Delta Air Lines (DL), and American Airlines (AA) are the most frequently represented.</summary>
   ![](/assets/projects/airline/carrier-count.png)
 </details>
 
 <details class="list">
-  <summary>**Origin/Destination columns**: Flights originate and land in all 50 US states and five overseas territories, including Puerto Rico, US Virgin Islands, and Guam. The top destinations in the dataset are California (CA), Texas (TX), Florida (FL), Illinois (IL), Georgia (GA), and New York (NY).</summary>
+  <summary>**Origin/Destination**: Flights are distributed across all 50 U.S. states and five overseas territories, including Puerto Rico, the U.S. Virgin Islands, and Guam. The top destinations include California (CA), Texas (TX), Florida (FL), Illinois (IL), Georgia (GA), and New York (NY).</summary>
   ![](/assets/projects/airline/state-count.png){.lightbox}
 </details>
 
 <details class="list">
-  <summary>**Time Variables**: Departures are more frequent in the morning hours, while arrivals peak in the evening. The distribution of CRS and actual time variables for departures and arrivals are almost identical, indicating that the average size of flight delays is small across the dataset.</summary>
+  <summary>**Time Variables**: Departures peak in the morning, while arrivals are most frequent in the evening. The mean CRS (Scheduled) and actual times for departures and arrivals, respectively, are nearly identical, indicating that average flight delays are small</summary>
   ![](/assets/projects/airline/time-distribution.png){.lightbox}
 </details>
 
 <details class="list">
-  <summary>**Delay Variables**: Approximately 80% of flights operate on-time, while around 20% experience delays (as by the industry-defined standard of exceeding 15 minutes). The distribution shows a right skew, with over 40% of flights arriving early by less than 15 minutes and about 30% arriving exactly on time. Out of all delayed flights, most fall within the 15 to 40-minute range.</summary>
+  <summary>**Delay Variables**: About 80% of flights are on time, with 20% experiencing delays exceeding 15 minutes. Delays are right-skewed, with over 40% of flights arriving early by less than 15 minutes and about 30% arriving exactly on time. Delayed flights typically fall within the 15 to 40-minute range.</summary>
 ![](/assets/projects/airline/delay-cols.png){.lightbox}
 </details>
 
 <details class="list">
-  <summary>**Flight Summary Variables**: Flights typically cover distances under 1000 miles, with a right-skewed distribution observed in the data. The majority of flights have durations under around 160 minutes or 2 hours and 40 minutes, as indicated by the right-skewed distributions of the elapsed time variables.</summary>
+  <summary>**Flight Summary**: Most flights cover distances under 1000 miles and have durations of less than 160 minutes (2 hours and 40 minutes), as indicated by the right-skewed distribution of elapsed time variables.</summary>
   ![](/assets/projects/airline/flight-summary-cols.png){.lightbox}
 </details>
-
-<!-- <details class="list"> -->
-<!-- <summary>**Delay Summary Variables**: The amount of delays across all causes show a right-skewed distribution, with most factors causing delays of less than 200 minutes. The highest recorded delay values approach approximately 1600 minutes, with SecurityDelay showing the smallest maximum delay of 219 minutes.</summary> -->
-<!-- </details> -->
 
 ### Bivariate Analysis
 
 #### How do delays vary across time?
 
-This question involves a longitudinal analysis of the evolution of delayed flights over 34 years. It compares the continuous variable "number of delayed flights" with the categorical time variable, examining both departure and arrival delays
+This question involves a longitudinal analysis comparing the number of departure and arrival delays across time.
 
-To answer this question, I first defined the time step by which to evaluate the evolution of delays. I chose to aggregate the data by month-year date, which provides a balance between granularity, interpretability and computational efficiency. Next, I decided on the metric to evaluate delays. Although the raw sum of delays is intuitive, normalizing the counts by the total flights per month offers a more accurate representation of delay frequency, as it adjusts for variations in monthly flight numbers.
+To answer this question, I aggregated the data by month and year, which provides a balance between granularity, interpretability and computational efficiency. Rather than using raw delay sums, I normalized the counts by the total number of flights each month to provide a more accurate depiction of delay frequency, accounting for variations in monthly flight volumes.
 
-With these definitions, I began by plotting the evolution in the number of delayed flights per month over the years, as shown in the figure below. 
+I then visualized the monthly evolution of delays over the years, as illustrated in the figure below.
 
 ![](/assets/projects/airline/evolution-mean-delays.png)
 
-The normalized plots above reveal several insights about the evolution of delays from a cross-sectional and longitudinal perspective:
+The normalized plots above reveal several insights:
 
 - **Cross-sectional observations**:
-  * The line plot reveals periodic fluctuations in both departure and arrival delays, reflecting seasonal changes in delays within each year.
-  * A noticeable drop in delays occurs between approximately 2001 and 2003, potentially influenced by external economic factors^[One potential cause for this temporary drop in delays is the contraction in the airline industry that followed 9/11, reducing the amount of delays together with the number of flights (see [this article](https://www.businessinsider.com/how-the-us-airline-industry-has-changed-since-911-2011-9?op=1))].
+  * The line plot shows periodic fluctuations in both departure and arrival delays, reflecting seasonal throughout each year.
+  * A sharp drop in delays between 2001 and 2003 suggests possible external influences, such as the reduction in flights post-9/11 impacting delays^[One potential cause for this temporary drop in delays is the contraction in the airline industry that followed 9/11, reducing the amount of delays together with the number of flights (see [this article](https://www.businessinsider.com/how-the-us-airline-industry-has-changed-since-911-2011-9?op=1))].
 - **Longitudinal observations**:
-  * The regression plot shows an initial gap between departure and arrival delays, which converges over time to approximately 20% by the end of the dataset.
-  * The line plot demonstrates a reduction in the volatility of delays over the years, suggesting a slight stabilization in the frequency of delays.
+  * The regression plot indicates a narrowing gap between departure and arrival delays over time, converging to approximately 20% by 2020.
+  * The line plot shows a reduction in the volatility of delays over the years, suggesting a slight stabilization in the frequency of delays.
 
-This narrowing gap and reduction in delay volatility would have suggested an improvement in airline on-time performance, if it were not for the fact that the reduction is cause by an increase in departure delays rather than a decrease in arrival delays. The regression analysis demonstrates this: arrival delays have decreased only by 1%, while departure delays have risen by over 5% in the span of 30 years. This confirms that airlines have been unable to improve on-time performance at arrivals and have become less efficient in managing departure delays.
+Although the narrowing gap and reduced volatility might suggest improved on-time performance, the apparent improvement is due to a 5% increase in departure delays rather than a reduction in arrival delays, with arrival delays decreasing by only 1% over 30 years. This confirms that airlines have been unable to improve on-time performance at arrivals and have become less efficient in managing departure delays.
 
 #### Are departures delays correlated with arrival delays?
 
-This question is a correlation analysis examining the connection between the two continuous variables: departure and arrival delays. 
+This question involves a correlation analysis to explore the relationship between departure delays and arrival delays, both of which are continuous variables.
 
-To answer this, I calculated the Pearson correlation coefficient between departure delays and arrival delays for delayed flights^[I filtered the dataset for flights with delays greater than 15 minutes, the industry standard for defining a delayed flight. This prevents the distribution from factoring in flights that were not delayed, which account for the majority of the dataset and may skew the results.]. This coefficient ranges from -1 indicating a perfect negative linear relationship, 0 indicating no linear relationship, up to 1 indicating a perfect positive linear relationship. To visualize the relationship, I plot the correlation using a custom `jointplot` function, which combines a scatter plot with a box plot to show the distribution of the data across both variables. This function also computes and displays the Pearson correlation coefficient.
+I calculated the Pearson correlation coefficient for flights delayed by more than 15 minutes^[15 minutes is the industry standard for defining a delayed flight.], excluding on-time flights to avoid skewing the results. The Pearson coefficient ranges from -1 (perfect negative correlation) to 1 (perfect positive correlation), with 0 indicating no linear relationship.  I used a custom `jointplot` function to visualize the correlation, which combines a scatter plot with a box plot to display the distribution of both variables and the Pearson coefficient.
 
-Before plotting the jointplot, I cleaned the data by removing the remaining extreme cases, such as flights with negative delays which, due to times crossing the change to daylight savings time, were not corrected in the preprocessing. After this, I plotted the jointplot, which is shown below.
+Prior to plotting, I cleaned the data by removing extreme cases, such as negative delays caused by flight times crossing the midnight transition to daylight savings time, which were not corrected in the preprocessing. The resulting jointplot is shown below.
 
 ![](/assets/projects/airline/delays-correlation.png)
 
-The Pearson correlation coefficient between departure and arrival delays is 0.93, indicating a strong positive linear relationship between the two variables. However, there are three observations that can be made from the jointplot:
+The Pearson correlation coefficient between departure and arrival delays is 0.93, indicating a strong positive linear relationship. Key observations from the jointplot include:
 
-1. **Outliers and Extreme Cases**: The scatter plot exhibits a broad spectrum of outliers that extend well beyond the interquartile range, yet notably adhere to the linear relationship between departure and arrival delays.
-2. **Linear Relationship**: The distribution shows that the relationship follows a more linear pattern the more extreme their values are, whereas the relationship becomes more dispersed as delays become less extreme.
-3. **Interquartile Range**: The interquartile range for both departure and arrival delays is notably narrower compared to the full range of the data, which underscores the concentration of delays within 60 minutes, as seen in the univariate analysis.
+1. **Outliers and Extreme Cases**: The scatter plot reveals a wide range of outliers beyond the interquartile range, but these outliers generally follow the strong linear relationship between departure and arrival delays.
+2. **Linear Relationship**: While the relationship is linear across the full range of data, it becomes more dispersed at lower delay values and more tightly correlated at higher values.
+3. **Interquartile Range**: The interquartile range for both kinds of delays is narrower compared to the full data range, with most delays concentrated within 60 minutes.
 
-To understand the nature of this relationship for the core of flights, I focused on the interquartile range and adjusted the analysis: recalculating the correlation coefficient and focusing the jointplot on this range.
+To gain a clearer understanding of the core relationship, I recalculated the Pearson correlation coefficient focusing on the interquartile range. This refined analysis is shown in the updated jointplot.
 
 ![](/assets/projects/airline/delays-correlation-filtered.png)
 
-The Pearson correlation coefficient is now 0.67 within the interquartile range, which indicates a weaker but still positive linear relationship between departure and arrival delays. This relationship is depicted in the jointplot by a broader dispersion of data points. The empty square in the lower left corner of the plot represents flights filtered out by the industry standard definition of a delay (>15 minutes). The boxplots along the edges of the scatterplot further confirm the findings from the univariate analysis, namely that the majority of delays range between 15 and 40 minutes.
+Within the interquartile range, the Pearson correlation coefficient is 0.67, reflecting a weaker yet still positive linear relationship. The jointplot reveals a broader dispersion of data points within this range, with the majority of delays falling between 15 and 40 minutes, as shown by the adjacent box plots. The plot's empty square in the lower left represents flights that did not meet the industry delay threshold.
 
-The filtered scatterplot has two clear boundaries that define the relationship between departure and arrival delays. I calculated approximate regression lines for these boundaries to understand the relationship more clearly. 
+
+
+The filtered scatter plot has two distinct boundaries that define the relationship between departure and arrival delays. I calculated approximate regression lines for these boundaries to understand the relationship more clearly. 
 
 ![](/assets/projects/airline/delays-correlation-filtered-bounds.png)
 
-There are two observations that can be made about the correlation of departure and arrival delays for the interquartile range:
+Two kinds of observations can be made about the correlation of departure and arrival delays for the interquartile range:
 
 - **Shallow Bound**: Indicates the minimum threshold to which arrival delays can be minimized.
   * Follows a linear relationship: $y = 1.15x - 45$, where $y$ is the arrival delay and $x$ is the departure delay.
   * Implies that the arrival delay can only be reduced by up to 45 minutes relative to a departure delay.
-  * Highlights a practical limit: minimizing arrival delays becomes increasingly constrained as departure delays increase.
-- **Steep Bound**: Indicates how arrival delays can increase relative to departure delays.
-  * Follows a steeper linear trend: $y = 6.5x + 120$, where $y$ is the arrival delay and $x$ is the departure delay.
-  * Reflects that arrival delays can significantly exceed departure delays due to extrenal factors like diversions, weather, or arrival airport congestion.
-  * Bound shows an upper limit of 250 minutes for on-time departures (see first scatterplot), then progressively aligning with the general trend as departure delays increase.
+- **Steep Bound**: Indicates how much arrival delays can increase relative to departure delays.
+  * Follows a much steeper linear trend: $y = 6.5x + 120$, where $y$ is the arrival delay and $x$ is the departure delay.
+  * Indicates that arrival delays can significantly exceed the general trend, suggesting the influence of external factors such as diversions, weather, or congestion at the arrival airport.
+  * Reflects that arrival delays can significantly exceed departure delays due to 
+  * Shows an upper limit of 250 minutes for on-time departures (see first scatterplot), then progressively aligning with the general trend as departure delays increase.
 
-In conclusion, the correlation analysis reveals a moderately positive linear relationship between departure and arrival delays when focusing on the interquartile range. The broad dispersion of data points within the interquartile range points to the influence external factors affecting arrival delays relative to departure delays. This dispersion is marked by two boundaries: arrival delays can be minimized by up to 45 minutes relative to departure delays, yet can exceed them by up to 250 minutes. Otherwise, when considering the full range of data, the analysis demonstrates a strong positive linear relationship between departure and arrival delays.
+In summary, the historical correlation analysis within the interquartile range shows a moderately positive linear relationship between departure and arrival delays. The broad dispersion of data points reflects the impact of external factors that influence arrival delays more significantly than departure delays. Historically, this dispersion has been constrained by two limits: arrival delays have typically been minimized by up to 45 minutes relative to departure delays (lower bound) but can exceed them by up to 250 minutes (upper bound). Conversely, analysis of the full range of data has historically demonstrated a strong positive linear relationship between departure and arrival delays.
 
 #### How do delays vary across carriers?
 
-This is one of the most frequently asked questions in the airline industry, as it provides insights into the performance of individual carriers and their overall competitiveness in the market. It requires a bivariate analysis comparing the frequency of delays across carriers. Most reports approach this question by comparing the total number of delays per carrier, but this approach can be misleading for two reasons:
+Analyzing how delays vary across carriers is one of the most frequently asked questions to measure individual airline performance and market competitiveness. It requires a bivariate analysis comparing the frequency of delays across carriers. 
 
-1. **Flight Volume**: Carriers with higher flight volumes are more likely to have higher delay counts, which can skew the results.
-2. **Carrier Age**: Older carriers have more historical data, which can also skew the results.
+Traditional approaches often focus on total delay counts, but this can be misleading due to:
 
-This analysis uses a more accurate metric: the normalized delay frequency. This metric adjusts the delay counts by the total number of flights per carrier^[An alternative approach would be to normalize the counts by the age of the carrier. However, this would require data mapping each carrier to its age in the industry, which, at the time of writing this report, was not available for the carriers in this dataset.]. This approach provides a more accurate representation of delay frequency, as it accounts for variations in flight volume and, to some extent, carrier age. Below are the plots of the normalized delay frequencies across carriers.
+1. **Flight Volume**: Carriers with more flights naturally accumulate higher delay counts, which can skew the results.
+2. **Carrier Age**: Older carriers tend to have more historical data, potentially influencing delay counts.
+
+To address these issues, this analysis employs a more precise metric: normalized delay frequency. This metric adjusts delay counts by the total number of flights per carrier^[An alternative normalization approach could involve adjusting by carrier age, but such data was not available for this analysis.]. This method provides a clearer picture of delay frequency by accounting for variations in flight volume and partially considering carrier age. The plots below illustrate the normalized delay frequencies across carriers.
 
 <!-- ![](/assets/projects/airline/departure-delays-carrier.png) -->
 <!-- ![](/assets/projects/airline/arrival-delays-carrier.png) -->
 ![](/assets/projects/airline/carrier-delays.png)
 
-The normalized delay counts show a more robust comparison of on-time performance between airlines, even among those with higher flight volumes or varying ages. Each plot reveals several insights about carrier performance, however, the most revealing insights come from comparing the rankings of carriers across both departure and arrival delays. 
+The normalized delay counts offer a robust comparison of on-time performance across airlines, even for those with varying flight volumes or ages. Key insights from the analysis include:
 
-- **Consistent Rankings**: JetBlue Airways, ExpressJet Airlines, and Frontier Airlines consistently rank among the top carriers with the highest frequency of delays, both at departure and arrival.
+- **Consistent Rankings**: JetBlue Airways, ExpressJet Airlines, and Frontier Airlines consistently rank among the top carriers for both departure and arrival delays.
 - **Top Departure Delays**: JetBlue Airways, ExpressJet Airlines, Frontier Airlines, Allegiant Air, and Southwest Airlines have the highest proportion of delays at departure.
 - **Top Arrival Delays**: Piedmont Airlines, JetBlue Airways, ExpressJet Airlines, Conair, and Frontier Airlines have the highest proportion of delays at arrival.
-- **Lowest Delays**: carriers with the lowest frequency of delays are either historical carriers with shorter operational histories recorded in the dataset, such as Pan American World Airways (operating long before the dataset's start date), Midway Airlines, and Northwest Airlines, or regional carriers such as Hawaiian Airlines, Aloha Air Cargo, Endeavor Air, and SkyWest Airlines.
-- **Largest Differences**: the largest difference between departure and arrival delays is observed for Southwest Airlines, which ranks 5th in departure delays but 20th in arrival delays. 
+- **Lowest Delays**: Carriers with the lowest delay frequencies include historical carriers with shorter operational histories in the dataset, such as Pan American World Airways, Midway Airlines, and Northwest Airlines, as well as regional carriers like Hawaiian Airlines, Aloha Air Cargo, Endeavor Air, and SkyWest Airlines.
+- **Largest Differences**: Southwest Airlines shows the largest disparity between departure and arrival delays, ranking 5th in departure delays but 20th in arrival delays.
  
-For measuring carrier performance, the proportion of departure delays is probably the most relevant metric for several reasons. Departure delays are more under the carrier's control, as they are influenced by factors such as boarding, fueling, and maintenance, which are all managed by the carrier. Furthermore, as confirmed by the correlation analysis, departure delays have a positive linear relationship with arrival delays, thus making them more likely to cascade into arrival delays. This causes colinearity between the two metrics, which can be misleading when comparing carriers. In addition to this, arrival delays are more influenced by external factors such as weather, air traffic control, and airport congestion, which are beyond the carrier's control. Even with these factors aside, a carrier may still be able to mitigate arrival delays, making the metric less indicative of carrier performance.
+For evaluating carrier performance, the proportion of departure delays is particularly relevant. Departure delays are more directly controllable by carriers, influenced by factors such as boarding, fueling, and maintenance. Furthermore, as shown by the correlation analysis, departure delays are positively correlated with arrival delays, making them a key indicator of performance. Arrival delays, influenced by external factors like weather, air traffic control, and airport congestion, are less indicative of a carrier's operational efficiency. 
 
-Considering these factors, the carriers with the highest proportion of departure delays, which are also consistent across arrival delays, are JetBlue Airways, ExpressJet Airlines, and Frontier Airlines.
+Considering this, carriers with the highest proportion of departure delays, also consistent in arrival delays, are JetBlue Airways, ExpressJet Airlines, and Frontier Airlines.
 
 #### How do delays vary by airport?
 
-Similar to the carrier analysis, this question involves comparing delay frequencies across airports. Also as one of the most posed questions in the airline industry, the goal is to identify airports with the highest frequency of delays, which can provide insights into the airport performance and their impact on the overall aviation sector.
+Comparing delay frequencies across airports helps evaluate airport performance and its impact on the aviation sector. This analysis uses two metrics: total delays and normalized delay frequency. However, choosing a metric to answer this question proves challenging, as each metric reveals a completely different story:
 
-There are two available metrics to evaluate delay frequencies across airports: total delays and normalized delay frequency. However, choosing a metric to answer this particular question proves challenging, as each metric reveals a completely different answer due to the univariate distribution of each metric. 
-
-1. **Total delays are skewed towards airport size**: larger airports have more flights and thus more delays, which skews the distribution by airport size.
-  - Provides a more differentiated view of airport performance.
-  - Biased towards larger airports.
-2. **Mean delays show high kurtosis**: the distribution of delays across airports is highly concentrated around the mean, with most airports having a similar frequency of delays, which makes it difficult to distinguish between them when visualizing the data.
-  - Provides a more accurate representation of delay frequency.
-  - Fails to distinguish airports close to the mean and may maximize the effects of airports with few flights.
+1. **Total delays are skewed towards airport size**: Larger airports with more flights tend to show higher total delays, reflecting their size but potentially skewing results.
+  - **Advantage**: Differentiates performance between airports.
+  - **Disadvantage**: Biased towards larger airports.
+2. **Normalized delays show high kurtosis**: This metric adjusts for airport size, but shows a distribution tightly clustered around the mean, which makes it harder to distinguish between airports.
+  - **Advantage**: Provides a clearer view of delay frequency across airports.
+  - **Disadvantage**: Less effective in differentiating among airports with similar delay frequencies.
 
 ![](/assets/projects/airline/airport-delay-distributions.png)
 
-For the purposes of visualizing the data, I chose to use the total delay counts for arrival delays due to several reasons. Firstly, it provides a more differentiated view of airport performance. Moreover, the question is usually posed in terms of identifying the most known airports with the highest frequency of delays, a question better answered by the total delay counts, which already favor larger airports. Furthermore, the choice of considering only arrival delays responds to the fact that departure delays are more susceptible to carrier operations^[According to the [Airline On-Time Statistics and Delay Causes](https://transtats.bts.gov/ot_delay/OT_DelayCause1.asp?20=E), air carrier delays accounted for nearly 25% of national delays from January 2010 to March 2020], whereas arrival delays are more influenced by external factors, including airport operations. This makes arrival delays a better metric for evaluating airport performance^[Of course, as stated in the previous section, airport management is not the only cause for arrival delays. There is also a moderate correlation between departure and arrival delays which increases after as certain threshold of departure delays. However, when comparing airports, arrival delays abstract the role of the carrier and focus on the external factors, *among which* is airport management.]. Below are the plots of the total delay counts across airports. 
+Given these factors, I chose to use total delay counts for arrival delays, as it provides a clearer picture of major airports' performance and is more relevant for assessing well-known airports. Arrival delays, influenced by external factors like airport operations, offer a better metric for evaluating airport performance compared to departure delays, which are more affected by carrier operations^[According to the [Airline On-Time Statistics and Delay Causes](https://transtats.bts.gov/ot_delay/OT_DelayCause1.asp?20=E), air carrier delays accounted for nearly 25% of national delays from January 2010 to March 2020]. Below are the plots of total arrival delays across airports.^[Of course, as stated in the previous section, airport management is not the only cause for arrival delays. There is also a moderate correlation between departure and arrival delays which increases after as certain threshold of departure delays. However, when comparing airports, arrival delays abstract the role of the carrier and focus on the external factors, *among which* is airport management.]. Below are the plots of the total delay counts across airports. 
 
 :::{.column-page-right}
 <p class="text-center">Arrival Delays by Airport</p>
 <iframe src='/projects/_arr-delay-airports.html' width=100%, height="600px"></iframe>
 :::
 
-The bubble map shows the distribution of arrival delays across airports, with the size of the bubble representing the total number of delays. Given the nature of the metric, the size of the bubbles favor larger airports, which have higher flight volumes and correspondingly higher delay counts. Several observations can be made from the visualization:
+The bubble map visualizes arrival delays by airport, with bubble size representing the total number of delays. Key insights include:
 
-- **Top Airports**: the top five airports with the highest total delay counts are Chicago O'Hare International Airport (ORD), Hartsfield-Jackson Atlanta International Airport (ATL), Dallas/Fort Worth International Airport (DFW), Los Angeles International Airport (LAX), and San Francisco International Airport (SFO).
-- **Costal Airports**: coastal airports such as Los Angeles (LAX), San Francisco (SFO), Newark (EWR), and Boston (BOS) also rank high among the top 15 airports, randing from 13783 to 8297.
-- **New York Area Congestion**: Newark (EWR) and LaGuardia (LGA) are among the top ten, with 11,119 (7th) and 8,723 (9th) delays respectively. This underscores the heavy congestion and operational difficulties in the New York metropolitan area.
-- **Geographical Spread**: the top 20 airports with the highest total delay counts are spread across the country,showing that delays are a widespread issue. 
-- **JFK**: insteresingly, JFK ranks 20th with 6095 delays, which is significantly lower than the top airports including those in the New York Metropolitan area. The causes of this difference would be an interesting question for further analysis.
+- **Top Airports**: The top five airports with the highest total delay counts are Chicago O'Hare International Airport (ORD), Hartsfield-Jackson Atlanta International Airport (ATL), Dallas/Fort Worth International Airport (DFW), Los Angeles International Airport (LAX), and San Francisco International Airport (SFO).
+- **Costal Airports**: Coastal airports such as Los Angeles (LAX), San Francisco (SFO), Newark (EWR), and Boston (BOS) also rank high among the top 15 airports.
+- **New York Area Congestion**: Newark (EWR) and LaGuardia (LGA) are among the top ten for delays, highlighting congestion and operational challenges in the New York area.
+- **Geographical Spread**: The top 20 airports for delays are spread across the country, showing that delays are a widespread issue.
+- **JFK**: John F. Kennedy (JFK) ranks 20th with 6,095 delays, significantly lower than other major airports in the New York Metropolitan area. The causes of this difference would be an interesting question for further analysis.
 
-Overall, analyzing arrival delays across airports reveals crucial insights into the distribution and frequency of delays within the aviation network. Larger airports such as Chicago O'Hare International Airport, Hartsfield-Jackson Atlanta International Airport, and Dallas/Fort Worth International Airport have the highest total delay counts, which is expected due to their higher flight volumes. Coastal airports and those in the New York area also show significant delay counts, highlighting congestion and operational challenges in these regions. The geographical spread of the top 20 airports indicates that delays are not confined to specific areas but are a nationwide issue. Overall, this analysis underscores the importance of addressing delays at both major hubs and regional airports to improve the efficiency of the U.S. aviation system.
+Overall, this analysis highlights that larger airports, particularly those in coastal and high-traffic areas like New York, experience significant delays. The geographical spread of delays underscores that this issue affects airports nationwide. Overall, this analysis underscores the importance of addressing delays at both major hubs and regional airports to improve the efficiency of the U.S. aviation system.
 
 ## Conclusion
 
-In this project, I analyzed 30 years of US domestic flight data to uncover trends in on-time performance across carriers, airports, and time. The analysis aimed to address four key questions: how delays vary over time, the correlation between departure and arrival delays, how delays differ among carriers, and how delays are distributed across airports. The analysis yielded the following findings:
+This project analyzed 30 years of US domestic flight data to uncover trends in on-time performance across carriers, airports, and time. The analysis focused on four key questions: how delays vary over time, the correlation between departure and arrival delays, variations in delays among carriers, and delay distribution across airports. The findings are summarized below:
 
 - **Longitudinal Analysis**
-  * The evolution of delays over 34 years shows a narrowing gap between departure and arrival delays, driven by an increase in departure delays rather than a decrease in arrival delays.
-  * The volatility of delays has slightly decreased over the years, suggesting a stabilization in the seasonal patterns of delays.
-  * Arrival delays have decreased by only 1%, while departure delays have increased by over 5% in 34 years, confirming that airlines and airports have been unable to improve on-time performance.
+  * Over 34 years, the gap between departure and arrival delays has narrowed due to an increase in departure delays, not a decrease in arrival delays.
+  * Delay volatility has slightly decreased, suggesting more stable seasonal delay patterns.
+  * Arrival delays have only decreased by 1%, while departure delays have increased by over 5%, indicating limited progress in improving on-time performance.
 - **Correlation Analysis**
-  * Departure and arrival delays exhibit a strong positive linear relationship, with a Pearson correlation coefficient of 0.93.
-  * The relationship is more dispersed within the interquartile range, with a weaker correlation coefficient of 0.67.
-  * The dispersion in delays is bounded by two linear trends: arrival delays can be minimized by up to 45 minutes relative to departure delays, yet can exceed them by up to 250 minutes.
-  * The disparity in the correlation responds to a difference in the causes of delays: while departure delays are more under the carrier's control, arrival delays are more influenced by external factors, including weather, diversion, or airport congestion.
+  * Departure and arrival delays show a strong positive linear relationship, with a Pearson correlation coefficient of 0.93.
+  * Within the interquartile range, the correlation weakens to 0.67, and delays are bounded by two linear trends: arrival delays can be minimized by up to 45 minutes relative to departure delays but can exceed them by up to 250 minutes.
+  * This disparity reflects that while departure delays are more under the carrier's control, arrival delays are influenced by external factors like weather and airport congestion.
 - **Carrier Analysis**
-  * JetBlue Airways, ExpressJet Airlines, and Frontier Airlines consistently rank among the top carriers with the highest frequency of delays both at departure and arrival.
-  * Southwest Airlines has the largest difference between departure and arrival delays, ranking 5th in departure delays but 20th in arrival delays.
-  * Departure delays are more indicative of carrier performance, as they are more under the carrier's control, influenced by factors such as boarding, fueling, and maintenance.
+  * JetBlue Airways, ExpressJet Airlines, and Frontier Airlines consistently have the highest frequencies of delays at both departure and arrival.
+  * Southwest Airlines shows the largest difference between departure and arrival delays, ranking 5th in departure delays but 20th in arrival delays.
+  * Departure delays are a more accurate indicator of carrier performance, as they are influenced by operational factors such as boarding and maintenance.
 - **Airport Analysis**
-  * The top five airports with the highest total delay counts are Chicago O'Hare International Airport, Hartsfield-Jackson Atlanta International Airport, Dallas/Fort Worth International Airport, Los Angeles International Airport, and San Francisco International Airport.
-  * Coastal airports such as Los Angeles, San Francisco, Newark, and Boston also rank high among the top 15 airports, indicating congestion and operational difficulties in these regions.
-  * The geographical spread of the top 20 airports indicates that delays are not confined to specific areas but are a nationwide issue.
+  * The top airports with the highest total delay counts are Chicago O'Hare, Hartsfield-Jackson Atlanta, Dallas/Fort Worth, Los Angeles, and San Francisco.
+  * Coastal airports like Los Angeles, San Francisco, Newark, and Boston rank high, indicating congestion and operational challenges in both coasts.
+  * The geographical spread of the top 20 airports shows that delays are a nationwide issue, spread across the Northeast, Southeast, Midwest, Central, and West regions of the US.
 
-This analysis highlights ongoing challenges in improving on-time performance, particularly with departure delays. The strong correlation between departure and arrival delays emphasizes the importance of addressing issues at the departure stage to enhance overall punctuality. Significant variations in delay frequencies across carriers and routes suggest that tailored strategies are needed for different airlines and specific airports The findings from this project have been effectively translated into an interactive visualization dashboard, providing valuable insights for stakeholders to inform decision-making and improve operational efficiency in the aviation industry.
+The analysis underscores persistent challenges in improving on-time performance, particularly with departure delays. The strong correlation between departure and arrival delays emphasizes the importance of addressing issues at the departure stage to enhance overall punctuality. The results suggest that tailored strategies are needed for different carriers and airports. The findings from this project have been effectively translated into an interactive visualization dashboard, providing valuable insights for stakeholders to inform decision-making and improve operational efficiency in the aviation industry.

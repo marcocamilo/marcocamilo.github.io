@@ -20,7 +20,6 @@ website:
 
 format:
   html:
-    # theme
     theme: 
       light: [default, assets/css/light-mods.scss]
       dark: [cyborg, assets/css/dark-mods.scss]
