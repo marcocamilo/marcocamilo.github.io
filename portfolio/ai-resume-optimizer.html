@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.45">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="This app leverages Google’s Gemini API and LangChain to evaluate and optimize resumes based job descriptions. Combining role prompting, task decomposition, and chain-of-thought, I enginered an AI-powered pipeline that identifies gaps, generates recommendations, and applies them to enhance resume-job alignement. The project integrates a cutting-edge AI pipeline to address a real-world challenge and significantly improve job seekers’ chances of success in the competitive job market.">
+
+<title>AI-Powered Resume Optimizer with Google Gemini and LangChain – marcocamilo</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-QQJ3PCTWK5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-QQJ3PCTWK5', { 'anonymize_ip': true});
+</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<link rel="stylesheet" href="../assets/css/global.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marcocamilo</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../portfolio.html"> 
+<span class="menu-text">Portfolio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#key-findings" id="toc-key-findings" class="nav-link active" data-scroll-target="#key-findings">Key Findings</a></li>
+  <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing">Preprocessing</a>
+  <ul>
+  <li><a href="#text-extraction" id="toc-text-extraction" class="nav-link" data-scroll-target="#text-extraction">Text Extraction</a></li>
+  <li><a href="#advanced-text-processing" id="toc-advanced-text-processing" class="nav-link" data-scroll-target="#advanced-text-processing">Advanced Text Processing</a></li>
+  </ul></li>
+  <li><a href="#prompt-engineering" id="toc-prompt-engineering" class="nav-link" data-scroll-target="#prompt-engineering">Prompt Engineering</a>
+  <ul>
+  <li><a href="#role-prompting" id="toc-role-prompting" class="nav-link" data-scroll-target="#role-prompting">Role Prompting</a></li>
+  <li><a href="#task-decomposition" id="toc-task-decomposition" class="nav-link" data-scroll-target="#task-decomposition">Task Decomposition</a></li>
+  <li><a href="#chain-of-thought-prompting" id="toc-chain-of-thought-prompting" class="nav-link" data-scroll-target="#chain-of-thought-prompting">Chain-of-Thought Prompting</a></li>
+  <li><a href="#additional-strategies" id="toc-additional-strategies" class="nav-link" data-scroll-target="#additional-strategies">Additional Strategies</a></li>
+  </ul></li>
+  <li><a href="#evaluation-phase" id="toc-evaluation-phase" class="nav-link" data-scroll-target="#evaluation-phase">Evaluation Phase</a>
+  <ul>
+  <li><a href="#initialization" id="toc-initialization" class="nav-link" data-scroll-target="#initialization">Initialization</a></li>
+  <li><a href="#evaluation-chain" id="toc-evaluation-chain" class="nav-link" data-scroll-target="#evaluation-chain">Evaluation Chain</a></li>
+  <li><a href="#evaluation-function" id="toc-evaluation-function" class="nav-link" data-scroll-target="#evaluation-function">Evaluation Function</a></li>
+  </ul></li>
+  <li><a href="#optimization-phase" id="toc-optimization-phase" class="nav-link" data-scroll-target="#optimization-phase">Optimization Phase</a></li>
+  <li><a href="#results-and-discussion" id="toc-results-and-discussion" class="nav-link" data-scroll-target="#results-and-discussion">Results and Discussion</a>
+  <ul>
+  <li><a href="#key-achievements" id="toc-key-achievements" class="nav-link" data-scroll-target="#key-achievements">Key Achievements</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">AI-Powered Resume Optimizer with Google Gemini and LangChain</h1>
+<p class="subtitle lead">Leveraging LLMs using LangChain to Optimize Resumes for a Competitive Job Market</p>
+</div>
+
+<div>
+  <div class="description">
+    This app leverages Google’s Gemini API and LangChain to evaluate and optimize resumes based job descriptions. Combining role prompting, task decomposition, and chain-of-thought, I enginered an AI-powered pipeline that identifies gaps, generates recommendations, and applies them to enhance resume-job alignement. The project integrates a cutting-edge AI pipeline to address a real-world challenge and significantly improve job seekers’ chances of success in the competitive job market.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="../assets/projects/ai-resume-optimizer/ai-resume-optimizer.jpeg" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="../assets/projects/ai-resume-optimizer/ai-resume-optimizer.jpeg" class="img-fluid"></a></p>
+<section id="key-findings" class="level3">
+<h3 class="anchored" data-anchor-id="key-findings">Key Findings</h3>
+<ul>
+<li><strong>30%-40% Improvement in ATS Scores</strong>: Optimized resumes demonstrated a 30%-40% increase in Applicant Tracking System (ATS) scores, significantly boosting the chances of passing initial screenings.</li>
+<li><strong>40% Increase in Resume-Job Alignment</strong>: The app achieved a 30%-40% enhancement in alignment between resumes and job descriptions, verified using similarity evaluations across various Large Language Models.</li>
+<li><strong>60% Improvement in Bullet Point Quality</strong>: The optimized resumes showed a 60% enhancement in the quality of bullet points, with increased use of action verbs, quantifiable metrics, and relevant keywords.</li>
+<li><strong>80% Reduction in Processing Time</strong>: The system reduced resume evaluation and optimization time by 70%-80%, completing the task in just 20 seconds on average, compared to the typical 15-30 minutes required by manual methods.</li>
+<li><strong>High-Precision Evaluation</strong>: The system consistently delivered accurate assessments of resume strengths, weaknesses, and missing keywords, providing actionable recommendations for optimization.</li>
+</ul>
+</section>
+<section id="preprocessing" class="level3">
+<h3 class="anchored" data-anchor-id="preprocessing">Preprocessing</h3>
+<section id="text-extraction" class="level4">
+<h4 class="anchored" data-anchor-id="text-extraction">Text Extraction</h4>
+<p>The project employs two preprocessing approaches to clean and format the resume and job description, adapting to various input formats. Aside from direct text input, the app supports two input formats: URL-based and PDF-based.</p>
+<ol type="1">
+<li><strong>URL-based Text Extraction</strong> (Job Descriptions): for job descriptions provided as URLs, the app utilizes the WebBaseLoader from LangChain to fetch content from job posting URLs.</li>
+<li><strong>PDF-based Extraction</strong> (Resumes): for resumes provided as PDF files, the pipeline applies the <code>read_pdf</code> function from <code>utils.py</code> module, which uses the <code>PdfReader</code> function from <code>PyPDF2</code> to extract text from uploaded PDF resumes.</li>
+</ol>
+</section>
+<section id="advanced-text-processing" class="level4">
+<h4 class="anchored" data-anchor-id="advanced-text-processing">Advanced Text Processing</h4>
+<p>Regardless of the input method, all text undergoes a comprehensive preprocessing pipeline implemented in the <code>preprocessing</code> function from the <code>nlp.py</code> module.</p>
+<ol type="1">
+<li><strong>Text Normalization</strong>: Converts text to lowercase for consistency, removes HTML content (if present in URL-extracted text), and expands contractions (e.g., “don’t” to “do not”).</li>
+<li><strong>Noise Reduction</strong>: Eliminates email addresses and URLs, and removes special characters, punctuation, and excessive spacing.</li>
+<li><strong>Stopword Removal</strong>: Removes common stopwords using the <code>NLTK</code> library’s English stopwords list.</li>
+<li><strong>Domain-Specific Cleaning</strong>: Involves removing a custom list of resume-specific stopwords defined in <code>utils.py</code>, as well as removing non-existent words cross-referenced with a standard English dictionary.</li>
+</ol>
+</section>
+</section>
+<section id="prompt-engineering" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="prompt-engineering">Prompt Engineering</h3>
+<p>The strategies for prompt engineering involved a combination of role-based contextualization, task decomposition, and chain-of-thought prompting to guide the model in evaluating and later optimizing the resume against a job description<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;For more details about prompt engineering strategies, please visit <a href="https://developers.google.com/machine-learning/resources/prompt-eng#prompting_with_examples_one-_few-_and_multi-shot">Prompt Engineering for Generative AI (Google)</a>.</p></div></div><p>Both evaluation and optimization phases involved a multi-step process that required the AI to identify strengths, weaknesses, missing keywords, and generate recommendations. The optimization task further expanded this by chaining various tasks such as bullet point optimization, keyword inclusion, and output formatting based on the weaknesses and recommendations identified in the evaluation phase. The diagram below illustrates the multi-step evaluation and optimization pipeline:</p>
+<p><a href="../assets/projects/ai-resume-optimizer/prompt-diagram.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="../assets/projects/ai-resume-optimizer/prompt-diagram.png" class="img-fluid"></a></p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<section id="role-prompting" class="level4 page-columns page-full">
+<h4 class="anchored" data-anchor-id="role-prompting">Role Prompting</h4>
+<p>Role prompting is a kind of zero-shot or direct prompting<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> that frames the model’s task in the context of a specific role.</p>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;Zero-shot or direct prompting provides the model with the direct instruction, optionally framed as a question or within a role.</p></div></div><p>This role guides it to focus on the most relevant aspects of the resume and job description. The prompt usually takes the form of: <em>[role] + [focus] + [task]</em>. This technique sets the tone and perspective for all subsequent interactions, encourages the AI to draw upon domain-specific knowledge and best practices in HR, and enhances the authority and relevance of the AI’s responses. Below an example:</p>
+<div id="a255c21b" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-overflow-wrap code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>role <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="st">You are an experienced Human Resources Manager, specializing in analyzing resumes and providing recommendations that help job seekers optimize their resumes. Your task is to evaluate the alignment between the provided resume and job description, and provide an expert's evaluation on whether the candidate had the best profile for the role. Please complete the following tasks.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="task-decomposition" class="level4">
+<h4 class="anchored" data-anchor-id="task-decomposition">Task Decomposition</h4>
+<p>Task decomposition involves breaking down the overall task into smaller, more manageable sub-tasks guide the AI’s reasoning throughout the entire process.</p>
+<p>Both the evaluation and optimization tasks were broken down into multiple sub-tasks, with the evaluation task broken down into three independent sub-tasks.</p>
+<ul>
+<li><strong>Evaluation Sub-Tasks</strong> (independent)
+<ul>
+<li><strong>Strengths</strong>: Identify the strengths in the resume that align with the job description.</li>
+<li><strong>Weaknesses</strong>: Identify the weaknesses in the resume that do not align with the job description.</li>
+<li><strong>Missing Keywords</strong>: Identify the keywords missing in the resume that are present in the job description.</li>
+</ul></li>
+<li><strong>Output</strong>:
+<ul>
+<li><strong>Evaluation Report</strong> (used for optimization): Compile the results of the evaluation tasks into a comprehensive evaluation report.</li>
+</ul></li>
+</ul>
+<p>Breaking down the tasks into smaller, more manageable sub-tasks allowed for more focused and precise responses from the AI, enhanced the overall quality of the analysis by addressing each aspect separately, and provided a clear structure for the processes.</p>
+</section>
+<section id="chain-of-thought-prompting" class="level4">
+<h4 class="anchored" data-anchor-id="chain-of-thought-prompting">Chain-of-Thought Prompting</h4>
+<p>Chain-of-thought prompting involves chaining multiple prompts together to guide the AI’s reasoning through a series of related tasks.</p>
+<p>The optimization phase, in particular, relied on a chain of thought that connected the results of the evaluation phase to the optimization tasks, as well as each subtask within the optimization phase with the subsequent subtask. This ensured that the AI’s responses built upon the results of the previous tasks to optimize the same content at different levels. Chain-of-thought was also key in maintaining the quality of information and reasoning throughout the optimization process.</p>
+<ul>
+<li><strong>Optimization Sub-Tasks</strong> (chained):
+<ol type="1">
+<li><strong>Bullet Point Optimization</strong>: Optimize the bullet points based on a set of five instructions.</li>
+<li><strong>Keyword Optimization</strong>: Optimize the keywords in the resume based on the job description.</li>
+<li><strong>Formatting</strong>: Optimize the formatting of the resume to improve readability and visual appeal.</li>
+</ol></li>
+<li><strong>Output</strong>:
+<ul>
+<li><strong>Optimized Resume</strong>: Implement the recommendations generated in the evaluation phase to optimize the resume.</li>
+</ul></li>
+</ul>
+</section>
+<section id="additional-strategies" class="level4">
+<h4 class="anchored" data-anchor-id="additional-strategies">Additional Strategies</h4>
+<ul>
+<li><strong>Constraint Specification</strong>: defines limits or constraints on the AI’s responses, ensuring that the responses are within the desired scope and quality.</li>
+<li><strong>Context Preservation</strong>: maintains the context of the conversation and the information provided in previous interactions, ensuring consistency and coherence in the AI’s responses.</li>
+<li><strong>Structured Output Formatting</strong>: organizes the AI’s responses in a structured format, making it easier for users to understand and act upon the information provided.</li>
+</ul>
+<blockquote class="blockquote">
+<p>To see the full list of prompts implemented in the project, you can refer to the <code>prompts.py</code> module in the project repository <a href="https://github.com/marcocamilo/ai-resume-alignment-engine/blob/main/src/templates/prompts.py">here</a></p>
+</blockquote>
+</section>
+</section>
+<section id="evaluation-phase" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="evaluation-phase">Evaluation Phase</h3>
+<p>The resume evaluation process utilizes the Google Gemini API through the <code>ChatGoogleGenerativeAI</code> class from LangChain. The evaluation is broken down into several components.</p>
+<section id="initialization" class="level4 page-columns page-full">
+<h4 class="anchored" data-anchor-id="initialization">Initialization</h4>
+<p>The process begins by setting up the Google Gemini API using the <code>ChatGoogleGenerativeAI</code> class from LangChain. The retrieves the API key from the <code>.env</code> file using <code>load_dotenv</code> from the <code>dotenv</code> library and initializes the <code>genai</code> model with the specified API key. The app uses the “gemini-1.5-flash”, a mid-sized model optimized for fast response times and a one-million-token context window<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;The app is currently being developed to offer the user more models, including Llama 3.</p></div></div><div id="f0c9ced6" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>View Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>api_key <span class="op">=</span> os.getenv(<span class="st">"GOOGLE_API_KEY"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>genai.configure(api_key<span class="op">=</span>api_key)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> <span class="st">"gemini-1.5-flash"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> ChatGoogleGenerativeAI(model<span class="op">=</span>model_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="evaluation-chain" class="level4">
+<h4 class="anchored" data-anchor-id="evaluation-chain">Evaluation Chain</h4>
+<p>The <code>create_evaluation_chain</code> function creates a pipeline that combines the role-based prompt, the Gemini model, and the output parser to evaluate the resume against the job description. The pipeline is created using the updated pipe <code>|</code> notation from LangChain, which chains the components together to produce the response. The function is applied to each evaluation prompt stored in the <code>EVALUATION_PROMPTS</code> dictionary, which contains the role-based prompts for each evaluation sub-task. The results of the evaluation are stored in a dictionary for further processing.</p>
+<div id="f15950ce" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>View Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a> <span class="kw">def</span> create_evaluation_chain(template, model<span class="op">=</span>llm):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>     input_variables <span class="op">=</span> template.count(<span class="st">"{"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>     prompt_template <span class="op">=</span> PromptTemplate(template<span class="op">=</span>template, input_variables<span class="op">=</span>input_variables)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>     <span class="cf">return</span> prompt_template <span class="op">|</span> model <span class="op">|</span> StrOutputParser()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="evaluation-function" class="level4">
+<h4 class="anchored" data-anchor-id="evaluation-function">Evaluation Function</h4>
+<p>The <code>run_evaluation</code> function invokes each chain of the evaluation pipeline and returns the responses for the strengths, weaknesses, missing keywords, and recommendations prompts. The function is cached using Streamlit’s <code>@st.cache_data</code> decorator to improve performance by storing the results in memory and avoiding redundant computations.</p>
+<div id="03417ff2" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>View Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="at">@st.cache_data</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> run_evaluation(description, resume):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    results <span class="op">=</span> {</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        key: chain.invoke({<span class="st">"description"</span>: description, <span class="st">"resume"</span>: resume})</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> key, chain <span class="kw">in</span> evaluation_results.items()</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    recommendations <span class="op">=</span> recommendations_chain.invoke(results)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        results[<span class="st">"strengths"</span>],</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        results[<span class="st">"weaknesses"</span>],</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        results[<span class="st">"missing_keywords"</span>],</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        recommendations,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+</section>
+<section id="optimization-phase" class="level3">
+<h3 class="anchored" data-anchor-id="optimization-phase">Optimization Phase</h3>
+<p>The optimization process builds upon the results of the evaluation phase to systematically enhance the resume against the job description at various levels. Unlike the evaluation phrase, the optimization phase is a chained process where each subtask builds upon the results of the previous one. As such, the bullet optimization task builds upon the original resume, the keyword optimization task builds upon the bullet-optimized resume, and the formatting task builds upon the keyword-optimized resume.</p>
+<p>To accommodate for this chained process, <code>create_optimization_chain</code> creates a <code>RunnableParallel</code> object that processes the main output with <code>RunnablePassthrough</code> variables, allowing for unchanged variables to pass through the chain and new variables to be added as needed.</p>
+<div id="56d18b6f" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>View Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> create_optimization_chain(template, input_variables, output_key, model<span class="op">=</span>llm):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    prompt <span class="op">=</span> PromptTemplate(template<span class="op">=</span>template, input_variables<span class="op">=</span>input_variables)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> RunnableParallel(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        {</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>            output_key: prompt <span class="op">|</span> model <span class="op">|</span> StrOutputParser(),</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>            <span class="op">**</span>{</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>                var: RunnablePassthrough()</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> var <span class="kw">in</span> input_variables</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> var <span class="op">!=</span> output_key</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>            },</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The optimization chain consists of three main steps:</p>
+<ol type="1">
+<li><strong>Bullet Point Optimization</strong> (resume, job description, evaluation): This step enhances individual bullet points in the experience and project sections based on a template of five qualities for strong bullet points, including strong action verbs, quantifiable metrics, and relevant skills from the job description.</li>
+<li><strong>Keyword Integration</strong> (optimized bullet resume, job description, evaluation): This step integrates missing keywords and skills into the bullet points from the previous section and into the skills section of the resume, improving alignment with Applicant Tracking Systems (ATS).</li>
+<li><strong>Length and Formatting</strong> (optimized keyword resume, job description, evaluation): This final step ensures the optimized content fits within the original resume’s length constraints, maintaining the original format and resume length.</li>
+</ol>
+<p>The chained process returns an optimized resume that incorporates the recommendations generated in the evaluation phase.</p>
+<div id="4f50d1d7" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>View Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>optimization_chain <span class="op">=</span> (</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    create_optimization_chain(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        OPTIMIZATION_TEMPLATES[<span class="st">"bullet_opt"</span>],</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        [<span class="st">"resume"</span>, <span class="st">"description"</span>, <span class="st">"evaluation"</span>],</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"bullet_optimized"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> create_optimization_chain(</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        OPTIMIZATION_TEMPLATES[<span class="st">"key_opt"</span>],</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        [<span class="st">"bullet_optimized"</span>, <span class="st">"description"</span>, <span class="st">"evaluation"</span>],</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"keyword_optimized"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> create_optimization_chain(</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        OPTIMIZATION_TEMPLATES[<span class="st">"output"</span>], [<span class="st">"keyword_optimized"</span>], <span class="st">"optimized_resume"</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Additionally, a summary of changes is generated, which compares the original and optimized resumes to provide users with a clear overview of the changes made.</p>
+</section>
+<section id="results-and-discussion" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="results-and-discussion">Results and Discussion</h2>
+<p>The AI-powered resume optimizer demonstrates impressive capabilities in analyzing and enhancing resumes. From a prompt engineering and model performance perspective, the model produces:</p>
+<ol type="1">
+<li><strong>High-Precision Evaluation</strong>: The system’s multi-faceted evaluation approach consistently produced highly accurate assessments of resume strengths and weaknesses, as well as missing keywords.</li>
+<li><strong>Effective Keyword Optimization</strong>: The engine’s keyword integration capabilities have shown a consistently marked improvement in resume-job description alignment, not only in the skills included in the skills section, but also in the keywords worked into the bullet points in other sections.</li>
+<li><strong>Impactful Bullet Point Enhancement</strong>: The bullet point optimization feature has led a significant increase in the use of strong action verbs and quantifiable achievements within optimized resumes.</li>
+<li><strong>Clear NLP Visualization</strong>: The integration of word cloud generation provided an intuitive, visual representation of resume-job description alignment, especially useful in comparing the improvement between the original and optimized resumes.</li>
+</ol>
+<p>These achievements can be attributed to several factors:</p>
+<ul>
+<li>The strategic use of state-of-the-art language models (Google Gemini API) and NLP frameworks (LangChain) provides a robust foundation for understanding and processing complex textual data.</li>
+<li>Sophisticated prompt engineering techniques guide the AI towards producing highly relevant and actionable outputs, mimicking the expertise of seasoned HR professionals.</li>
+<li>The modular, pipeline-based architecture allows for efficient, step-by-step resume optimization, ensuring that each aspect of the resume is thoroughly addressed.</li>
+<li>Careful consideration of real-world HR practices and ATS requirements in the system design ensures that the optimizations are not just technically sound but also practically relevant.</li>
+</ul>
+<section id="key-achievements" class="level4 page-columns page-full">
+<h4 class="anchored" data-anchor-id="key-achievements">Key Achievements</h4>
+<p>Although specific metrics would require extensive testing, the are several key metrics that were observed during development:</p>
+<ol type="1">
+<li><strong>30% ATS Optimization</strong>: The optimized resumes consistently showed 30%-40% improvement in ATS scores<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>, increasing the chances of passing initial screening.</li>
+<li><strong>40% Increase in Resume-Job Alignment</strong>: The improvement in alignment was tested using similarity evaluations across various LLMs, including GPT4, Claude and Gemini. Tested resumes consistently showed a 30%-40% increase in alignment scores according to various LLM estimations.</li>
+<li><strong>60% Increase in Bullet Point Quality</strong>: Optimized resumes consistently exhibited a minimum of 60% improvement in the quality of bullet points based on the template provided during prompting. Optimized bullet points included more action verbs, quantifiable metrics, and relevant skills and keywords from the job description and evaluation.</li>
+<li><strong>80% Reduced Processing</strong>: The LLM choice enabled the system to evaluate and optimize a resume in an average of 20 seconds, a task that typically takes 15-30 minutes, which represents a percentage of 70-80% time saved compared to manual methods.</li>
+</ol>
+<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;Measurements of ATS scores were obtained using available ATS tools and APIs such as Jobscan, Resumeworded, and Nodefair.</p></div></div></section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>The AI-Powered Resume Optimization Engine demonstrated high success in advancing the application of AI to improve a crucial step in job search process. By leveraging cutting-edge AI models and a strategic prompt engineering approach, the system offers a powerful tool that dramatically improves resume tailoring process, providing faster, more consistent, and highly personalized resume optimization. The system’s ability to significantly improve resume quality while dramatically reducing the time investment for job seekers showcases the tangible benefits of AI integration in career development tools.</p>
+<p>While the current system has shown impressive results, there are still several areas for future development:</p>
+<ol type="1">
+<li><strong>Improve Prompt Engineering</strong>: Further refine the prompt engineering strategies to enhance the AI’s understanding of the evaluation and optimization tasks, leading to more precise and consistent optimizations.</li>
+<li><strong>Apply Resume Templates</strong>: Implementing a feature to return optimized resumes in various templates to suit different roles and seniority levels.</li>
+<li><strong>Multilingual Support</strong>: Expanding capabilities to handle resumes in multiple languages, increasing global applicability.</li>
+<li><strong>Adaptive Learning</strong>: Developing a more interactive interface that allows users to collaborate with the AI in real-time, fine-tuning optimizations based on user feedback.</li>
+</ol>
+<p>The AI-Powered Resume Optimization Engine demonstrates a strong capability to produce high-performing AI products that address real-world challenges. For recruiters and team leaders, this project showcases:</p>
+
+
+</section>
+
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/marcocamilo\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2024 Marco-Andrés Camilo-Pietri</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"loop":false,"descPosition":"bottom","selector":".lightbox","openEffect":"zoom","closeEffect":"zoom"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+</body></html>

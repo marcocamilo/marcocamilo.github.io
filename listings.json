@@ -2,6 +2,7 @@
   {
     "listing": "/portfolio.html",
     "items": [
+      "/portfolio/ai-resume-optimizer.html",
       "/portfolio/airline-performance.html",
       "/portfolio/resume-classifier.html",
       "/portfolio/biodiversity.html",
@@ -11,9 +12,10 @@
   {
     "listing": "/index.html",
     "items": [
+      "/portfolio/ai-resume-optimizer.html",
       "/portfolio/resume-classifier.html",
-      "/portfolio/airline-performance.html",
       "/portfolio/stock-sentiment-prediction.html",
+      "/portfolio/airline-performance.html",
       "/portfolio/biodiversity.html"
     ]
   }
