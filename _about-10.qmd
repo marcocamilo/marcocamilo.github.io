@@ -1,0 +1,27 @@
+---
+title: ""
+---
+
+::: {.grid}
+::: {.g-col-12 .g-col-lg-9}
+
+# 10 Things About Me
+
+1. **I'm Marco Camilo**, an NLP professional passionate about merging language with technology.
+2. **Educational Background**:
+  — Master’s in Slavic Languages from Humboldt-Universität zu Berlin
+  — Bachelor’s in Foreign Languages from the University of Puerto Rico, Río Piedras
+  — Natural Language Processing from DeepLearning.AI
+  — Machine Learning from Stanford University School of Engineering
+3. **Core Expertise**: 
+  — NLP, deep learning like BERT, CNN, LSTM, and Transformer models
+4. **Technical Skills**: 
+  — MLOps, DevOps, LLMs, Prompt Engineering, Data Preprocessing, Data Engineering, Hyperparameter Tunning, APIs
+  — PyTorch, TensorFlow, Scikit-Learn, XGBoost, Spark, Ollama, Scipy, Numpy, Pandas
+5. **Languages**:
+  — Python, R, SQL, JavaScript
+  — English & Spanish (native), German & French (C2), Russian (C1), Italian & Portuguese (B2), Polish (B1)
+6. **Professional Journey**: transitioned from linguistics to NLP/ML driven by a deep fascination with language, mathematics, and algorithms.
+9. **Takeaway**: 
+  — Enthusiastic about continuous learning and staying at the forefront of NLP advancements. Passionate about collaborative problem-solving and impactful technology solutions.
+

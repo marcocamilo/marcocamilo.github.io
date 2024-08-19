@@ -18,7 +18,7 @@ Data Scientist.
     <i class="bi bi-github"></i>
      <span class="about-link-text">Github</span>
   </a></div>
-  <div><a href="mailto:{{site.email}}" class="about-link" rel="" target="">
+  <div><a href="mailto:marco.camilopietri@gmail.com" class="about-link" rel="" target="">
     <i class="bi bi-envelope-fill"></i>
      <span class="about-link-text">Email</span>
   </a></div>

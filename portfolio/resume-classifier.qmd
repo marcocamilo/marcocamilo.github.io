@@ -3,7 +3,7 @@ title: BERT, Encoders and Linear Models for Resume Text Classification
 subtitle: Exploring Performance of Advanced NLP Algorithms for Text Classification
 image: /assets/projects/resume-analyzer/resume-analyzer.jpg
 description: This project evaluates the performance of advanced NLP models and vectorization techniques for text classifcation using a resume dataset. Implementing Linear SVC, FNN, Encoder models, and BERT, the project achieved an accuracy of 91.67% with BERT. The project demonstrates how to build efficient preprocessing pipelines, optimize feature representation to enhance resource usage, and develop high-performing text classification models using Scikit-Learn and PyTorch.
-featured: 1
+featured: 2
 category: NLP
 type: Deep Learning
 skills:
@@ -978,7 +978,7 @@ plt.show()
 
 1. **BERT and Linear SVC: High Accuracy and Robust Performance**
 
-    - **Linear SVC**: Achieved 84% accuracy, offering competitive performance due to its simplicity and effective feature representation^[To read more on the efficiency of linear classifiers in text classification, see [Lin, Y.-C. et al. (2023) 'Linear Classifier: An Often-Forgotten Baseline for Text Classification'](https://doi.org/10.18653/v1/2023.acl-short.160).]. using TF-IDF vectors. This simplicity reduces the risk of overfitting and the straightforward feature representation contributes to the model's high accuracy and fast training times. This model is a reliable option for businesses that prioritize efficiency and simplicity without sacrificing too much accuracy.
+    - **Linear SVC**: Achieved 84% accuracy, offering competitive performance due to its simplicity and effective feature representation^[To read more on the efficiency of linear classifiers in text classification, see [Lin, Y.-C. et al. (2023) 'Linear Classifier: An Often-Forgotten Baseline for Text Classification'](https://doi.org/10.18653/v1/2023.acl-short.160).] using TF-IDF vectors. This simplicity reduces the risk of overfitting and the straightforward feature representation contributes to the model's high accuracy and fast training times. This model is a reliable option for businesses that prioritize efficiency and simplicity without sacrificing too much accuracy.
     - **BERT**: With an accuracy of 91.67%, BERT demonstrated the highest performance among the models. Its success is attributed to its pre-trained nature and high-quality embeddings. The model was pre-trained on a large corpus and thus has the ability to generate embeddings that encode deep semantic information^[See [Devlin, J. et al. (2018) 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding'](https://doi.org/10.48550/ARXIV.1810.04805).]. Moreover, its bidirectional nature captures a wide range of contextual information across a long-range dependencies. Businesses with the resources to deploy complex models would benefit from BERT's superior accuracy.
     
 2. **FNN and Encoder Model: Moderate Performance with Complex Architectures**
