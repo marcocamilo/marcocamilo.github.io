@@ -115,9 +115,6 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-QQJ3PCTWK5', { 'anonymize_ip': true});
 </script>
-<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
-<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
-<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
@@ -263,22 +260,11 @@ gtag('config', 'G-QQJ3PCTWK5', { 'anonymize_ip': true});
 <p>The strategies for prompt engineering involved a combination of role-based contextualization, task decomposition, and chain-of-thought prompting to guide the model in evaluating and later optimizing the resume against a job description<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
 <div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;For more details about prompt engineering strategies, please visit <a href="https://developers.google.com/machine-learning/resources/prompt-eng#prompting_with_examples_one-_few-_and_multi-shot">Prompt Engineering for Generative AI (Google)</a>.</p></div></div><p>Both evaluation and optimization phases involved a multi-step process that required the AI to identify strengths, weaknesses, missing keywords, and generate recommendations. The optimization task further expanded this by chaining various tasks such as bullet point optimization, keyword inclusion, and output formatting based on the weaknesses and recommendations identified in the evaluation phase. The diagram below illustrates the multi-step evaluation and optimization pipeline:</p>
 <p><a href="../assets/projects/ai-resume-optimizer/prompt-diagram.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2"><img src="../assets/projects/ai-resume-optimizer/prompt-diagram.png" class="img-fluid"></a></p>
-<div class="cell" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class="figure"><p></p>
-<div>
-
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
 <section id="role-prompting" class="level4 page-columns page-full">
 <h4 class="anchored" data-anchor-id="role-prompting">Role Prompting</h4>
 <p>Role prompting is a kind of zero-shot or direct prompting<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> that frames the model’s task in the context of a specific role.</p>
 <div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;Zero-shot or direct prompting provides the model with the direct instruction, optionally framed as a question or within a role.</p></div></div><p>This role guides it to focus on the most relevant aspects of the resume and job description. The prompt usually takes the form of: <em>[role] + [focus] + [task]</em>. This technique sets the tone and perspective for all subsequent interactions, encourages the AI to draw upon domain-specific knowledge and best practices in HR, and enhances the authority and relevance of the AI’s responses. Below an example:</p>
-<div id="a255c21b" class="cell" data-execution_count="1">
+<div id="83398991" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-overflow-wrap code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>role <span class="op">=</span> <span class="st">"""</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="st">You are an experienced Human Resources Manager, specializing in analyzing resumes and providing recommendations that help job seekers optimize their resumes. Your task is to evaluate the alignment between the provided resume and job description, and provide an expert's evaluation on whether the candidate had the best profile for the role. Please complete the following tasks.</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -337,7 +323,7 @@ gtag('config', 'G-QQJ3PCTWK5', { 'anonymize_ip': true});
 <section id="initialization" class="level4 page-columns page-full">
 <h4 class="anchored" data-anchor-id="initialization">Initialization</h4>
 <p>The process begins by setting up the Google Gemini API using the <code>ChatGoogleGenerativeAI</code> class from LangChain. The retrieves the API key from the <code>.env</code> file using <code>load_dotenv</code> from the <code>dotenv</code> library and initializes the <code>genai</code> model with the specified API key. The app uses the “gemini-1.5-flash”, a mid-sized model optimized for fast response times and a one-million-token context window<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
-<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;The app is currently being developed to offer the user more models, including Llama 3.</p></div></div><div id="f0c9ced6" class="cell" data-execution_count="2">
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;The app is currently being developed to offer the user more models, including Llama 3.</p></div></div><div id="4ecfed85" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>api_key <span class="op">=</span> os.getenv(<span class="st">"GOOGLE_API_KEY"</span>)</span>
@@ -350,7 +336,7 @@ gtag('config', 'G-QQJ3PCTWK5', { 'anonymize_ip': true});
 <section id="evaluation-chain" class="level4">
 <h4 class="anchored" data-anchor-id="evaluation-chain">Evaluation Chain</h4>
 <p>The <code>create_evaluation_chain</code> function creates a pipeline that combines the role-based prompt, the Gemini model, and the output parser to evaluate the resume against the job description. The pipeline is created using the updated pipe <code>|</code> notation from LangChain, which chains the components together to produce the response. The function is applied to each evaluation prompt stored in the <code>EVALUATION_PROMPTS</code> dictionary, which contains the role-based prompts for each evaluation sub-task. The results of the evaluation are stored in a dictionary for further processing.</p>
-<div id="f15950ce" class="cell" data-execution_count="3">
+<div id="b8387868" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a> <span class="kw">def</span> create_evaluation_chain(template, model<span class="op">=</span>llm):</span>
@@ -363,7 +349,7 @@ gtag('config', 'G-QQJ3PCTWK5', { 'anonymize_ip': true});
 <section id="evaluation-function" class="level4">
 <h4 class="anchored" data-anchor-id="evaluation-function">Evaluation Function</h4>
 <p>The <code>run_evaluation</code> function invokes each chain of the evaluation pipeline and returns the responses for the strengths, weaknesses, missing keywords, and recommendations prompts. The function is cached using Streamlit’s <code>@st.cache_data</code> decorator to improve performance by storing the results in memory and avoiding redundant computations.</p>
-<div id="03417ff2" class="cell" data-execution_count="4">
+<div id="6cca32d2" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="at">@st.cache_data</span></span>
@@ -387,7 +373,7 @@ gtag('config', 'G-QQJ3PCTWK5', { 'anonymize_ip': true});
 <h3 class="anchored" data-anchor-id="optimization-phase">Optimization Phase</h3>
 <p>The optimization process builds upon the results of the evaluation phase to systematically enhance the resume against the job description at various levels. Unlike the evaluation phrase, the optimization phase is a chained process where each subtask builds upon the results of the previous one. As such, the bullet optimization task builds upon the original resume, the keyword optimization task builds upon the bullet-optimized resume, and the formatting task builds upon the keyword-optimized resume.</p>
 <p>To accommodate for this chained process, <code>create_optimization_chain</code> creates a <code>RunnableParallel</code> object that processes the main output with <code>RunnablePassthrough</code> variables, allowing for unchanged variables to pass through the chain and new variables to be added as needed.</p>
-<div id="56d18b6f" class="cell" data-execution_count="5">
+<div id="814b94fb" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> create_optimization_chain(template, input_variables, output_key, model<span class="op">=</span>llm):</span>
@@ -411,7 +397,7 @@ gtag('config', 'G-QQJ3PCTWK5', { 'anonymize_ip': true});
 <li><strong>Length and Formatting</strong> (optimized keyword resume, job description, evaluation): This final step ensures the optimized content fits within the original resume’s length constraints, maintaining the original format and resume length.</li>
 </ol>
 <p>The chained process returns an optimized resume that incorporates the recommendations generated in the evaluation phase.</p>
-<div id="4f50d1d7" class="cell" data-execution_count="6">
+<div id="e9d013ae" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>optimization_chain <span class="op">=</span> (</span>
@@ -1055,7 +1041,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
-<script>var lightboxQuarto = GLightbox({"loop":false,"descPosition":"bottom","selector":".lightbox","openEffect":"zoom","closeEffect":"zoom"});
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","openEffect":"zoom","loop":false,"descPosition":"bottom","selector":".lightbox"});
 (function() {
   let previousOnload = window.onload;
   window.onload = () => {
