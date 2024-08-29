@@ -49,34 +49,6 @@ Both evaluation and optimization phases involved a multi-step process that requi
 
 ![](/assets/projects/ai-resume-optimizer/prompt-diagram.png)
 
-```{mermaid}
-%% graph TD
-%%   subgraph Input
-%%       A["Resume + Job Description"] 
-%%   end
-%%
-%%   subgraph Evaluation
-%%       A --> B["Evaluation Role"]
-%%       B --> X["Strengths"]
-%%       B --> Y["Weaknesses"]
-%%       B --> Z["Missing Keywords"]
-%%       X --> C["Recommendations"]
-%%       Y --> C
-%%       Z --> C
-%%   end
-%%
-%%   subgraph Optimization
-%%       A --> D["Optimization Role"]
-%%       D --> E["Bullet Point Optimization"]
-%%       E --> F["Keyword Optimization"]
-%%       F --> G["Formatting"]
-%%   end
-%%
-%%   subgraph Output
-%%       C --> I["Evaluation Report"]
-%%       G --> J["Optimized Resume"]
-%%   end
-```
 
 #### Role Prompting
 
