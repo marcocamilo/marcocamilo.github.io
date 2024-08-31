@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Portfolio – marcocamilo</title>
+<title>marcocamilo</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -80,7 +80,7 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-title','listing-description','listing-image',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-file-modified-sort'] },{ data: ['listing-reading-time-sort'] },{ data: ['listing-word-count-sort'] }],
+      valueNames: ['listing-title','listing-description','listing-featured',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-file-modified-sort'] },{ data: ['listing-reading-time-sort'] },{ data: ['listing-word-count-sort'] }],
       
       searchColumns: ["listing-project","listing-website","listing-format","listing-reference-location","listing-citation-location","listing-language","listing-execute","listing-toc","listing-toc-expand","listing-toc-depth","listing-title","listing-subtitle","listing-image","listing-description","listing-featured","listing-category","listing-type","listing-skills","listing-path","listing-outputHref","listing-author","listing-filename","listing-file-modified","listing-reading-time","listing-word-count"],
     };
@@ -161,11 +161,11 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html"> 
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./portfolio.html" aria-current="page"> 
+    <a class="nav-link" href="./portfolio.html"> 
 <span class="menu-text">Portfolio</span></a>
   </li>  
   <li class="nav-item">
@@ -187,151 +187,78 @@ window.Quarto = {
     
 <!-- main -->
 <main class="content" id="quarto-document-content">
+<script>
+(function($) {
+    $(window).on('load hashchange', function() {
+        $('.content-region').hide();
+        $('.main-menu a').removeClass('active');
+        var region = location.hash.toString() || $('.main-menu a:first').attr('href');
+        $(region).show();
+        $('.main-menu a[href="' + region + '"]').addClass('active');
+    });
+})(jQuery);
+$(document).ready(function() {
+    var items = ['an NLP Engineer', 'a Data Scientist', 'a Linguist', 'a Writer'];
+    // var items = ["a Data Scientist.", "a Linguist.", "a Writer.", "a Stoic."],
+        $text = $('#hi span'),
+        delay = 1.8;
+    function loop(delay) {
+        $.each(items, function(i, elm) {
+            $text.delay(delay * 1E3).fadeOut();
+            $text.queue(function() {
+                $text.html(items[i]);
+                $text.dequeue();
+            });
+            $text.fadeIn();
+            $text.queue(function() {
+                if (i == items.length - 1) {
+                    loop(delay);
+                }
+                $text.dequeue();
+            });
+        });
+    }
+    loop(delay);
+});
+</script>
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Portfolio</h1>
-<p class="subtitle lead">A collection of projects in NLP, machine learning and data science</p>
-</div>
 
-
-
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
 
 
 <div class="grid">
 <div class="g-col-12 g-col-lg-9">
+<h1 id="hi">
+Hi, I’m Marco Camilo, <span></span>
+</h1>
+<p>I design, build, and operate deep learning systems that process natural language. I also specialize in data analysis and machine learning. Here are some of the projects in my portfolio:</p>
 <div id="listing-portfolio-listing" class="quarto-listing quarto-listing-container-custom">
-<h3 class="anchored">
-NLP
-</h3>
-<ul class="list-unstyled">
-<li>
-<a href="./portfolio/ai-resume-optimizer.html">
-<h4 class="anchored">
-AI-Powered Resume Optimizer with Google Gemini and LangChain
-</h4>
-</a>
-<div class="badges-container">
 <p>
-<img src="https://img.shields.io/badge/AI-B31212" alt="AI">
+<a href="./portfolio/ai-resume-optimizer.html">AI-Powered Resume Optimizer with Google Gemini and LangChain</a><br> This app leverages Google’s Gemini API and LangChain to evaluate and optimize resumes based job descriptions. Combining role prompting, task decomposition, and chain-of-thought, I enginered an AI-powered pipeline that identifies gaps, generates recommendations, and applies them to enhance resume-job alignement. The project integrates a cutting-edge AI pipeline to address a real-world challenge and significantly improve job seekers’ chances of success in the competitive job market.
 </p>
-<p><img src="https://img.shields.io/badge/LangChain-white" alt="LangChain"></p>
-<p><img src="https://img.shields.io/badge/Gemini-white" alt="Gemini"></p>
-<p><img src="https://img.shields.io/badge/Streamlit-white" alt="Streamlit"></p>
-<p><img src="https://img.shields.io/badge/nltk-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI%2FPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI%2BCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMjc4LjAwMDAwMHB0IiBoZWlnaHQ9IjI3NS4wMDAwMDBwdCIgdmlld0JveD0iMCAwIDI3OC4wMDAwMDAgMjc1LjAwMDAwMCIKIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiPgoKPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsMjc1LjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIKZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJub25lIj4KPHBhdGggZD0iTTExODQgMjY0NSBjLTExMyAtMjAgLTI1OCAtNjggLTMyNCAtMTA3IC02NyAtNDEgLTcwIC01MiAtNzMgLTI3OApsLTIgLTE2NSAzNjggLTMgMzY3IC0yIDAgLTMwIDAgLTI5IC01NzIgLTMgLTU3MyAtMyAtNjMgLTI5IGMtMTE0IC01MyAtMTkyCi0xNjEgLTIzNCAtMzI5IC0yOCAtMTA5IC0yMiAtMzE2IDEyIC00MjIgODIgLTI1OSAyNjMgLTQyMiA0OTEgLTQ0MiBsNjUgLTYKMTggMTIyIGM0NiAzMjUgMTAwIDQyNyAyNjUgNDkzIDU0IDIyIDY2IDIzIDQxMSAyNCAzMDIgMSAzNjQgMyA0MTUgMTggODYgMjUKMTE2IDQ1IDE1MyAxMDYgNjggMTEzIDEwMiAyODYgMTAyIDUxNSAwIDM3MCAtNjMgNDg2IC0zMDAgNTU2IC02MyAxOCAtMTA1IDIyCi0yNjAgMjUgLTEyOCAyIC0yMTAgLTEgLTI2NiAtMTF6IG0tNDMgLTE2OSBjMTI1IC04NSA2NCAtMjgxIC04NyAtMjc4IC05MCAxCi0xNjQgODYgLTE0OSAxNzIgMTggMTA5IDE0NyAxNjcgMjM2IDEwNnoiLz4KPHBhdGggZD0iTTIxMTYgMTk4OCBjLTIgLTcgLTkgLTU5IC0xNSAtMTE1IC0zMCAtMjg2IC04MSAtMzk3IC0yMTIgLTQ2MiAtMTAwCi01MCAtMTQ0IC01NCAtNDQ5IC00OCAtNDQ4IDEwIC01MzEgLTEzIC02MDAgLTE2OCAtNTkgLTEzMiAtODUgLTMwNSAtNzcgLTUyNQo4IC0yNTMgNDcgLTM2NyAxNTAgLTQzNCAxMDMgLTY4IDIyOSAtOTYgNDM1IC05NiAxNDQgMCAyMzEgMTAgMzU3IDQyIDg2IDIxCjIzMiA4NSAyNTMgMTEwIDE4IDIyIDMxIDE0NCAzMiAyOTEgbDAgMTI3IC0zNzAgMCAtMzcwIDAgMCAzMCAwIDI5IDU4OCAzIDU4NwozIDUyIDI0IGM2NiAyOSAxNDEgMTA4IDE4MyAxOTAgOTggMTk1IDk1IDQ3OCAtNyA2ODkgLTQ1IDkxIC0xNTggMjEyIC0yNDAKMjU1IC05NyA1MSAtMjg4IDg2IC0yOTcgNTV6IG0tMzQ4IC0xMzc4IGMxMjggLTc4IDczIC0yODQgLTc2IC0yODQgLTE1NiAwCi0yMTMgMTk0IC04MiAyODEgNDMgMjkgMTEyIDMxIDE1OCAzeiIvPgo8L2c%2BCjwvc3ZnPgo%3D" alt="NLTK"></p>
-<p><img src="https://img.shields.io/badge/BeautifulSoup-white" alt="BeautifulSoup"></p>
-</div>
 <p>
-This app leverages Google’s Gemini API and LangChain to evaluate and optimize resumes based job descriptions. Combining role prompting, task decomposition, and chain-of-thought, I enginered an AI-powered pipeline that identifies gaps, generates recommendations, and applies them to enhance resume-job alignement. The project integrates a cutting-edge AI pipeline to address a real-world challenge and significantly improve job seekers’ chances of success in the competitive job market.
+<a href="./portfolio/resume-classifier.html">BERT, Encoders and Linear Models for Resume Text Classification</a><br> This project evaluates the performance of advanced NLP models and vectorization techniques for text classifcation using a resume dataset. Implementing Linear SVC, FNN, Encoder models, and BERT, the project achieved an accuracy of 91.67% with BERT. The project demonstrates how to build efficient preprocessing pipelines, optimize feature representation to enhance resource usage, and develop high-performing text classification models using Scikit-Learn and PyTorch.
 </p>
-</li>
-<li>
-<a href="./portfolio/resume-classifier.html">
-<h4 class="anchored">
-BERT, Encoders and Linear Models for Resume Text Classification
-</h4>
-</a>
-<div class="badges-container">
 <p>
-<img src="https://img.shields.io/badge/Deep Learning-B31212" alt="Deep Learning">
+<a href="./portfolio/stock-sentiment-prediction.html">Sentiment-Optimized Stock Price Forecasting Using Modern RNNs</a><br> This project focuses on optimizing the predictive capabilities of modern RNN models for stock price movements of TSLA, AAPL, and GOOG. The goal is to enhance forecasting accuracy by utilizing historical stock data and news sentiment data. The analysis evaluates the performance of LSTM, GRU, and Attention-CNN-LSTM models, tested with and without sentiment data, to determine their effectiveness in stock price prediction.
 </p>
-<p><img src="https://img.shields.io/badge/pytorch-white?logo=pytorch" alt="PyTorch"></p>
-<p><img src="https://img.shields.io/badge/tensorflow-white?logo=tensorflow" alt="Tensorflow"></p>
-<p><img src="https://img.shields.io/badge/HuggingFace-white?logo=huggingface&amp;logoColor=yellow" alt="HuggingFace"></p>
-<p><img src="https://img.shields.io/badge/Scikit--Learn-white?logo=scikit-learn" alt="Scikit-Learn"></p>
-<p><img src="https://img.shields.io/badge/Sentence--Transformers-white?logo=moleculer" alt="SBERT"></p>
-<p><img src="https://img.shields.io/badge/gensim-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI%2FPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI%2BCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMjAwLjAwMDAwMHB0IiBoZWlnaHQ9IjIwMC4wMDAwMDBwdCIgdmlld0JveD0iMCAwIDIwMC4wMDAwMDAgMjAwLjAwMDAwMCIKIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiPgoKPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsMjAwLjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIKZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJub25lIj4KPHBhdGggZD0iTTg3MCAxOTkwIGMtNDA4IC01NyAtNzMzIC0zNDggLTgzNyAtNzQ5IC0zMSAtMTE4IC0zNSAtMzIyIC0xMCAtNDM2CjU0IC0yNDMgMTg3IC00NTMgMzc3IC01OTcgODQgLTY0IDI0MyAtMTQyIDM0NSAtMTcwIDY4IC0xOSAxMDYgLTIyIDI1NSAtMjIKMjAwIDAgMjY2IDEzIDQxNCA4MiAxMTUgNTQgMTk4IDExMiAyODcgMjAxIDEyNCAxMjUgMjE2IDI4MiAyNjAgNDQ2IDMzIDEyMgozOCAzNTAgMTAgNDY3IC00OSAyMDUgLTEzOCAzNjUgLTI4MiA1MDMgLTEzOSAxMzIgLTI3MCAyMDYgLTQ0NiAyNTEgLTEwOCAyNwotMjczIDM4IC0zNzMgMjR6IG0zNzUgLTYxIGMyOTcgLTc1IDU2MCAtMzIwIDY2MSAtNjE2IDU5IC0xNzQgNjIgLTI4MCAxMgotNDMzIC03MiAtMjIyIC0yNDIgLTQxMSAtNDU1IC01MDUgLTE0OSAtNjcgLTM2OSAtODUgLTUyOSAtNDUgLTkzIDIzIC0yNzEKMTA3IC0yNTcgMTIxIDYgNiAyNSAzIDQ5IC03IDUxIC0yMSAxODYgLTMwIDI1MyAtMTUgMTU3IDM0IDI4NyAxNTAgMzQxIDMwNgoyOCA4MSAyNyAyMTQgLTEgMjk3IC03MyAyMTYgLTI5MCAzNDggLTUxMSAzMTAgLTE1NSAtMjcgLTI3NCAtMTE2IC0zNDQgLTI1OAotMzUgLTcwIC0zOSAtODYgLTQyIC0xNzQgLTMgLTcyIDAgLTExMyAxMyAtMTU2IDIwIC02OCAyMCAtNjcgNyAtNzIgLTE1IC01Ci04OSAxNTUgLTExMyAyNDMgLTMwIDExMiAtMzAgMjk3IDAgNDEwIDg0IDMxNSAzMjQgNTQ0IDY0MSA2MTEgNzggMTYgMTY1IDExCjI3NSAtMTd6Ii8%2BCjwvZz4KPC9zdmc%2BCg%3D%3D" alt="Gensim"></p>
-<p><img src="https://img.shields.io/badge/nltk-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI%2FPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI%2BCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMjc4LjAwMDAwMHB0IiBoZWlnaHQ9IjI3NS4wMDAwMDBwdCIgdmlld0JveD0iMCAwIDI3OC4wMDAwMDAgMjc1LjAwMDAwMCIKIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiPgoKPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsMjc1LjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIKZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJub25lIj4KPHBhdGggZD0iTTExODQgMjY0NSBjLTExMyAtMjAgLTI1OCAtNjggLTMyNCAtMTA3IC02NyAtNDEgLTcwIC01MiAtNzMgLTI3OApsLTIgLTE2NSAzNjggLTMgMzY3IC0yIDAgLTMwIDAgLTI5IC01NzIgLTMgLTU3MyAtMyAtNjMgLTI5IGMtMTE0IC01MyAtMTkyCi0xNjEgLTIzNCAtMzI5IC0yOCAtMTA5IC0yMiAtMzE2IDEyIC00MjIgODIgLTI1OSAyNjMgLTQyMiA0OTEgLTQ0MiBsNjUgLTYKMTggMTIyIGM0NiAzMjUgMTAwIDQyNyAyNjUgNDkzIDU0IDIyIDY2IDIzIDQxMSAyNCAzMDIgMSAzNjQgMyA0MTUgMTggODYgMjUKMTE2IDQ1IDE1MyAxMDYgNjggMTEzIDEwMiAyODYgMTAyIDUxNSAwIDM3MCAtNjMgNDg2IC0zMDAgNTU2IC02MyAxOCAtMTA1IDIyCi0yNjAgMjUgLTEyOCAyIC0yMTAgLTEgLTI2NiAtMTF6IG0tNDMgLTE2OSBjMTI1IC04NSA2NCAtMjgxIC04NyAtMjc4IC05MCAxCi0xNjQgODYgLTE0OSAxNzIgMTggMTA5IDE0NyAxNjcgMjM2IDEwNnoiLz4KPHBhdGggZD0iTTIxMTYgMTk4OCBjLTIgLTcgLTkgLTU5IC0xNSAtMTE1IC0zMCAtMjg2IC04MSAtMzk3IC0yMTIgLTQ2MiAtMTAwCi01MCAtMTQ0IC01NCAtNDQ5IC00OCAtNDQ4IDEwIC01MzEgLTEzIC02MDAgLTE2OCAtNTkgLTEzMiAtODUgLTMwNSAtNzcgLTUyNQo4IC0yNTMgNDcgLTM2NyAxNTAgLTQzNCAxMDMgLTY4IDIyOSAtOTYgNDM1IC05NiAxNDQgMCAyMzEgMTAgMzU3IDQyIDg2IDIxCjIzMiA4NSAyNTMgMTEwIDE4IDIyIDMxIDE0NCAzMiAyOTEgbDAgMTI3IC0zNzAgMCAtMzcwIDAgMCAzMCAwIDI5IDU4OCAzIDU4NwozIDUyIDI0IGM2NiAyOSAxNDEgMTA4IDE4MyAxOTAgOTggMTk1IDk1IDQ3OCAtNyA2ODkgLTQ1IDkxIC0xNTggMjEyIC0yNDAKMjU1IC05NyA1MSAtMjg4IDg2IC0yOTcgNTV6IG0tMzQ4IC0xMzc4IGMxMjggLTc4IDczIC0yODQgLTc2IC0yODQgLTE1NiAwCi0yMTMgMTk0IC04MiAyODEgNDMgMjkgMTEyIDMxIDE1OCAzeiIvPgo8L2c%2BCjwvc3ZnPgo%3D" alt="NLTK"></p>
-<p><img src="https://img.shields.io/badge/pyLDAvis-white" alt="PyLDAVis"></p>
-</div>
-<p>
-This project evaluates the performance of advanced NLP models and vectorization techniques for text classifcation using a resume dataset. Implementing Linear SVC, FNN, Encoder models, and BERT, the project achieved an accuracy of 91.67% with BERT. The project demonstrates how to build efficient preprocessing pipelines, optimize feature representation to enhance resource usage, and develop high-performing text classification models using Scikit-Learn and PyTorch.
-</p>
-</li>
-<li>
-<a href="./portfolio/stock-sentiment-prediction.html">
-<h4 class="anchored">
-Sentiment-Optimized Stock Price Forecasting Using Modern RNNs
-</h4>
-</a>
-<div class="badges-container">
-<p>
-<img src="https://img.shields.io/badge/Deep Learning-B31212" alt="Deep Learning">
-</p>
-<p><img src="https://img.shields.io/badge/tensorflow-white?logo=tensorflow" alt="Tensorflow"></p>
-<p><img src="https://img.shields.io/badge/HuggingFace-white?logo=huggingface&amp;logoColor=yellow" alt="HuggingFace"></p>
-<p><img src="https://img.shields.io/badge/Scikit--Learn-white?logo=scikit-learn" alt="Scikit-Learn"></p>
-<p><img src="https://img.shields.io/badge/gensim-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI%2FPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI%2BCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMjAwLjAwMDAwMHB0IiBoZWlnaHQ9IjIwMC4wMDAwMDBwdCIgdmlld0JveD0iMCAwIDIwMC4wMDAwMDAgMjAwLjAwMDAwMCIKIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiPgoKPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsMjAwLjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIKZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJub25lIj4KPHBhdGggZD0iTTg3MCAxOTkwIGMtNDA4IC01NyAtNzMzIC0zNDggLTgzNyAtNzQ5IC0zMSAtMTE4IC0zNSAtMzIyIC0xMCAtNDM2CjU0IC0yNDMgMTg3IC00NTMgMzc3IC01OTcgODQgLTY0IDI0MyAtMTQyIDM0NSAtMTcwIDY4IC0xOSAxMDYgLTIyIDI1NSAtMjIKMjAwIDAgMjY2IDEzIDQxNCA4MiAxMTUgNTQgMTk4IDExMiAyODcgMjAxIDEyNCAxMjUgMjE2IDI4MiAyNjAgNDQ2IDMzIDEyMgozOCAzNTAgMTAgNDY3IC00OSAyMDUgLTEzOCAzNjUgLTI4MiA1MDMgLTEzOSAxMzIgLTI3MCAyMDYgLTQ0NiAyNTEgLTEwOCAyNwotMjczIDM4IC0zNzMgMjR6IG0zNzUgLTYxIGMyOTcgLTc1IDU2MCAtMzIwIDY2MSAtNjE2IDU5IC0xNzQgNjIgLTI4MCAxMgotNDMzIC03MiAtMjIyIC0yNDIgLTQxMSAtNDU1IC01MDUgLTE0OSAtNjcgLTM2OSAtODUgLTUyOSAtNDUgLTkzIDIzIC0yNzEKMTA3IC0yNTcgMTIxIDYgNiAyNSAzIDQ5IC03IDUxIC0yMSAxODYgLTMwIDI1MyAtMTUgMTU3IDM0IDI4NyAxNTAgMzQxIDMwNgoyOCA4MSAyNyAyMTQgLTEgMjk3IC03MyAyMTYgLTI5MCAzNDggLTUxMSAzMTAgLTE1NSAtMjcgLTI3NCAtMTE2IC0zNDQgLTI1OAotMzUgLTcwIC0zOSAtODYgLTQyIC0xNzQgLTMgLTcyIDAgLTExMyAxMyAtMTU2IDIwIC02OCAyMCAtNjcgNyAtNzIgLTE1IC01Ci04OSAxNTUgLTExMyAyNDMgLTMwIDExMiAtMzAgMjk3IDAgNDEwIDg0IDMxNSAzMjQgNTQ0IDY0MSA2MTEgNzggMTYgMTY1IDExCjI3NSAtMTd6Ii8%2BCjwvZz4KPC9zdmc%2BCg%3D%3D" alt="Gensim"></p>
-<p><img src="https://img.shields.io/badge/nltk-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI%2FPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI%2BCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMjc4LjAwMDAwMHB0IiBoZWlnaHQ9IjI3NS4wMDAwMDBwdCIgdmlld0JveD0iMCAwIDI3OC4wMDAwMDAgMjc1LjAwMDAwMCIKIHByZXNlcnZlQXNwZWN0UmF0aW89InhNaWRZTWlkIG1lZXQiPgoKPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsMjc1LjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIKZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJub25lIj4KPHBhdGggZD0iTTExODQgMjY0NSBjLTExMyAtMjAgLTI1OCAtNjggLTMyNCAtMTA3IC02NyAtNDEgLTcwIC01MiAtNzMgLTI3OApsLTIgLTE2NSAzNjggLTMgMzY3IC0yIDAgLTMwIDAgLTI5IC01NzIgLTMgLTU3MyAtMyAtNjMgLTI5IGMtMTE0IC01MyAtMTkyCi0xNjEgLTIzNCAtMzI5IC0yOCAtMTA5IC0yMiAtMzE2IDEyIC00MjIgODIgLTI1OSAyNjMgLTQyMiA0OTEgLTQ0MiBsNjUgLTYKMTggMTIyIGM0NiAzMjUgMTAwIDQyNyAyNjUgNDkzIDU0IDIyIDY2IDIzIDQxMSAyNCAzMDIgMSAzNjQgMyA0MTUgMTggODYgMjUKMTE2IDQ1IDE1MyAxMDYgNjggMTEzIDEwMiAyODYgMTAyIDUxNSAwIDM3MCAtNjMgNDg2IC0zMDAgNTU2IC02MyAxOCAtMTA1IDIyCi0yNjAgMjUgLTEyOCAyIC0yMTAgLTEgLTI2NiAtMTF6IG0tNDMgLTE2OSBjMTI1IC04NSA2NCAtMjgxIC04NyAtMjc4IC05MCAxCi0xNjQgODYgLTE0OSAxNzIgMTggMTA5IDE0NyAxNjcgMjM2IDEwNnoiLz4KPHBhdGggZD0iTTIxMTYgMTk4OCBjLTIgLTcgLTkgLTU5IC0xNSAtMTE1IC0zMCAtMjg2IC04MSAtMzk3IC0yMTIgLTQ2MiAtMTAwCi01MCAtMTQ0IC01NCAtNDQ5IC00OCAtNDQ4IDEwIC01MzEgLTEzIC02MDAgLTE2OCAtNTkgLTEzMiAtODUgLTMwNSAtNzcgLTUyNQo4IC0yNTMgNDcgLTM2NyAxNTAgLTQzNCAxMDMgLTY4IDIyOSAtOTYgNDM1IC05NiAxNDQgMCAyMzEgMTAgMzU3IDQyIDg2IDIxCjIzMiA4NSAyNTMgMTEwIDE4IDIyIDMxIDE0NCAzMiAyOTEgbDAgMTI3IC0zNzAgMCAtMzcwIDAgMCAzMCAwIDI5IDU4OCAzIDU4NwozIDUyIDI0IGM2NiAyOSAxNDEgMTA4IDE4MyAxOTAgOTggMTk1IDk1IDQ3OCAtNyA2ODkgLTQ1IDkxIC0xNTggMjEyIC0yNDAKMjU1IC05NyA1MSAtMjg4IDg2IC0yOTcgNTV6IG0tMzQ4IC0xMzc4IGMxMjggLTc4IDczIC0yODQgLTc2IC0yODQgLTE1NiAwCi0yMTMgMTk0IC04MiAyODEgNDMgMjkgMTEyIDMxIDE1OCAzeiIvPgo8L2c%2BCjwvc3ZnPgo%3D" alt="NLTK"></p>
-</div>
-<p>
-This project focuses on optimizing the predictive capabilities of modern RNN models for stock price movements of TSLA, AAPL, and GOOG. The goal is to enhance forecasting accuracy by utilizing historical stock data and news sentiment data. The analysis evaluates the performance of LSTM, GRU, and Attention-CNN-LSTM models, tested with and without sentiment data, to determine their effectiveness in stock price prediction.
-</p>
-</li>
-</ul>
-<h3 class="anchored">
-Exploratory Data Analysis
-</h3>
-<ul class="list-unstyled">
-<li>
-<a href="./portfolio/biodiversity.html">
-<h4 class="anchored">
-Biodiversity, Endangerement and Conversation in Data from National Parks Service
-</h4>
-</a>
-<div class="badges-container">
-<p>
-<img src="https://img.shields.io/badge/Data Analysis-B31212" alt="Data Analysis">
-</p>
-<p><img src="https://img.shields.io/badge/Pandas-white?logo=pandas&amp;logoColor=black" alt="Pandas"></p>
-<p><img src="https://img.shields.io/badge/NumPy-white?logo=Numpy&amp;logoColor=grey" alt="NumPy"></p>
-<p><img src="https://img.shields.io/badge/matplotlib-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiBzdHJva2U9ImdyYXkiPgo8ZyBzdHJva2Utd2lkdGg9IjIiIGZpbGw9IiNGRkYiPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSI4OCIvPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSI2NiIvPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSI0NCIvPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSIyMiIvPgo8cGF0aCBkPSJtOTAsMnYxNzZtNjItMjYtMTI0LTEyNG0xMjQsMC0xMjQsMTI0bTE1MC02MkgyIi8%2BCjwvZz48ZyBvcGFjaXR5PSIuOCI%2BCjxwYXRoIGZpbGw9IiM0NEMiIGQ9Im05MCw5MGgxOGExOCwxOCAwIDAsMCAwLTV6Ii8%2BCjxwYXRoIGZpbGw9IiNCQzMiIGQ9Im05MCw5MCAzNC00M2E1NSw1NSAwIDAsMC0xNS04eiIvPgo8cGF0aCBmaWxsPSIjRDkzIiBkPSJtOTAsOTAtMTYtNzJhNzQsNzQgMCAwLDAtMzEsMTV6Ii8%2BCjxwYXRoIGZpbGw9IiNEQjMiIGQ9Im05MCw5MC01OC0yOGE2NSw2NSAwIDAsMC01LDM5eiIvPgo8cGF0aCBmaWxsPSIjM0JCIiBkPSJtOTAsOTAtMzMsMTZhMzcsMzcgMCAwLDAgMiw1eiIvPgo8cGF0aCBmaWxsPSIjM0M5IiBkPSJtOTAsOTAtMTAsNDVhNDYsNDYgMCAwLDAgMTgsMHoiLz4KPHBhdGggZmlsbD0iI0Q3MyIgZD0ibTkwLDkwIDQ2LDU4YTc0LDc0IDAgMCwwIDEyLTEyeiIvPgo8L2c%2BPC9zdmc%2B" alt="Matplotlib"></p>
-<p><img src="https://img.shields.io/badge/seaborn-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI%2FPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI%2BCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMTg1MC4wMDAwMDBwdCIgaGVpZ2h0PSIxODUwLjAwMDAwMHB0IiB2aWV3Qm94PSIwIDAgMTg1MC4wMDAwMDAgMTg1MC4wMDAwMDAiCiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0Ij4KCjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLDE4NTAuMDAwMDAwKSBzY2FsZSgwLjEwMDAwMCwtMC4xMDAwMDApIgpmaWxsPSIjMDAwMDAwIiBzdHJva2U9Im5vbmUiPgo8cGF0aCBkPSJNODgzOSAxODQ4OSBjLTIxMDMgLTk1IC00MDk2IC04OTggLTU2OTIgLTIyOTEgLTIxMCAtMTg0IC02NjUgLTYzOQotODQ2IC04NDYgLTg2OCAtOTk3IC0xNTAyIC0yMTI5IC0xODg2IC0zMzcyIC0zODkgLTEyNjAgLTUwNSAtMjU4MyAtMzM5Ci0zOTAwIDIxOCAtMTc0MiA5NDAgLTM0MDUgMjA2MyAtNDc1NCA1NjkgLTY4NCAxMjIyIC0xMjczIDE5NTYgLTE3NjYgMTIwMwotODA2IDI1NzIgLTEzMTkgNDAwNSAtMTUwMCA0MTYgLTUyIDQ3OSAtNTUgMTE1NSAtNTUgNjg4IDAgNzQwIDMgMTE5NCA2MQoxNTY5IDIwMSAzMDg4IDgxNyA0MzUxIDE3NjYgMzg1IDI4OSA2NjIgNTI5IDEwMDUgODczIDEwMTUgMTAxNiAxNzY1IDIyMjUKMjIyMCAzNTgwIDI0MCA3MTMgMzcyIDEzNDAgNDUyIDIxNDAgMTUgMTUzIDE4IDI3NyAxOCA4MjAgMCA2NzYgLTMgNzM5IC01NQoxMTU1IC0yOTQgMjMyOSAtMTQ2MCA0NDU4IC0zMjY2IDU5NjEgLTE3NjQgMTQ2OSAtNDAzOCAyMjMzIC02MzM1IDIxMjh6IG05MzEKLTMxOSBjODI2IC01MiAxNjA5IC0yMDYgMjM3MCAtNDY1IDI0MTIgLTgyMyA0MzU2IC0yNjM0IDUzNTEgLTQ5ODMgNTY1IC0xMzMzCjc5OCAtMjgwNCA2NzQgLTQyMzkgLTE0NSAtMTY2OCAtNzUxIC0zMjU2IC0xNzUwIC00NTkyIC0yNzEgLTM2MSAtNTA3IC02MzQKLTg0MCAtOTY2IC0zMzIgLTMzMyAtNjA1IC01NjkgLTk2NiAtODQwIC0xODc5IC0xNDA2IC00MjUyIC0yMDIwIC02NTY0IC0xNjk5Ci0yNzY2IDM4NCAtNTE4MyAyMDIwIC02NTYxIDQ0NDIgLTY3NSAxMTg4IC0xMDY5IDI1MTkgLTExNTQgMzkwMiAtMTMgMjE0IC0xMwo4MDMgMCAxMDIzIDEyMyAyMDU5IDk0NSA0MDA5IDIzMjcgNTUxOSAxNDIgMTU1IDQ3MSA0ODIgNjIzIDYxOSA4OTQgODA4IDE5OTIKMTQ0NiAzMTU1IDE4MzQgNzI5IDI0MyAxNTA2IDM5NCAyMjgwIDQ0NCAxOTEgMTIgODY0IDEzIDEwNTUgMXoiLz4KPHBhdGggZD0iTTY3NTAgMTAxMTMgYy0xMDIwIC0yNCAtMjA4OCAtMjcyIC0zMzYyIC03ODIgLTQ1OCAtMTgzIC04NDkgLTM1MwotMTc0MyAtNzU4IC0zNTcgLTE2MyAtNzMxIC0zMzEgLTgzMCAtMzc1IC05OSAtNDQgLTE4MSAtODEgLTE4MiAtODIgLTMgLTMgMzEKLTIzMCA1OCAtMzgxIDEzNSAtNzgxIDM5NCAtMTU3OCA3NDYgLTIzMDAgbDU4IC0xMjAgMyA0ODggMiA0ODcgMTAwNSAwIDEwMDUKMCAwIDY5NSAwIDY5NSAxMDAwIDAgMTAwMCAwIDAgMTI1IDAgMTI1IDEwNzUgMCAxMDc1IDAgMCAtNTYwIDAgLTU2MCAxMDAwIDAKMTAwMCAwIDAgLTc3MCAwIC03NzAgMTAwNSAwIDEwMDUgMCAwIC01MzAgMCAtNTMwIDEwMDAgMCAxMDAwIDAgMCAtMjI1IDAKLTIyNSAxMDAwIDAgMTAwMCAwIDAgLTE5NyAxIC0xOTggMzIgMzYgYzE4IDIwIDg0IDk3IDE0OCAxNzAgNjI5IDcyOCAxMTM1CjE1NjcgMTQ5NCAyNDc0IDEwMSAyNTcgMjE4IDU5NCAyMTEgNjEyIC0zIDcgLTEzIDEzIC0yMSAxMyAtNTIgMCAtNzk0IDE3NwotMTEzMSAyNzAgLTY2OCAxODQgLTEzNzYgNDI1IC0yMTEwIDcxOCAtNTQ3IDIxOCAtOTY3IDQwMSAtMTk5NCA4NjcgLTEzMzMKNjA1IC0xOTEzIDg0OCAtMjUzNSAxMDYyIC0xMDk5IDM4MCAtMjA3MCA1NDkgLTMwMTUgNTI2eiIvPgo8cGF0aCBkPSJNNTY1OCA0NTU4IGwtMyAtMzIzMyA4NCAtMzggYzQ4NCAtMjE3IDExMjQgLTQyNSAxNjU5IC01NDEgbDExMiAtMjQKMCAzNTM0IDAgMzUzNCAtOTI1IDAgLTkyNSAwIC0yIC0zMjMyeiIvPgo8cGF0aCBkPSJNMzY1MCA1MDY1IGwwIC0yNDc0IDExMyAtOTIgYzQ2NCAtMzgxIDEwNTUgLTc2MyAxNjE2IC0xMDQ0IGwxMzEKLTY1IDAgMzA3NSAwIDMwNzUgLTkzMCAwIC05MzAgMCAwIC0yNDc1eiIvPgo8cGF0aCBkPSJNNzY2MCAzNjgxIGwwIC0yOTg5IDY2IC0xMSBjMjYzIC00NiA1NzQgLTg2IDg2OSAtMTExIDcyIC03IDMwOSAtMTQKNTI4IC0xNyBsMzk3IC02IDAgMzA2MiAwIDMwNjEgLTkzMCAwIC05MzAgMCAwIC0yOTg5eiIvPgo8cGF0aCBkPSJNMTY0OCA1NTg4IGwtMyAtNTUzIDI5IC01NSBjNjEgLTExMiAyMTMgLTM2MSAzMzEgLTU0MCAzNjcgLTU1NiA4MjIKLTEwOTUgMTI5NSAtMTUzNiAxMDAgLTkzIDE4OCAtMTczIDE5NiAtMTc3IDEyIC03IDE0IDIyOSAxNCAxNzAzIGwwIDE3MTAKLTkzMCAwIC05MzAgMCAtMiAtNTUyeiIvPgo8cGF0aCBkPSJNOTY2MCAyODQwIGwwIC0yMjgwIDY4IDAgYzk0IDAgMzgxIDI2IDYxOCA1NSAzNDQgNDMgNjQ0IDk5IDk4NyAxODIKbDE4NyA0NiAwIDIxMzggMCAyMTM5IC05MzAgMCAtOTMwIDAgMCAtMjI4MHoiLz4KPHBhdGggZD0iTTExNjcwIDI0NzUgYzAgLTg3MiA0IC0xNTg1IDggLTE1ODUgNDEgMCA1NzIgMTgyIDgxNyAyODAgMjkxIDExNgo3MzAgMzI0IDk1NSA0NTIgbDc1IDQzIC0zIDExOTggLTIgMTE5NyAtOTI1IDAgLTkyNSAwIDAgLTE1ODV6Ii8%2BCjxwYXRoIGQ9Ik0xMzY3MCAyNjg0IGwwIC05MzYgNDggMjggYzUyOSAzMDcgMTEzNCA3NzMgMTYyNCAxMjUzIGwxODggMTgzIDAKMjA0IDAgMjA0IC05MzAgMCAtOTMwIDAgMCAtOTM2eiIvPgo8L2c%2BCjwvc3ZnPgo%3D" alt="Seaborn"></p>
-</div>
-<p>
-Embark on a captivating exploration of biodiversity with this data science project, delving into the conservation statuses of endangered species across national parks. Through meticulous analysis, uncover profound insights into the distribution of endangered species, their likelihood of endangerment, and the most frequently spotted species in each park, illuminating the intricate dynamics of wildlife preservation and ecological sustainability.
-</p>
-</li>
-<li>
-<a href="./portfolio/airline-performance.html">
-<h4 class="anchored">
-Operational Analysis of Airline On-Time Performance
-</h4>
-</a>
-<div class="badges-container">
-<p>
-<img src="https://img.shields.io/badge/EDA-B31212" alt="EDA">
-</p>
-<p><img src="https://img.shields.io/badge/Pandas-white?logo=pandas&amp;logoColor=black" alt="Pandas"></p>
-<p><img src="https://img.shields.io/badge/NumPy-white?logo=Numpy&amp;logoColor=grey" alt="NumPy"></p>
-<p><img src="https://img.shields.io/badge/matplotlib-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiBzdHJva2U9ImdyYXkiPgo8ZyBzdHJva2Utd2lkdGg9IjIiIGZpbGw9IiNGRkYiPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSI4OCIvPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSI2NiIvPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSI0NCIvPgo8Y2lyY2xlIGN4PSI5MCIgY3k9IjkwIiByPSIyMiIvPgo8cGF0aCBkPSJtOTAsMnYxNzZtNjItMjYtMTI0LTEyNG0xMjQsMC0xMjQsMTI0bTE1MC02MkgyIi8%2BCjwvZz48ZyBvcGFjaXR5PSIuOCI%2BCjxwYXRoIGZpbGw9IiM0NEMiIGQ9Im05MCw5MGgxOGExOCwxOCAwIDAsMCAwLTV6Ii8%2BCjxwYXRoIGZpbGw9IiNCQzMiIGQ9Im05MCw5MCAzNC00M2E1NSw1NSAwIDAsMC0xNS04eiIvPgo8cGF0aCBmaWxsPSIjRDkzIiBkPSJtOTAsOTAtMTYtNzJhNzQsNzQgMCAwLDAtMzEsMTV6Ii8%2BCjxwYXRoIGZpbGw9IiNEQjMiIGQ9Im05MCw5MC01OC0yOGE2NSw2NSAwIDAsMC01LDM5eiIvPgo8cGF0aCBmaWxsPSIjM0JCIiBkPSJtOTAsOTAtMzMsMTZhMzcsMzcgMCAwLDAgMiw1eiIvPgo8cGF0aCBmaWxsPSIjM0M5IiBkPSJtOTAsOTAtMTAsNDVhNDYsNDYgMCAwLDAgMTgsMHoiLz4KPHBhdGggZmlsbD0iI0Q3MyIgZD0ibTkwLDkwIDQ2LDU4YTc0LDc0IDAgMCwwIDEyLTEyeiIvPgo8L2c%2BPC9zdmc%2B" alt="Matplotlib"></p>
-<p><img src="https://img.shields.io/badge/seaborn-white?logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI%2FPgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI%2BCjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMTg1MC4wMDAwMDBwdCIgaGVpZ2h0PSIxODUwLjAwMDAwMHB0IiB2aWV3Qm94PSIwIDAgMTg1MC4wMDAwMDAgMTg1MC4wMDAwMDAiCiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0Ij4KCjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLDE4NTAuMDAwMDAwKSBzY2FsZSgwLjEwMDAwMCwtMC4xMDAwMDApIgpmaWxsPSIjMDAwMDAwIiBzdHJva2U9Im5vbmUiPgo8cGF0aCBkPSJNODgzOSAxODQ4OSBjLTIxMDMgLTk1IC00MDk2IC04OTggLTU2OTIgLTIyOTEgLTIxMCAtMTg0IC02NjUgLTYzOQotODQ2IC04NDYgLTg2OCAtOTk3IC0xNTAyIC0yMTI5IC0xODg2IC0zMzcyIC0zODkgLTEyNjAgLTUwNSAtMjU4MyAtMzM5Ci0zOTAwIDIxOCAtMTc0MiA5NDAgLTM0MDUgMjA2MyAtNDc1NCA1NjkgLTY4NCAxMjIyIC0xMjczIDE5NTYgLTE3NjYgMTIwMwotODA2IDI1NzIgLTEzMTkgNDAwNSAtMTUwMCA0MTYgLTUyIDQ3OSAtNTUgMTE1NSAtNTUgNjg4IDAgNzQwIDMgMTE5NCA2MQoxNTY5IDIwMSAzMDg4IDgxNyA0MzUxIDE3NjYgMzg1IDI4OSA2NjIgNTI5IDEwMDUgODczIDEwMTUgMTAxNiAxNzY1IDIyMjUKMjIyMCAzNTgwIDI0MCA3MTMgMzcyIDEzNDAgNDUyIDIxNDAgMTUgMTUzIDE4IDI3NyAxOCA4MjAgMCA2NzYgLTMgNzM5IC01NQoxMTU1IC0yOTQgMjMyOSAtMTQ2MCA0NDU4IC0zMjY2IDU5NjEgLTE3NjQgMTQ2OSAtNDAzOCAyMjMzIC02MzM1IDIxMjh6IG05MzEKLTMxOSBjODI2IC01MiAxNjA5IC0yMDYgMjM3MCAtNDY1IDI0MTIgLTgyMyA0MzU2IC0yNjM0IDUzNTEgLTQ5ODMgNTY1IC0xMzMzCjc5OCAtMjgwNCA2NzQgLTQyMzkgLTE0NSAtMTY2OCAtNzUxIC0zMjU2IC0xNzUwIC00NTkyIC0yNzEgLTM2MSAtNTA3IC02MzQKLTg0MCAtOTY2IC0zMzIgLTMzMyAtNjA1IC01NjkgLTk2NiAtODQwIC0xODc5IC0xNDA2IC00MjUyIC0yMDIwIC02NTY0IC0xNjk5Ci0yNzY2IDM4NCAtNTE4MyAyMDIwIC02NTYxIDQ0NDIgLTY3NSAxMTg4IC0xMDY5IDI1MTkgLTExNTQgMzkwMiAtMTMgMjE0IC0xMwo4MDMgMCAxMDIzIDEyMyAyMDU5IDk0NSA0MDA5IDIzMjcgNTUxOSAxNDIgMTU1IDQ3MSA0ODIgNjIzIDYxOSA4OTQgODA4IDE5OTIKMTQ0NiAzMTU1IDE4MzQgNzI5IDI0MyAxNTA2IDM5NCAyMjgwIDQ0NCAxOTEgMTIgODY0IDEzIDEwNTUgMXoiLz4KPHBhdGggZD0iTTY3NTAgMTAxMTMgYy0xMDIwIC0yNCAtMjA4OCAtMjcyIC0zMzYyIC03ODIgLTQ1OCAtMTgzIC04NDkgLTM1MwotMTc0MyAtNzU4IC0zNTcgLTE2MyAtNzMxIC0zMzEgLTgzMCAtMzc1IC05OSAtNDQgLTE4MSAtODEgLTE4MiAtODIgLTMgLTMgMzEKLTIzMCA1OCAtMzgxIDEzNSAtNzgxIDM5NCAtMTU3OCA3NDYgLTIzMDAgbDU4IC0xMjAgMyA0ODggMiA0ODcgMTAwNSAwIDEwMDUKMCAwIDY5NSAwIDY5NSAxMDAwIDAgMTAwMCAwIDAgMTI1IDAgMTI1IDEwNzUgMCAxMDc1IDAgMCAtNTYwIDAgLTU2MCAxMDAwIDAKMTAwMCAwIDAgLTc3MCAwIC03NzAgMTAwNSAwIDEwMDUgMCAwIC01MzAgMCAtNTMwIDEwMDAgMCAxMDAwIDAgMCAtMjI1IDAKLTIyNSAxMDAwIDAgMTAwMCAwIDAgLTE5NyAxIC0xOTggMzIgMzYgYzE4IDIwIDg0IDk3IDE0OCAxNzAgNjI5IDcyOCAxMTM1CjE1NjcgMTQ5NCAyNDc0IDEwMSAyNTcgMjE4IDU5NCAyMTEgNjEyIC0zIDcgLTEzIDEzIC0yMSAxMyAtNTIgMCAtNzk0IDE3NwotMTEzMSAyNzAgLTY2OCAxODQgLTEzNzYgNDI1IC0yMTEwIDcxOCAtNTQ3IDIxOCAtOTY3IDQwMSAtMTk5NCA4NjcgLTEzMzMKNjA1IC0xOTEzIDg0OCAtMjUzNSAxMDYyIC0xMDk5IDM4MCAtMjA3MCA1NDkgLTMwMTUgNTI2eiIvPgo8cGF0aCBkPSJNNTY1OCA0NTU4IGwtMyAtMzIzMyA4NCAtMzggYzQ4NCAtMjE3IDExMjQgLTQyNSAxNjU5IC01NDEgbDExMiAtMjQKMCAzNTM0IDAgMzUzNCAtOTI1IDAgLTkyNSAwIC0yIC0zMjMyeiIvPgo8cGF0aCBkPSJNMzY1MCA1MDY1IGwwIC0yNDc0IDExMyAtOTIgYzQ2NCAtMzgxIDEwNTUgLTc2MyAxNjE2IC0xMDQ0IGwxMzEKLTY1IDAgMzA3NSAwIDMwNzUgLTkzMCAwIC05MzAgMCAwIC0yNDc1eiIvPgo8cGF0aCBkPSJNNzY2MCAzNjgxIGwwIC0yOTg5IDY2IC0xMSBjMjYzIC00NiA1NzQgLTg2IDg2OSAtMTExIDcyIC03IDMwOSAtMTQKNTI4IC0xNyBsMzk3IC02IDAgMzA2MiAwIDMwNjEgLTkzMCAwIC05MzAgMCAwIC0yOTg5eiIvPgo8cGF0aCBkPSJNMTY0OCA1NTg4IGwtMyAtNTUzIDI5IC01NSBjNjEgLTExMiAyMTMgLTM2MSAzMzEgLTU0MCAzNjcgLTU1NiA4MjIKLTEwOTUgMTI5NSAtMTUzNiAxMDAgLTkzIDE4OCAtMTczIDE5NiAtMTc3IDEyIC03IDE0IDIyOSAxNCAxNzAzIGwwIDE3MTAKLTkzMCAwIC05MzAgMCAtMiAtNTUyeiIvPgo8cGF0aCBkPSJNOTY2MCAyODQwIGwwIC0yMjgwIDY4IDAgYzk0IDAgMzgxIDI2IDYxOCA1NSAzNDQgNDMgNjQ0IDk5IDk4NyAxODIKbDE4NyA0NiAwIDIxMzggMCAyMTM5IC05MzAgMCAtOTMwIDAgMCAtMjI4MHoiLz4KPHBhdGggZD0iTTExNjcwIDI0NzUgYzAgLTg3MiA0IC0xNTg1IDggLTE1ODUgNDEgMCA1NzIgMTgyIDgxNyAyODAgMjkxIDExNgo3MzAgMzI0IDk1NSA0NTIgbDc1IDQzIC0zIDExOTggLTIgMTE5NyAtOTI1IDAgLTkyNSAwIDAgLTE1ODV6Ii8%2BCjxwYXRoIGQ9Ik0xMzY3MCAyNjg0IGwwIC05MzYgNDggMjggYzUyOSAzMDcgMTEzNCA3NzMgMTYyNCAxMjUzIGwxODggMTgzIDAKMjA0IDAgMjA0IC05MzAgMCAtOTMwIDAgMCAtOTM2eiIvPgo8L2c%2BCjwvc3ZnPgo%3D" alt="Seaborn"></p>
-<p><img src="https://img.shields.io/badge/Dashboarding-white" alt="Dashboarding"></p>
-</div>
-<p>
-The project explores on-time performance trends from 34 years of US domestic flight data, focusing on variations across carriers, routes, airports, and time. The exploratory data analysis (EDA) resulted in a comprehensive report with 35+ data insights and 25+ visualizations, converted into an interactive Streamlit dashboard. The analysis demonstrates how to extract critical performance trends from historical data, enabling stakeholders to make informed decisions and significantly boost operational efficiency in the aviation industry.
-</p>
-</li>
-</ul>
-<h3 class="anchored">
-Machine Learning
-</h3>
-<ul class="list-unstyled">
-</ul>
 <div class="listing-no-matching d-none">
 No matching items
 </div>
 </div>
+<!-- <h1 id="hi">Hi, I’m Marco Camilo, <span></span></h1> -->
+<!-- I design, build, and operate deep learning systems that process natural language. I also specialize in data analysis and machine learning. Here are some of the projects in my portfolio: -->
+<!---->
+<!-- [BERT, Encoders and Linear Models for Resume Text Classification]()   -->
+<!-- Exploring performance of advanced NLP techniques on topic modeling, text classification and document similarity. -->
+<!-- 11 Jun 2024 • GitHub • Jupyter • Article -->
+<!---->
+<!-- [Airline On-Time Performance across 80 Years EDA]()   -->
+<!-- An analysis of airline peformance from 2 million flights spanning 80 years. -->
+<!-- 30 Apr 2024 • GitHub • Jupyter • Article -->
+<!---->
+<!-- [Raspberry-LLM - Making My Raspberry Pico a Little Smarter]()   -->
+<!-- Generating Dr. Seuss headlines, fake WSJ quotes, HackerNews troll comments, and more. -->
+<!-- 16 Apr 2024 • GitHub • Jupyter • Article -->
 </div>
 <div class="g-col-12 g-col-lg-3">
 <div class="profile-sidebar">

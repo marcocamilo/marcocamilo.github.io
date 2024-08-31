@@ -292,7 +292,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="preprocessing">Preprocessing</h2>
 <p>Data preprocessing involved two tasks: text preprocessing and data rebalancing.</p>
 <p>For text cleaning, I developed a custom&nbsp;<code>preprocessing</code>&nbsp;function that integrates several operations into a streamlined pipeline. This function is highly adaptable, with parameters to handle tasks such as converting text to lowercase, decoding HTML, removing emails and URLs, eliminating special characters, expanding contractions, applying custom regex cleaning, and performing tokenization, stemming, lemmatization, and stopword removal. In particular, I improved the text quality by eliminating noise like non-existent words and frequent, resume-specific stopwords such as months, function verbs, and section headings.</p>
-<div id="051f49b5" class="cell" data-execution_count="1">
+<div id="df2e277c" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
@@ -422,7 +422,7 @@ window.Quarto = {
 <section id="import-packages-and-data" class="level3">
 <h3 class="anchored" data-anchor-id="import-packages-and-data">Import Packages and Data</h3>
 <p>In addition to standard libraries, I imported two custom functions: <code>classifier_report</code> to generate classification reports and confusion matrices, and <code>save_performance</code> to store model performance metrics in a JSON file for future analysis. I also loaded a pre-trained Label Encoder to label the encoded categories in subsequent visualizations.</p>
-<div id="01e470aa" class="cell" data-execution_count="2">
+<div id="d95502dd" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
@@ -445,7 +445,7 @@ window.Quarto = {
 <section id="baseline-linearsvc" class="level3">
 <h3 class="anchored" data-anchor-id="baseline-linearsvc">Baseline LinearSVC</h3>
 <p>I split the dataset into 70% for training and 30% for testing. I used the <code>tfidf_vectors</code> column as the feature matrix, stacking the vectors into a single matrix with <code>np.vstack</code>. The encoded <code>Category</code> column served as the target variable, and I extracted the variables into a NumPy array using the <code>.values</code> method to improve performance. To verify the split, I printed the shapes of the training and testing sets.</p>
-<div id="96e4f38e" class="cell" data-execution_count="3">
+<div id="2973aa4b" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.vstack(df[<span class="st">'tfidf_vectors'</span>].values)</span>
@@ -463,7 +463,7 @@ window.Quarto = {
 <pre><code>Training set: (2016, 11618), (2016,)
 Testing set: (864, 11618), (864,)</code></pre>
 <p>Next, I trained a Linear SVC model with default hyperparameters and evaluated its performance using the <code>classifier_report</code> function, which generated a classification report and confusion matrix.</p>
-<div id="b25c305d" class="cell" data-execution_count="4">
+<div id="a275a884" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>svc <span class="op">=</span> LinearSVC(dual<span class="op">=</span><span class="st">"auto"</span>)</span>
@@ -481,7 +481,7 @@ Testing set: (864, 11618), (864,)</code></pre>
 <p><a href="../assets/projects/resume-analyzer/svc_files/truncated-svd.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="../assets/projects/resume-analyzer/svc_files/truncated-svd.png" class="img-fluid"></a></p>
 </div><div id="fn3"><p><sup>3</sup>&nbsp;For an in-depth explanation, see Manning, C.D., Raghavan, P., &amp; Schütze, H. (2008) <a href="https://nlp.stanford.edu/IR-book/pdf/18lsi.pdf">‘Matrix Decompositions and Latent Semantic Indexing’</a>, <em>Introduction to Information Retrieval</em>, 1.</p></div></div><p>Transforming TF-IDF matrices with Truncated SVD is known as Latent Semantic Analysis (LSA). This technique extracts the <span class="math inline">\(n\)</span> largest eigenvalues to capture the most significant semantic relationships between terms and documents, while filtering out noise and low-information features<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
 <p>I used <code>TruncatedSVD</code> to reduce the number of components to 500, which is less than 5% of the original number of features. I then applied this transformation, split the resulting feature matrix into training and testing sets, and proceeded to train the new model.</p>
-<div id="0b6ff802" class="cell" data-execution_count="5">
+<div id="ab88de1e" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>t_svd <span class="op">=</span> TruncatedSVD(n_components<span class="op">=</span><span class="dv">500</span>, algorithm<span class="op">=</span><span class="st">'arpack'</span>)</span>
@@ -501,7 +501,7 @@ Testing set: (864, 11618), (864,)</code></pre>
 <pre><code>Training set: (2016, 500), (2016,)
 Testing set: (864, 500), (864,)</code></pre>
 <p>I trained a new Linear SVC model using the SVD-transformed feature matrix and generated a classification report and confusion matrix.</p>
-<div id="57a2d521" class="cell" data-execution_count="6">
+<div id="6ceca639" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>svc_svd <span class="op">=</span> LinearSVC(dual<span class="op">=</span><span class="st">"auto"</span>)</span>
@@ -512,7 +512,7 @@ Testing set: (864, 500), (864,)</code></pre>
 <p><a href="../assets/projects/resume-analyzer/svc_files/figure-markdown_strict/cell-6-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="../assets/projects/resume-analyzer/svc_files/figure-markdown_strict/cell-6-output-2.png" class="img-fluid"></a></p>
 <p>The model achieved an <strong>84% accuracy</strong> on the test set, which is slightly lower than the baseline model. However, this performance comes from a model <strong>trained on less than 5%</strong> of the original features, demonstrating that despite the reduced dimensionality, the model retains a high level of accuracy. This highlights the sparsity of the TF-IDF vectors while showcasing that effective accuracy can be maintained with a significantly smaller feature set.</p>
 <p>Before proceeding to the next model, I saved the performance metrics of the baseline model for future comparison.</p>
-<div id="b7985179" class="cell" data-execution_count="7">
+<div id="7a41aa1f" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>save_performance(model_name<span class="op">=</span><span class="st">'LinearSVC'</span>,</span>
@@ -550,7 +550,7 @@ Testing set: (864, 500), (864,)</code></pre>
 <li><strong><code>test_model</code></strong>: Evaluates the model on the test set using the best model saved during training and returns the test accuracy.</li>
 <li><strong><code>save_performance</code></strong>: Saves the model’s performance metrics to a JSON file for future analysis.</li>
 </ul>
-<div id="36f9d464" class="cell" data-execution_count="8">
+<div id="df1a517a" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -575,7 +575,7 @@ Testing set: (864, 500), (864,)</code></pre>
 </details>
 </div>
 <p>When training deep learning models, I always include the option to use a GPU if available and set the <code>device</code> variable accordingly. This approach not only enables the model to utilize parallel computing resources if available, but also makes the code reproducible across different device setups. The snippet below checks for GPU availability and assigns the <code>device</code> variable, which is then used by the <code>DataLoader</code> and the model.</p>
-<div id="4c9557db" class="cell" data-execution_count="9">
+<div id="833b9034" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> torch.cuda.is_available():</span>
@@ -590,7 +590,7 @@ Testing set: (864, 500), (864,)</code></pre>
 <section id="dataset-and-dataloader" class="level3">
 <h3 class="anchored" data-anchor-id="dataset-and-dataloader">Dataset and DataLoader</h3>
 <p>Before constructing the <code>Dataset</code> class, I defined a <code>tokenization</code> function that initializes the tokenizer, tokenizes the text data, and builds a vocabulary using PyTorch’s <code>get_tokenizer</code> and <code>build_vocab_from_iterator</code> functions. This function returns the tokenized texts for indexing by the <code>DataLoader</code> during training and the vocabulary for determining vocabulary size.</p>
-<div id="89888852" class="cell" data-execution_count="10">
+<div id="cabe59b4" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tokenization(texts, tokenizer_type<span class="op">=</span><span class="st">'basic_english'</span>, specials<span class="op">=</span>[<span class="st">'&lt;unk&gt;'</span>], device<span class="op">=</span>device):</span>
@@ -610,7 +610,7 @@ Testing set: (864, 500), (864,)</code></pre>
 </details>
 </div>
 <p>Next, I created the <code>ResumeDataset</code> iterator, which preprocesses the text data using the <code>tokenization</code> function and indexes samples for the <code>DataLoader</code> during training. The class includes: - <strong><code>__len__</code></strong>: Returns the length of the dataset. - <strong><code>vocab_size</code></strong>: Provides the size of the vocabulary. - <strong><code>num_class</code></strong>: Returns the number of unique classes in the dataset. - <strong><code>__getitem__</code></strong>: Returns a sample of text and its corresponding label from the dataset.</p>
-<div id="439cb2bb" class="cell" data-execution_count="11">
+<div id="f0674aca" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ResumeDataset(Dataset):</span>
@@ -643,7 +643,7 @@ Testing set: (864, 500), (864,)</code></pre>
 </details>
 </div>
 <p>I also defined a <code>collate_fn</code> function to implement dynamic padding when batching the data. Dynamic padding is a technique used to adjusts sequence lengths to match the longest sequence in each batch, rather than to the longest sequence in the entire dataset. Dynamic padding allows the model to process sequences of varying lengths more efficiently, saving memory and computation time.</p>
-<div id="541d6a0a" class="cell" data-execution_count="12">
+<div id="4a9645ba" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> collate_fn(batch):</span>
@@ -656,7 +656,7 @@ Testing set: (864, 500), (864,)</code></pre>
 </details>
 </div>
 <p>Finally, I instantiated the <code>ResumeDataset</code> class and split the dataset into 70% training, 15% validation, and 15% test sets using the <code>random_split</code> function. I created <code>DataLoader</code> iterators for each set, applying dynamic padding through the <code>collate_fn</code> function.</p>
-<div id="b2fb2bd0" class="cell" data-execution_count="13">
+<div id="ccdc64c2" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> ResumeDataset(data)</span>
@@ -675,7 +675,7 @@ Testing set: (864, 500), (864,)</code></pre>
 <p><a href="../assets/projects/resume-analyzer/nn_files/fnn-architecture.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="../assets/projects/resume-analyzer/nn_files/fnn-architecture.jpg" class="img-fluid"></a></p>
 </div></div><p>The model is a simple FNN with an embedding layer, followed by two fully connected layers with ReLU activation functions, and a final fully connected layer with output size matching the number of classes. The architecture is defined in the <code>SimpleNN</code> class, which takes the vocabulary size, embedding size, number of classes, and an <code>expansion_factor</code> parameter (set to 2) to determine the hidden dimension size.</p>
 <p>The <code>EmbeddingBag</code> function efficiently computes embeddings by first creating embeddings for the input indices and then averaging the output across the sequence dimension. This approach accommodates sequences of varying lengths, allowing the model to process them more efficiently.</p>
-<div id="9ea5d915" class="cell" data-execution_count="14">
+<div id="b91900c1" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SimpleNN(nn.Module):</span>
@@ -702,7 +702,7 @@ Testing set: (864, 500), (864,)</code></pre>
 <section id="hyperparameters-and-training" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="hyperparameters-and-training">Hyperparameters and Training</h3>
 <p>Before training, I set the hyperparameters for the neural network. The vocabulary size and number of classes are sourced from the <code>ResumeDataset</code> class. The embedding size is set to 60, the learning rate to 1e-3, and the model is trained for 40 epochs.</p>
-<div id="ee018cac" class="cell" data-execution_count="15">
+<div id="eeb25e8c" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>vocab_size <span class="op">=</span> dataset.vocab_size()</span>
@@ -714,7 +714,7 @@ Testing set: (864, 500), (864,)</code></pre>
 </div>
 <p>I instantiated the model, assigned it to the available device, and defined the loss function and optimizer. The loss function used is Cross Entropy Loss, suitable for multi-class classification, and the optimizer is Adam, known for its adaptive learning rate capabilities. Additionally, I set up a learning rate scheduler to reduce the learning rate by a factor of 0.1 if the validation loss does not improve over a specified <code>patience</code> period, helping to prevent overfitting and enhance generalization. The model and hyperparameters were then passed to the <code>train_model</code> function<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>.</p>
 <div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;During fine-tuning, the model achieved better accuracy with a dropout rate of 0.4.</p></div></div><p>To visualize the training progress, I set the <code>visualize</code> parameter to ‘liveloss’, utilizing the <a href="https://p.migdal.pl/livelossplot/">PlotLosses library</a> for a dynamically updating plot that shows real-time training and validation loss and accuracy. This allows for effective monitoring and adjustment of hyperparameters as needed.</p>
-<div id="bd6c5b60" class="cell" data-execution_count="16">
+<div id="28c22cf3" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SimpleNN(vocab_size, embed_size, num_class, dropout<span class="op">=</span><span class="fl">0.4</span>).to(device)</span>
@@ -742,7 +742,7 @@ Val Loss: 1.3300 | Val Acc: 0.6852
 <section id="evaluation" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="evaluation">Evaluation</h3>
 <p>After training the model, I evaluated its performance on the test set using the <code>test_model</code> function. This function takes the trained model, test data loader, and criterion as inputs, and returns the model’s accuracy on the test set.</p>
-<div id="de826991" class="cell" data-execution_count="17">
+<div id="87e4d755" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> test_model(model, test_loader, criterion)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -753,7 +753,7 @@ Val Loss: 1.3300 | Val Acc: 0.6852
 <p>The FNN achieved a test accuracy of <strong>73.15%</strong> and a loss of 1.1444. The test performance is consistent with the validation accuracy observed during training, indicating that the model generalizes well to new data and demonstrates robustness in its predictions.</p>
 <p>While the FNN’s accuracy is lower than the baseline model, it is still impressive given the simplicity of the architecture. Performance could be enhanced by incorporating advanced regularization techniques, utilizing pre-trained word embeddings<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>, or increasing model complexity. The next section explores a more advanced Transformer-based architecture that leverages self-attention mechanisms to capture long-range dependencies in the data.</p>
 <div class="no-row-height column-margin column-container"><div id="fn6"><p><sup>6</sup>&nbsp;Examples of pre-trained embeddings include: <a href="https://code.google.com/archive/p/word2vec/">Word2Vec</a>, <a href="https://nlp.stanford.edu/projects/glove/">GloVe</a>, and <a href="https://fasttext.cc/">fastText</a>.</p></div></div><p>To conclude this section, I saved the performance metrics of the FNN model for future analysis.</p>
-<div id="3a4e5800" class="cell" data-execution_count="18">
+<div id="4d75f03a" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>save_performance(model_name<span class="op">=</span><span class="st">'Feedforward Neural Network'</span>,</span>
@@ -805,7 +805,7 @@ Val Loss: 1.3300 | Val Acc: 0.6852
 <li><a href="https://towardsdatascience.com/text-classification-with-transformer-encoders-1dcaa50dabae">Text Classification with Transformer Encoders</a></li>
 </ul>
 </blockquote>
-<div id="5082554d" class="cell" data-execution_count="19">
+<div id="5651cc2b" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EmbeddingLayer(nn.Module):</span>
@@ -959,7 +959,7 @@ Val Loss: 1.3300 | Val Acc: 0.6852
 <section id="hyperparameters-and-training-1" class="level3">
 <h3 class="anchored" data-anchor-id="hyperparameters-and-training-1">Hyperparameters and Training</h3>
 <p>With the model constructed, I set the training hyperparameters. As with the previous model, I obtain the vocabulary size and number of output features from the <code>ResumeDataset</code> class. The embedding size is set to 80, the hidden dimension to 180, and the multi-head attention mechanism uses 4 heads with an encoder stack of 4 layers. I train the model for 20 epochs with a learning rate of 1e-3.</p>
-<div id="16c98110" class="cell" data-execution_count="20">
+<div id="88ab550f" class="cell" data-execution_count="20">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>vocab_size <span class="op">=</span> dataset.vocab_size()</span>
@@ -973,7 +973,7 @@ Val Loss: 1.3300 | Val Acc: 0.6852
 </details>
 </div>
 <p>I instantiated the model with the specified hyperparameters and moved it to the appropriate device. The criterion and optimizer remained unchanged from the previous model, using the Adam optimizer and CrossEntropyLoss for multi-class classification. I also initialized a learning rate scheduler with a patience of 2 epochs to mitigate overfitting. The model was trained using the <code>train_model</code> function.</p>
-<div id="e2cedd11" class="cell" data-execution_count="21">
+<div id="67b0b001" class="cell" data-execution_count="21">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> TransformerClassifier(vocab_size, d_model, num_heads, </span>
@@ -1001,7 +1001,7 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 </section>
 <section id="evaluation-1" class="level3">
 <h3 class="anchored" data-anchor-id="evaluation-1">Evaluation</h3>
-<div id="b18eafde" class="cell" data-execution_count="22">
+<div id="cc104794" class="cell" data-execution_count="22">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> test_model(model, test_loader, criterion)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1012,7 +1012,7 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 <p>Despite incorporating a more advanced architecture with a multi-head self-attention mechanism, the Encoder model achieved an <strong>accuracy of 74.5%</strong>, similar to the FNN model. The large gap observed between training and validation performance suggests that this overfitting may be affecting the model’s generalization capabilities.</p>
 <p>With improved training and validation performance, the model could potentially reach higher accuracy on the test set. Enhancing the model’s performance might involve techniques such as data augmentation, adjusting hyperparameters like embedding size, hidden dimensions, and the number of layers, or experimenting with different optimizers and learning rate schedulers.</p>
 <p>As with the previous models, I saved the performance metrics for later analysis.</p>
-<div id="1eff122e" class="cell" data-execution_count="23">
+<div id="9fba4baa" class="cell" data-execution_count="23">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>save_performance(model_name<span class="op">=</span><span class="st">'Transformer'</span>,</span>
@@ -1052,7 +1052,7 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 <li><code>DataCollatorWithPadding</code>: Creates batches with dynamically padded sequences.</li>
 </ul>
 <p>Given BERT’s unique output format, I also imported custom functions <code>train_BERT</code> and <code>test_BERT</code>, designed specifically to handle BERT’s outputs, including input IDs and attention masks, for evaluating the model’s performance.</p>
-<div id="61380de9" class="cell" data-execution_count="24">
+<div id="492cae00" class="cell" data-execution_count="24">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> BertModel, BertTokenizer, DataCollatorWithPadding</span>
@@ -1065,7 +1065,7 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 <h3 class="anchored" data-anchor-id="dataset-and-dataloader-1">Dataset and DataLoader</h3>
 <p>Before creating the dataset and <code>DataLoader</code>, I initialized the BERT tokenizer and define the pre-trained BERT model. I then constructed the <code>ResumeBertDataset</code>, which handles the tokenization and preparation of resumes for model input.</p>
 <p>Unlike the previous models, I configured the tokenizer using the <code>.encode_plus</code> method. This method returns a dictionary containing the batch encodings, including tokenized input sequences and attention masks. I set <code>padding</code> to <code>False</code>, as dynamic padding will be managed by the data collator, and <code>truncation</code> to <code>True</code> to truncate sequences that exceed the maximum length. The method also adds the special tokens <code>[CLS]</code> and <code>[SEP]</code>, required by BERT. I use <code>return_tensors='pt'</code> to return PyTorch tensors. The function ultimately returns a dictionary with the processed input sequences, attention masks, and labels.</p>
-<div id="944a502b" class="cell" data-execution_count="25">
+<div id="c6fa1efc" class="cell" data-execution_count="25">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> BertTokenizer.from_pretrained(<span class="st">'bert-base-uncased'</span>)</span>
@@ -1110,7 +1110,7 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 </details>
 </div>
 <p>I initialized the dataset and set <code>max_length</code> to 512, the maximum token limit that BERT could handle. I then split the dataset into 70% training, 15% validation, and 15% test sets using the <code>random_split</code> function. To manage varying sequence lengths, I used the <code>DataCollatorWithPadding</code> class, which dynamically padded sequences to the maximum length within each batch. Finally, I created <code>DataLoader</code> instances for the training, validation, and test sets, setting the batch size to 16, enabling data shuffling, and applying the data collator for padding.</p>
-<div id="62a9afbf" class="cell" data-execution_count="26">
+<div id="51addc88" class="cell" data-execution_count="26">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> ResumeBertDataset(data, max_length<span class="op">=</span><span class="dv">512</span>)</span>
@@ -1127,7 +1127,7 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 <section id="model-architecture-2" class="level3">
 <h3 class="anchored" data-anchor-id="model-architecture-2">Model Architecture</h3>
 <p>The <code>BertResumeClassifier</code> model comprised the pre-trained BERT base model, a dropout layer, and a linear output layer for resume classification. I utilized the <code>bert-base-uncased</code> pre-trained model to generate contextual embeddings from the input sequences. I extracted these embeddings by indexing the <code>pooler_output</code> key from the output dictionary. The embeddings were then passed through a dropout layer to mitigate overfitting, and subsequently fed into a fully connected linear layer that mapped the embeddings to the desired number of output classes for classification.</p>
-<div id="21e07264" class="cell" data-execution_count="27">
+<div id="d848b0c9" class="cell" data-execution_count="27">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BertResumeClassifier(nn.Module):</span>
@@ -1152,7 +1152,7 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 <h3 class="anchored" data-anchor-id="hyperparameters-and-training-2">Hyperparameters and Training</h3>
 <p>Since BERT is a pre-trained model with a fixed input size of 512 tokens, there were fewer parameters to set for the model itself. The primary parameter to configure was the number of output classes, which, as before, was obtained from the <code>Dataset</code> class.</p>
 <p>I initialized the model, loss function, optimizer, and set the number of epochs. I used the Cross Entropy Loss function and the Adam optimizer, adjusting the learning rate to 2e-5, which had shown better performance in preliminary tests. The model was trained for 10 epochs.</p>
-<div id="4c21ae06" class="cell" data-execution_count="28">
+<div id="d4302f00" class="cell" data-execution_count="28">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>n_classes <span class="op">=</span> dataset.num_class()</span>
@@ -1182,7 +1182,7 @@ Val Loss: 0.4143 | Val Acc: 0.9190
 <section id="evaluation-2" class="level3">
 <h3 class="anchored" data-anchor-id="evaluation-2">Evaluation</h3>
 <p>As before, I evaluate the model using the <code>test_model</code> function using the best saved model.</p>
-<div id="3a5fdf0d" class="cell" data-execution_count="29">
+<div id="ee3a20ef" class="cell" data-execution_count="29">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> test_BERT(model, test_loader, criterion)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1192,7 +1192,7 @@ Val Loss: 0.4143 | Val Acc: 0.9190
 ✅ Testing complete!</code></pre>
 <p>The BERT model achieved impressive performance on the test set, reaching an <strong>accuracy of 91.67%</strong> with a test loss of 0.3984. This result significantly outperformed all previous models tested. As anticipated from the training and validation performances, the model demonstrated robustness and excellent generalization to unseen data. This was further confirmed by the close alignment between test and validation accuracies, both of which represented datasets not previously seen by the model. The similar accuracy between the validation data and the test data indicated that the model could generalize effectively to new resumes and accurately classify them into the correct categories.</p>
 <p>As with the previous models, I saved its performance using the <code>save_performance</code> function.</p>
-<div id="8b6d7011" class="cell" data-execution_count="30">
+<div id="7af13ebd" class="cell" data-execution_count="30">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>save_performance(model_name<span class="op">=</span><span class="st">'BERT'</span>,</span>
@@ -1212,7 +1212,7 @@ Val Loss: 0.4143 | Val Acc: 0.9190
 <h2 class="anchored" data-anchor-id="results-and-discussion">Results and Discussion</h2>
 <p>Below I discuss the performance of the classification models, the reasons behind their varying accuracies, and their implications in industry applications.</p>
 <p>All four models achieved accuracies above 70%, in large part thanks to effective data preparation including, involving thorough text preprocessing, data balancing, and advanced vectorization techniques. The models can be categorized into two performance groups: Linear SVC and BERT, both achieving around 90% accuracy, and FNN and Transformer, with approximately 70% accuracy. Interestingly, the highest-performing models are at opposite ends of the complexity spectrum, with Linear SVC being the simplest and BERT the most complex, while the lower-performing models have higher complexity than the baseline. The reasons for these performance differences are discussed below.</p>
-<div id="bbed7685" class="cell" data-execution_count="31">
+<div id="691cf573" class="cell" data-execution_count="31">
 <details class="code-fold">
 <summary>View Code</summary>
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>evaluation_df <span class="op">=</span> pd.read_json(<span class="st">'./output/classifier_performance.json'</span>).sort_values(by<span class="op">=</span><span class="st">'accuracy'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
