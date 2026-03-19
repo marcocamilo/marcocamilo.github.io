@@ -2,7 +2,7 @@
 <div><img class="profile" src="/assets/img/profile.png" /></div>
 
 **I am Marco Camilo,**  
-an NLP Engineer &  
+an AI/ML Engineer &  
 Data Scientist.
 
 <div class="about-links">

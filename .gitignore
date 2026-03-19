@@ -1,3 +1,5 @@
 /.quarto/
 /_site/
 assets/projects/airline
+
+**/*.quarto_ipynb
