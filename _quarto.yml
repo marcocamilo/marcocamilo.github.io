@@ -28,7 +28,8 @@ format:
     css: /assets/css/global.css
     toc: false
     lightbox: true
-    
+    default-image-extension: ""
+
     # code blocks
     highlight-style: github
     code-block-border-left: true

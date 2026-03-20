@@ -1,7 +1,7 @@
 ---
 title: AI-Powered Patient Journey Analytics
 subtitle: An End-to-End GenAI Extraction Pipeline
-image: /assets/projects/ai-patient-journey/ai-patient-journey.jpg
+image: /assets/projects/ai-patient-journey/ai-patient-journey.png
 description: This project builds an end-to-end GenAI pipeline that transforms 50 synthetic IBD patient interview transcripts into structured, analyzable records using LLM-powered extraction with Pydantic schemas, chain-of-thought prompting, and confidence scoring. The pipeline combines classical NLP (TF-IDF, LDA/NMF topic modeling, VADER sentiment) with structured LLM extraction (Gemini 2.5 Flash via instructor + litellm) to answer four research questions about biologic treatment adoption, barriers, treatment patterns, and referral pathways.
 featured: 1
 category: GenAI
