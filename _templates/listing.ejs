@@ -1,9 +1,13 @@
-<% 
+<%
+// Portfolio Listing Template
+// Displays all projects grouped by category with technology badges
+
 const categories = {
   'NLP': [],
+  'GenAI': [],
   'Exploratory Data Analysis': [],
   'Machine Learning': []
-}; 
+};
 
 // Group items by category
 items.forEach(item => {
@@ -12,7 +16,8 @@ items.forEach(item => {
   }
 });
 
-// Define badges data
+// Technology badge definitions for portfolio skill tags
+// Maps skill names to shields.io badge URLs
 const badges = {
   "python": "https://img.shields.io/badge/python-white?logo=python",
   "jupyter": "https://img.shields.io/badge/jupyter-white?logo=jupyter",

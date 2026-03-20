@@ -1,5 +1,16 @@
+# Quarto
 /.quarto/
 /_site/
+
+# Legacy
+/docs/
+
+# OS files
+**/.DS_Store
+
+# Project-specific
 assets/projects/airline
 
 **/*.quarto_ipynb
+
+CLAUDE.md

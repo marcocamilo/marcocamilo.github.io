@@ -1,5 +1,6 @@
 project:
   type: website
+  output-dir: _site
   resources:
     - CNAME
 
@@ -13,22 +14,17 @@ website:
         text: Home
       - portfolio.qmd
       - about.qmd
-  page-footer: 
-    left: "© 2024 Marco-Andrés Camilo-Pietri"
+  page-footer:
+    left: "© 2026 Marco-Andrés Camilo-Pietri"
   bread-crumbs: false
   google-analytics: "G-QQJ3PCTWK5"
 
 format:
   html:
-    theme: 
+    theme:
       light: [default, assets/css/light-mods.scss]
       dark: [cyborg, assets/css/dark-mods.scss]
-    css: assets/css/global.css
-    # css: assets/css/styles.css
-    # theme: 
-    #   light: [default, assets/css/light-mods.scss]
-    #   dark: cyborg
-    # css: /assets/css/global.css
+    css: /assets/css/global.css
     toc: false
     lightbox: true
     
@@ -37,11 +33,6 @@ format:
     code-block-border-left: true
     code-fold: true
     code-summary: View Code
-    
-    # includes
-    include-in-header:
-      - text: |
-          <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 reference-location: margin
 citation-location: margin
