@@ -2,7 +2,7 @@
 title: AI-Powered Patient Journey Analytics
 subtitle: An End-to-End GenAI Extraction Pipeline
 image: /assets/projects/ai-patient-journey/ai-patient-journey.jpg
-description: This project builds an end-to-end GenAI pipeline that transforms 50 synthetic Crohn's Disease patient interview transcripts into structured, analyzable records using LLM-powered extraction with Pydantic schemas, chain-of-thought prompting, and confidence scoring. The pipeline combines classical NLP (TF-IDF, LDA/NMF topic modeling, VADER sentiment) with structured LLM extraction (Gemini 2.5 Flash via instructor + litellm) to answer four research questions about biologic treatment adoption, barriers, treatment patterns, and referral pathways.
+description: This project builds an end-to-end GenAI pipeline that transforms 50 synthetic IBD patient interview transcripts into structured, analyzable records using LLM-powered extraction with Pydantic schemas, chain-of-thought prompting, and confidence scoring. The pipeline combines classical NLP (TF-IDF, LDA/NMF topic modeling, VADER sentiment) with structured LLM extraction (Gemini 2.5 Flash via instructor + litellm) to answer four research questions about biologic treatment adoption, barriers, treatment patterns, and referral pathways.
 featured: 1
 category: GenAI
 type: NLP Pipeline
@@ -29,7 +29,7 @@ skills:
 
 ## Dataset
 
-The project uses 50 synthetic patient interview transcripts simulating clinical interviews with Crohn's Disease patients. Each transcript is a first-person narrative covering diagnosis history, treatment sequences, biologic therapy experiences, insurance barriers, referral pathways, and emotional burden. The transcripts vary in length from ~1,000 to ~4,300 characters, with shorter transcripts potentially representing incomplete patient journeys (churn candidates).
+The project uses 50 synthetic patient interview transcripts simulating clinical interviews with IBD patients. Each transcript is a first-person narrative covering diagnosis history, treatment sequences, biologic therapy experiences, insurance barriers, referral pathways, and emotional burden. The transcripts vary in length from ~1,000 to ~4,300 characters, with shorter transcripts potentially representing incomplete patient journeys (churn candidates).
 
 ::: {.column-margin}
 ![](/assets/projects/ai-patient-journey/corpus_statistics.png)
@@ -277,7 +277,7 @@ axes[2].scatter(df["total_treatments"], df["completeness_score"], ...)
 
 > 44/50 records are complete, but the 6 partial records cluster towards the low-treatment, low-biologic corner of the scatter plot — an early warning of **survivorship bias** that becomes central to the churn analysis later.
 
-## Q1: Biologic Treatment Adoption
+## Biologic Treatment Adoption
 
 ```{python}
 # Adoption donut + engagement funnel + adoption by duration
@@ -305,7 +305,7 @@ axes[1].bar(funnel["Stage"], funnel["Count"], ...)
 > 4. **Adoption increases with disease duration** as expected, since patients progress through step-up therapy.
 > 5. **Patients diagnosed <1 year ago have low adoption** not because they resist biologics, but because they haven't yet exhausted the treatment ladder — they're future biologic candidates, not permanent non-adopters.
 
-## Q2: Barriers to Biologic Adoption
+## Barriers to Biologic Adoption
 
 ```{python}
 not_on = df[~df["is_on_biologic"]].copy()
@@ -345,7 +345,7 @@ for barriers in barrier_sets:
 
 ![](/assets/projects/ai-patient-journey/q2_barrier_cooccurrence.png)
 
-## Q3: Pre-Biologic Treatment Landscape
+## Pre-Biologic Treatment Landscape
 
 ```{python}
 fig, axes = plt.subplots(1, 3, figsize=(16, 5))
@@ -379,7 +379,7 @@ ladder = {
 > - **Aminosalicylates (64%)**, **corticosteroids (52%)**, and **immunomodulators (68%)** form the pre-biologic treatment ladder
 > - The consistent ladder pattern confirms step-up therapy as the standard approach
 
-## Q4: Referral Pathway Analysis
+## Referral Pathway Analysis
 
 ```{python}
 fig, axes = plt.subplots(1, 3, figsize=(16, 5))
@@ -476,10 +476,10 @@ sns.heatmap(corr, mask=mask, annot=True, fmt=".2f", cmap="RdBu_r", ...)
 
 | Question | Finding | Confidence | Key Caveat |
 |---|---|---|---|
-| **Q1:** Adoption rate | 68% currently on biologic | **Medium-High** | Upper-bound estimate; churn bias means true rate is likely lower (55–65%) |
-| **Q2:** Main barriers | Cost/insurance (69%), fear (62%), doctor hesitancy (25%) | **High** | Corroborated across extraction + regex + topic modeling; robust to churn |
-| **Q3:** Treatment ladder | Median 3 steps; mesalamine → prednisone → immunomodulators → biologic | **High** | Based on narrative order, not verified clinical records |
-| **Q4:** Referral pathway | 70% misdiagnosed; median 4 provider steps | **Medium** | May be inflated by recall bias in interview setting |
+| Adoption rate | 68% currently on biologic | **Medium-High** | Upper-bound estimate; churn bias means true rate is likely lower (55–65%) |
+| Main barriers | Cost/insurance (69%), fear (62%), doctor hesitancy (25%) | **High** | Corroborated across extraction + regex + topic modeling; robust to churn |
+| Treatment ladder | Median 3 steps; mesalamine → prednisone → immunomodulators → biologic | **High** | Based on narrative order, not verified clinical records |
+| Referral pathway | 70% misdiagnosed; median 4 provider steps | **Medium** | May be inflated by recall bias in interview setting |
 
 ### Recommendations for Interpretation
 
