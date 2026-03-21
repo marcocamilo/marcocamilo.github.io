@@ -5,7 +5,7 @@ image: /assets/projects/ai-resume-optimizer/ai-resume-optimizer.jpeg
 description: This app leverages Google's Gemini API and LangChain to evaluate and optimize resumes based job descriptions. Combining role prompting, task decomposition, and chain-of-thought, I enginered an AI-powered pipeline that identifies gaps, generates recommendations, and applies them to enhance resume-job alignement. The project integrates a cutting-edge AI pipeline to address a real-world challenge and significantly improve job seekers' chances of success in the competitive job market.
 featured: 2
 category: GenAI
-type: AI
+type: LLM
 skills:
   - LangChain
   - Gemini
