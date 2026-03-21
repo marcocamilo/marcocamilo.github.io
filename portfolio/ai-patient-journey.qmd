@@ -293,7 +293,7 @@ funnel = pd.DataFrame({
 axes[1].bar(funnel["Stage"], funnel["Count"], ...)
 ```
 
-<iframe src="/assets/projects/ai-patient-journey/q1_biologic_adoption.html"
+<iframe src="/assets/projects/ai-patient-journey/biologic_adoption.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
@@ -320,7 +320,7 @@ for b in not_on["biologic_barriers"].dropna():
 barrier_counts = Counter(all_barriers)
 ```
 
-<iframe src="/assets/projects/ai-patient-journey/q2_biologic_barriers.html"
+<iframe src="/assets/projects/ai-patient-journey/biologic_barriers.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
@@ -345,7 +345,7 @@ for barriers in barrier_sets:
         co_occur[pair] += 1
 ```
 
-<iframe src="/assets/projects/ai-patient-journey/q2_barrier_cooccurrence.html"
+<iframe src="/assets/projects/ai-patient-journey/barrier_cooccurrence.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
@@ -361,7 +361,7 @@ axes[1].axvline(steps.median(), color="red", linestyle="--",
                 label=f"Median: {steps.median():.0f}")
 ```
 
-<iframe src="/assets/projects/ai-patient-journey/q3_treatment_landscape.html"
+<iframe src="/assets/projects/ai-patient-journey/treatment_landscape.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
@@ -377,7 +377,7 @@ ladder = {
 }
 ```
 
-![](/assets/projects/ai-patient-journey/q3_treatment_ladder.png)
+![](/assets/projects/ai-patient-journey/treatment_ladder.png)
 
 > **Findings:**
 >
@@ -402,7 +402,7 @@ axes[1].pie(misdiag_cts.values, ...)
 axes[2].hist(df["referral_steps"], ...)
 ```
 
-![](/assets/projects/ai-patient-journey/q4_referral_pathway.png)
+![](/assets/projects/ai-patient-journey/referral_pathway.png)
 
 ```{python}
 misdiag_impact = df.groupby("was_misdiagnosed").agg(
@@ -413,7 +413,7 @@ misdiag_impact = df.groupby("was_misdiagnosed").agg(
 ).round(2)
 ```
 
-<iframe src="/assets/projects/ai-patient-journey/q4_misdiagnosis_impact.html"
+<iframe src="/assets/projects/ai-patient-journey/misdiagnosis_impact.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
