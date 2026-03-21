@@ -1,3 +1,7 @@
+<%
+// Featured Projects Template
+// Shows only projects with 'featured' field on homepage
+%>
 <% for (const item of items) { %>
 <% if (item.featured) { %>
 <p><a href="<%- item.path %>"><%= item.title %></a><br>

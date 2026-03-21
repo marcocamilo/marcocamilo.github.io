@@ -1,7 +1,9 @@
 project:
   type: website
+  output-dir: _site
   resources:
     - CNAME
+    - assets/**
 
 website:
   title: "marcocamilo"
@@ -13,35 +15,28 @@ website:
         text: Home
       - portfolio.qmd
       - about.qmd
-  page-footer: 
-    left: "© 2024 Marco-Andrés Camilo-Pietri"
+  page-footer:
+    left: |
+      <span id="copyright">© <span id="year"></span> Marco-Andrés Camilo-Pietri</span>
+      <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
   bread-crumbs: false
   google-analytics: "G-QQJ3PCTWK5"
 
 format:
   html:
-    theme: 
+    theme:
       light: [default, assets/css/light-mods.scss]
       dark: [cyborg, assets/css/dark-mods.scss]
-    css: assets/css/global.css
-    # css: assets/css/styles.css
-    # theme: 
-    #   light: [default, assets/css/light-mods.scss]
-    #   dark: cyborg
-    # css: /assets/css/global.css
+    css: /assets/css/global.css
     toc: false
     lightbox: true
-    
+    default-image-extension: ""
+
     # code blocks
     highlight-style: github
     code-block-border-left: true
     code-fold: true
     code-summary: View Code
-    
-    # includes
-    include-in-header:
-      - text: |
-          <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 reference-location: margin
 citation-location: margin

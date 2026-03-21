@@ -1,3 +1,9 @@
+<style>
+#hi span {
+  transition: opacity 0.9s ease-in-out;
+}
+</style>
+
 <script>
 (function($) {
     $(window).on('load hashchange', function() {
@@ -9,7 +15,7 @@
     });
 })(jQuery);
 $(document).ready(function() {
-    var items = ['an AI/ML Engineer', 'a Data Scientist', 'a Linguist', 'a Writer'];
+    var items = ['AI Engineer', 'ML Engineer', 'Data Scientist'];
         $text = $('#hi span'),
         delay = 1.8;
     function loop(delay) {
