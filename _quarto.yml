@@ -16,7 +16,9 @@ website:
       - portfolio.qmd
       - about.qmd
   page-footer:
-    left: "© 2026 Marco-Andrés Camilo-Pietri"
+    left: |
+      <span id="copyright">© <span id="year"></span> Marco-Andrés Camilo-Pietri</span>
+      <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
   bread-crumbs: false
   google-analytics: "G-QQJ3PCTWK5"
 
