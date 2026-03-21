@@ -31,9 +31,7 @@ skills:
 
 The project uses 50 synthetic patient interview transcripts simulating clinical interviews with IBD patients. Each transcript is a first-person narrative covering diagnosis history, treatment sequences, biologic therapy experiences, insurance barriers, referral pathways, and emotional burden. The transcripts vary in length from ~1,000 to ~4,300 characters, with shorter transcripts potentially representing incomplete patient journeys (churn candidates).
 
-::: {.column-margin}
 ![](/assets/projects/ai-patient-journey/corpus_statistics.png)
-:::
 
 The dataset is stored as a JSON array where each entry contains a `patient_id` and an `interview_transcript`:
 
@@ -107,8 +105,6 @@ doc_topics_lda = lda.fit_transform(doc_term)
 nmf = NMF(n_components=5, random_state=42, max_iter=500, init="nndsvda")
 doc_topics_nmf = nmf.fit_transform(tfidf_matrix)
 ```
-
-![](/assets/projects/ai-patient-journey/topic_heatmaps.png)
 
 Both models converge on similar thematic clusters:
 
@@ -273,7 +269,9 @@ axes[1].hist(df["completeness_score"], bins=12, ...)
 axes[2].scatter(df["total_treatments"], df["completeness_score"], ...)
 ```
 
-![](/assets/projects/ai-patient-journey/data_quality_assessment.png)
+<iframe src="/assets/projects/ai-patient-journey/data_quality_completeness.html"
+        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
 
 > 44/50 records are complete, but the 6 partial records cluster towards the low-treatment, low-biologic corner of the scatter plot — an early warning of **survivorship bias** that becomes central to the churn analysis later.
 
@@ -295,7 +293,9 @@ funnel = pd.DataFrame({
 axes[1].bar(funnel["Stage"], funnel["Count"], ...)
 ```
 
-![](/assets/projects/ai-patient-journey/q1_biologic_adoption.png)
+<iframe src="/assets/projects/ai-patient-journey/q1_biologic_adoption.html"
+        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
 
 > **Findings:**
 >
@@ -320,7 +320,9 @@ for b in not_on["biologic_barriers"].dropna():
 barrier_counts = Counter(all_barriers)
 ```
 
-![](/assets/projects/ai-patient-journey/q2_biologic_barriers.png)
+<iframe src="/assets/projects/ai-patient-journey/q2_biologic_barriers.html"
+        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
 
 ### Patient Barrier Archetypes
 
@@ -343,7 +345,9 @@ for barriers in barrier_sets:
         co_occur[pair] += 1
 ```
 
-![](/assets/projects/ai-patient-journey/q2_barrier_cooccurrence.png)
+<iframe src="/assets/projects/ai-patient-journey/q2_barrier_cooccurrence.html"
+        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
 
 ## Pre-Biologic Treatment Landscape
 
@@ -357,7 +361,9 @@ axes[1].axvline(steps.median(), color="red", linestyle="--",
                 label=f"Median: {steps.median():.0f}")
 ```
 
-![](/assets/projects/ai-patient-journey/q3_treatment_landscape.png)
+<iframe src="/assets/projects/ai-patient-journey/q3_treatment_landscape.html"
+        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
 
 The treatment ladder is consistent across patients:
 
@@ -407,7 +413,9 @@ misdiag_impact = df.groupby("was_misdiagnosed").agg(
 ).round(2)
 ```
 
-![](/assets/projects/ai-patient-journey/q4_misdiagnosis_impact.png)
+<iframe src="/assets/projects/ai-patient-journey/q4_misdiagnosis_impact.html"
+        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
 
 > **Findings:**
 >
@@ -434,7 +442,9 @@ metrics = {
 comparison = df.groupby("churn_indicator").agg(metrics).round(2)
 ```
 
-![](/assets/projects/ai-patient-journey/churn_bias_analysis.png)
+<iframe src="/assets/projects/ai-patient-journey/churn_bias_scatter.html"
+        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
 
 ### Quantifying the Bias
 
