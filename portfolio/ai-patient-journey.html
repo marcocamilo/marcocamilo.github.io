@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="This project builds an end-to-end GenAI pipeline that transforms 50 synthetic IBD patient interview transcripts into structured, analyzable records using LLM-powered extraction with Pydantic schemas, chain-of-thought prompting, and confidence scoring. The pipeline combines classical NLP (TF-IDF, LDA/NMF topic modeling, VADER sentiment) with structured LLM extraction (Gemini 2.5 Flash via instructor + litellm) to answer four research questions about biologic treatment adoption, barriers, treatment patterns, and referral pathways.">
+
+<title>AI-Powered Patient Journey Analytics – marcocamilo</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-a06763021a52c43c40a351ac8b799b8f.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-dbc92dda8186f57fa2e333fbb71d6a9d.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-a06763021a52c43c40a351ac8b799b8f.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-ffead1f4cee643b8aa7f01e3a75b2893.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-b58ffd3c629dc4e5254208ba48bb3f49.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-ffead1f4cee643b8aa7f01e3a75b2893.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-QQJ3PCTWK5"></script>
+
+<script type="text/javascript">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-QQJ3PCTWK5', { 'anonymize_ip': true});
+</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="../assets/css/global.css">
+</head>
+
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">marcocamilo</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../portfolio.html"> 
+<span class="menu-text">Portfolio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#executive-summary" id="toc-executive-summary" class="nav-link active" data-scroll-target="#executive-summary">🔍 Executive Summary</a></li>
+  <li><a href="#the-story-the-data-tells" id="toc-the-story-the-data-tells" class="nav-link" data-scroll-target="#the-story-the-data-tells">📖 The Story the Data Tells</a>
+  <ul>
+  <li><a href="#the-treatment-ladder-is-working-until-it-hits-a-wall" id="toc-the-treatment-ladder-is-working-until-it-hits-a-wall" class="nav-link" data-scroll-target="#the-treatment-ladder-is-working-until-it-hits-a-wall">💊 The Treatment Ladder Is Working… Until It Hits a Wall</a></li>
+  <li><a href="#who-is-on-biologics-and-who-isnt" id="toc-who-is-on-biologics-and-who-isnt" class="nav-link" data-scroll-target="#who-is-on-biologics-and-who-isnt">🩺 Who Is on Biologics, and Who Isn’t?</a></li>
+  <li><a href="#the-barrier-landscape-distinct-patient-archetypes" id="toc-the-barrier-landscape-distinct-patient-archetypes" class="nav-link" data-scroll-target="#the-barrier-landscape-distinct-patient-archetypes">🧱 The Barrier Landscape: Distinct Patient Archetypes</a></li>
+  <li><a href="#the-referral-maze-70-are-initially-misdiagnosed" id="toc-the-referral-maze-70-are-initially-misdiagnosed" class="nav-link" data-scroll-target="#the-referral-maze-70-are-initially-misdiagnosed">🏥 The Referral Maze: 70% Are Initially Misdiagnosed</a></li>
+  </ul></li>
+  <li><a href="#data-limitations-churn-bias" id="toc-data-limitations-churn-bias" class="nav-link" data-scroll-target="#data-limitations-churn-bias">⚖️ Data Limitations &amp; Churn Bias</a>
+  <ul>
+  <li><a href="#the-churn-problem" id="toc-the-churn-problem" class="nav-link" data-scroll-target="#the-churn-problem">🔁 The Churn Problem</a></li>
+  <li><a href="#why-this-matters" id="toc-why-this-matters" class="nav-link" data-scroll-target="#why-this-matters">💡 Why This Matters</a></li>
+  <li><a href="#communicating-uncertainty" id="toc-communicating-uncertainty" class="nav-link" data-scroll-target="#communicating-uncertainty">📢 Communicating Uncertainty</a></li>
+  </ul></li>
+  <li><a href="#technical-implementation" id="toc-technical-implementation" class="nav-link" data-scroll-target="#technical-implementation">🔬 Technical Implementation</a>
+  <ul>
+  <li><a href="#pipeline-architecture" id="toc-pipeline-architecture" class="nav-link" data-scroll-target="#pipeline-architecture">🏗️ Pipeline Architecture</a></li>
+  <li><a href="#key-design-decisions" id="toc-key-design-decisions" class="nav-link" data-scroll-target="#key-design-decisions">🎯 Key Design Decisions</a></li>
+  <li><a href="#schema-design" id="toc-schema-design" class="nav-link" data-scroll-target="#schema-design">📐 Schema Design</a></li>
+  <li><a href="#data-quality-assessment" id="toc-data-quality-assessment" class="nav-link" data-scroll-target="#data-quality-assessment">✅ Data Quality Assessment</a></li>
+  </ul></li>
+  <li><a href="#treatment-landscape-deep-dive" id="toc-treatment-landscape-deep-dive" class="nav-link" data-scroll-target="#treatment-landscape-deep-dive">💊 Treatment Landscape Deep Dive</a></li>
+  <li><a href="#evidence-summary-confidence-assessment" id="toc-evidence-summary-confidence-assessment" class="nav-link" data-scroll-target="#evidence-summary-confidence-assessment">📊 Evidence Summary &amp; Confidence Assessment</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">🎯 Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content page-columns page-full" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">AI-Powered Patient Journey Analytics</h1>
+<p class="subtitle lead">An End-to-End GenAI Extraction Pipeline</p>
+</div>
+
+<div>
+  <div class="description">
+    This project builds an end-to-end GenAI pipeline that transforms 50 synthetic IBD patient interview transcripts into structured, analyzable records using LLM-powered extraction with Pydantic schemas, chain-of-thought prompting, and confidence scoring. The pipeline combines classical NLP (TF-IDF, LDA/NMF topic modeling, VADER sentiment) with structured LLM extraction (Gemini 2.5 Flash via instructor + litellm) to answer four research questions about biologic treatment adoption, barriers, treatment patterns, and referral pathways.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="../assets/projects/ai-patient-journey/ai-patient-journey.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1"><img src="../assets/projects/ai-patient-journey/ai-patient-journey.png" class="img-fluid"></a></p>
+<section id="executive-summary" class="level2">
+<h2 class="anchored" data-anchor-id="executive-summary">🔍 Executive Summary</h2>
+<p>This project analyzes 50 synthetic interview transcripts from inflammatory bowel disease (IBD) patients using an LLM-powered extraction pipeline to answer four critical research questions:</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><strong>Current rate of biologic adoption among IBD patients</strong></li>
+<li><strong>Barriers prevent patients from accessing biologic therapy</strong></li>
+<li><strong>Treatment patterns exist before patients reach biologics</strong></li>
+<li><strong>Patient journey in the healthcare system from initial symptoms to established care</strong></li>
+</ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Central Finding
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Cost and insurance — not clinical resistance — is the dominant barrier preventing biologic adoption.</strong> Among the 32% of patients not currently on a biologic, 69% cite cost or insurance obstacles. This represents an addressable market gap:</p>
+<p><strong>Patients and their physicians <em>want</em> biologics, but the system makes access difficult.</strong></p>
+</div>
+</div>
+<p>However, these numbers come with important caveats. Our dataset contains incomplete patient journeys that likely bias results, and the small sample size limits generalizability. This analysis demonstrates how an AI engineering pipeline can extract structured insights from unstructured clinical narratives while transparently accounting for data quality limitations.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Key Findings
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>68% of patients are currently on a biologic</strong>, but churn bias suggests the true population rate is lower (55–65%)</li>
+<li><strong>Cost and insurance (69%) is the dominant barrier</strong> to biologic adoption — not clinical resistance</li>
+<li><strong>Median 3 treatment steps</strong> before first biologic, following a consistent ladder: mesalamine → prednisone → immunomodulators → biologics</li>
+<li><strong>70% of patients were initially misdiagnosed</strong> — most commonly as IBS or stress-related — navigating a median of 4 provider steps to established care</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="the-story-the-data-tells" class="level2">
+<h2 class="anchored" data-anchor-id="the-story-the-data-tells">📖 The Story the Data Tells</h2>
+<section id="the-treatment-ladder-is-working-until-it-hits-a-wall" class="level3">
+<h3 class="anchored" data-anchor-id="the-treatment-ladder-is-working-until-it-hits-a-wall">💊 The Treatment Ladder Is Working… Until It Hits a Wall</h3>
+<p>The data reveals a clear, consistent treatment escalation pattern across patients:</p>
+<p><strong>Mesalamine → Prednisone → Azathioprine/Methotrexate → Biologics</strong></p>
+<p>Patients try a median of <strong>3 medications</strong> before reaching their first biologic (range: 0–6). The step-up approach is clinically sound — aminosalicylates (found in 64% of pre-biologic regimens), corticosteroids (52%), and immunomodulators (68%) all serve their role in the ladder.</p>
+<iframe src="../assets/projects/ai-patient-journey/q3_steps_to_biologic.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
+<p>But the ladder has a broken rung. When patients reach biologics, many hit a wall that isn’t clinical — it’s financial and administrative. Insurance companies enforce “step therapy” requirements, demanding patients fail on cheaper medications before approving biologics, even when physicians believe earlier biologic intervention is warranted.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This isn’t just bureaucratic friction: <strong>it’s measurable delay in effective treatment for a progressive, tissue-damaging disease.</strong></p>
+</div>
+</div>
+</section>
+<section id="who-is-on-biologics-and-who-isnt" class="level3">
+<h3 class="anchored" data-anchor-id="who-is-on-biologics-and-who-isnt">🩺 Who Is on Biologics, and Who Isn’t?</h3>
+<p><strong>68% (34/50) of patients appear to be on a biologic</strong>, but this snapshot understates the progression story. The funnel provides clearer context: nearly every patient has had biologics discussed, and engagement narrows predictably at each stage.</p>
+<p><strong>90% discussed → 72% ever used → 68% currently on</strong></p>
+<p>The 4% gap between “ever used” and “currently on” represents two patients who discontinued — a small but strategically important segment. More importantly, <em>the gap between discussion and adoption isn’t driven by ignorance — it’s driven by access</em>.</p>
+<iframe src="../assets/projects/ai-patient-journey/q1_biologic_adoption.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
+<p>Adoption also increases with disease duration, consistent with step-up therapy dynamics. Patients diagnosed less than one year ago show lower current biologic use not because of resistance, but because they have not yet progressed through conventional lines of therapy — positioning them as future biologic candidates rather than permanent non-adopters.</p>
+<p>Among the 34 patients on biologics, <strong>Humira (adalimumab)</strong> dominates with 25 mentions, followed by Remicade (infliximab) at 18 and Stelara (ustekinumab) at 12. This aligns with Humira’s first-mover advantage and subcutaneous convenience, though Remicade’s strong showing reflects its continued role for severe or refractory cases.</p>
+</section>
+<section id="the-barrier-landscape-distinct-patient-archetypes" class="level3">
+<h3 class="anchored" data-anchor-id="the-barrier-landscape-distinct-patient-archetypes">🧱 The Barrier Landscape: Distinct Patient Archetypes</h3>
+<p>The 16 patients not on biologics aren’t a monolith. They fall into distinct archetypes, each requiring a different intervention according to the biologic barriers they face.</p>
+<iframe src="../assets/projects/ai-patient-journey/q2_biologic_barriers.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
+<p><strong>1. The Insurance-Blocked Patient (69%)</strong> The largest group. These patients have physicians who want to prescribe biologics, but insurance denies coverage or demands step therapy failures first. Some face catastrophic out-of-pocket costs.</p>
+<p><strong>2. The Fear-Driven Patient (62%)</strong> Patients who are medically eligible but terrified of side effects — cancer risk, serious infections, immunosuppression. Often amplified by online research.</p>
+<p><strong>3. The Doctor-Deferred Patient (25%)</strong> Physicians who are hesitant to escalate, preferring to exhaust conventional options first — sometimes beyond what guidelines recommend.</p>
+<p><strong>4. The Preference-Driven Patient (19%)</strong> Patients who prefer to explore non-biologic options, whether due to personal beliefs, desire for autonomy, or reluctance to commit to long-term injectable therapy.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Critical Insight
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Cost/insurance co-occurs with nearly every other barrier.</strong> A patient might fear side effects and face insurance denials and have a hesitant doctor. Solving any single barrier in isolation won’t move the needle — <strong>interventions need to address the <em>cluster</em>.</strong></p>
+</div>
+</div>
+<iframe src="../assets/projects/ai-patient-journey/q2_barrier_cooccurrence.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
+</section>
+<section id="the-referral-maze-70-are-initially-misdiagnosed" class="level3">
+<h3 class="anchored" data-anchor-id="the-referral-maze-70-are-initially-misdiagnosed">🏥 The Referral Maze: 70% Are Initially Misdiagnosed</h3>
+<p>Perhaps the most striking finding is the referral pathway data. Patients navigate a median of <strong>4 provider steps</strong> from first symptoms to established care (range: 2–12). The dominant path is:</p>
+<p><strong>GP/Primary Care → Gastroenterologist → Specialist(s) → Mental Health</strong></p>
+<p>But 70% of patients (35/50) were initially misdiagnosed — most commonly as <strong>IBS</strong> or told their symptoms were <strong>stress-related</strong>. This misdiagnosis introduces significant diagnostic delay, during which disease progression continues unchecked.</p>
+<iframe src="../assets/projects/ai-patient-journey/q4_misdiagnosis_impact.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
+<p>The Sankey diagram shows the branching complexity: patients bounce between GPs, ERs, multiple GI specialists, surgeons, and mental health providers before their care stabilizes. The <em>real</em> market access challenge may begin years before the biologic conversation — at the point of initial misdiagnosis.</p>
+</section>
+</section>
+<section id="data-limitations-churn-bias" class="level2">
+<h2 class="anchored" data-anchor-id="data-limitations-churn-bias">⚖️ Data Limitations &amp; Churn Bias</h2>
+<section id="the-churn-problem" class="level3">
+<h3 class="anchored" data-anchor-id="the-churn-problem">🔁 The Churn Problem</h3>
+<p>Of 50 transcripts, 44 are classified as “complete” interviews (completeness score ≥ 0.75) and 6 are “partial” (lower completeness scores). The partial transcripts correspond to shorter interviews with less treatment history.</p>
+<p>The critical question: <strong>does patient incompleteness correlate with biologic adoption?</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Group</th>
+<th>n</th>
+<th>On Biologic</th>
+<th>Adoption Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Complete interviews</td>
+<td>44</td>
+<td>32</td>
+<td><strong>72%</strong></td>
+</tr>
+<tr class="even">
+<td>Partial interviews</td>
+<td>6</td>
+<td>2</td>
+<td><strong>33%</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>Overall</strong></td>
+<td><strong>50</strong></td>
+<td><strong>34</strong></td>
+<td><strong>68%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The difference is stark: 72% vs 33%. This means our headline 68% adoption rate is likely an <strong>overestimate</strong> of the true population rate and thus to be taken as an <em>upper-bound</em> estimate, because patients with more complete records are more likely to be on biologics.</p>
+<iframe src="../assets/projects/ai-patient-journey/churn_bias_scatter.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
+</section>
+<section id="why-this-matters" class="level3">
+<h3 class="anchored" data-anchor-id="why-this-matters">💡 Why This Matters</h3>
+<p>If incomplete interviews represent patients who disengaged from the healthcare system, then the “real” untreated population is larger than our 32% estimate suggests. The patients we <em>can’t</em> fully see in the data — those who dropped out before reaching a biologic conversation — may represent the highest-need, hardest-to-reach segment.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Direction of Bias
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>The direction of bias is important:</strong> it makes the addressable opportunity look <em>smaller</em> than it actually is. <strong>The true population eligible for biologic outreach is likely larger than 32%.</strong></p>
+</div>
+</div>
+</section>
+<section id="communicating-uncertainty" class="level3">
+<h3 class="anchored" data-anchor-id="communicating-uncertainty">📢 Communicating Uncertainty</h3>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Interpret as Directional Signals, Not Precise Measurements
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>The <strong>68% biologic adoption rate is a reasonable estimate</strong> for patients <em>engaged enough to complete an interview</em>. The true population rate is likely lower.</li>
+<li><strong>Cost/insurance being the #1 barrier is a high-confidence finding</strong> — it appears across both complete and partial interviews, is corroborated by entity extraction, and aligns with published literature on biologic access.</li>
+<li><strong>The treatment ladder</strong> (median 3 steps to biologic) <strong>is robust</strong> because it’s derived from ordered sequences within individual transcripts, not cross-patient comparisons.</li>
+<li>The <strong>70% misdiagnosis</strong> rate should be treated as <strong>directionally correct</strong> <em>but potentially inflated</em> — patients in interviews may over-report negative experiences.</li>
+</ul>
+</div>
+</div>
+</section>
+</section>
+<section id="technical-implementation" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="technical-implementation">🔬 Technical Implementation</h2>
+<section id="pipeline-architecture" class="level3">
+<h3 class="anchored" data-anchor-id="pipeline-architecture">🏗️ Pipeline Architecture</h3>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Core Design Principles
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The extraction pipeline transforms unstructured transcripts into structured records through a multi-stage AI engineering workflow designed around three core principles:</p>
+<ol type="1">
+<li><strong>Structured extraction with confidence scoring</strong></li>
+<li><strong>Churn detection as a first-class concept</strong></li>
+<li><strong>Async processing with rate limit management</strong></li>
+</ol>
+</div>
+</div>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart
+    A[📄 interviews.json&lt;br&gt;50 transcripts] --&gt; B[🧪 EDA Notebook&lt;br&gt;NLP / Topics]
+    B --&gt; C[📐 Schema Design&lt;br&gt;Pydantic models]
+    C --&gt; D[🤖 LLM Extraction&lt;br&gt;Gemini 2.5 Flash / Lite]
+    D --&gt; E[📊 Analysis&lt;br&gt;pandas]
+    E --&gt; F[📈 Visualization&lt;br&gt;Plotly]
+
+    style A fill:#f9f,stroke:#333,stroke-width:1px
+    style B fill:#bbf,stroke:#333,stroke-width:1px
+    style C fill:#bfb,stroke:#333,stroke-width:1px
+    style D fill:#ffb,stroke:#333,stroke-width:1px
+    style E fill:#fbb,stroke:#333,stroke-width:1px
+    style F fill:#fbf,stroke:#333,stroke-width:1px
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Component</th>
+<th>Technology</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Schema</td>
+<td>Pydantic v2</td>
+<td>13 enums, 8 nested models, confidence scores on every field</td>
+</tr>
+<tr class="even">
+<td>Extraction</td>
+<td>instructor + litellm</td>
+<td>Structured LLM output with chain-of-thought prompting</td>
+</tr>
+<tr class="odd">
+<td>LLM</td>
+<td>Gemini 2.5 Flash / Flash Lite</td>
+<td>Free-tier models with round-robin rotation</td>
+</tr>
+<tr class="even">
+<td>Analysis</td>
+<td>pandas + Python</td>
+<td>Research question analysis with churn-adjusted metrics</td>
+</tr>
+<tr class="odd">
+<td>Visualization</td>
+<td>Plotly</td>
+<td>Interactive charts with hover, zoom, pan</td>
+</tr>
+<tr class="even">
+<td>EDA</td>
+<td>scikit-learn, wordcloud, VADER</td>
+<td>Topic modeling (LDA/NMF), TF-IDF, entity extraction</td>
+</tr>
+<tr class="odd">
+<td>Testing</td>
+<td>pytest</td>
+<td>16 unit tests covering schema, data loading, analysis</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="key-design-decisions" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="key-design-decisions">🎯 Key Design Decisions</h3>
+<p><strong>1. Chain-of-thought extraction:</strong> The LLM is prompted to first <em>identify</em> relevant information by category, then <em>structure</em> it into the Pydantic schema. This two-step approach improves accuracy on complex temporal reasoning (treatment order, referral sequences).</p>
+<p><strong>2. Confidence scoring:</strong> Every extracted field carries a confidence level (HIGH / MEDIUM / LOW / NOT_FOUND). This lets downstream analysis weight findings appropriately and distinguishes “patient is not on biologic” from “we don’t know if patient is on biologic.”</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p>Confidence scoring is critical for healthcare analytics where missing data vs.&nbsp;negative findings have different clinical implications.</p>
+</div></div><p><strong>3. Churn as a first-class concept:</strong> The <code>DataCompleteness</code> model explicitly tracks completeness scores, churn indicators, and missing information — enabling the bias analysis that became central to interpreting results.</p>
+<p><strong>4. Async extraction with model rotation:</strong> The pipeline uses <code>asyncio</code> with semaphore-based concurrency, rotating requests across multiple Gemini models to maximize free-tier throughput (~3× faster than sequential). This was essential for processing 50 transcripts without hitting rate limits.</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simplified async pattern</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="cf">with</span> asyncio.Semaphore(<span class="dv">5</span>):</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    tasks <span class="op">=</span> [extract(t, model)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>             <span class="cf">for</span> t, model <span class="kw">in</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>             <span class="bu">zip</span>(transcripts, cycle(models))]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    results <span class="op">=</span> <span class="cf">await</span> asyncio.gather(<span class="op">*</span>tasks)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div></div></section>
+<section id="schema-design" class="level3">
+<h3 class="anchored" data-anchor-id="schema-design">📐 Schema Design</h3>
+<p>The Pydantic schema captures the full complexity of each patient record — demographics, diagnosis, treatment sequences, biologic status with barriers, referral pathways, and data completeness with churn indicators.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Core schema structure (simplified for readability)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PatientRecord(BaseModel):</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    patient_id: <span class="bu">str</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    demographics: Demographics           <span class="co"># age, gender, occupation, comorbidities</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    diagnosis_status: DiagnosisStatus     <span class="co"># confirmed, misdiagnosed, unknown</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    treatments: <span class="bu">list</span>[Treatment]           <span class="co"># ordered sequence with type, outcome, confidence</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    biologic_status: BiologicStatus       <span class="co"># current use, barriers, barrier details</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    referral_pathway: <span class="bu">list</span>[ReferralStep]  <span class="co"># provider type, action taken, wait time</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    emotional_themes: <span class="bu">list</span>[<span class="bu">str</span>]</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    data_completeness: DataCompleteness   <span class="co"># completeness score, churn indicator</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This schema evolved through exploratory data analysis. Before building the extraction pipeline, I performed classical NLP analysis (TF-IDF, topic modeling with LDA/NMF, sentiment analysis with VADER, regex-based entity extraction) to understand corpus structure and identify the key information dimensions that needed capture. The 5 dominant themes that emerged — medication management, healthcare navigation, family burden, mental health, and chronic illness complications — directly informed the schema design.</p>
+</section>
+<section id="data-quality-assessment" class="level3">
+<h3 class="anchored" data-anchor-id="data-quality-assessment">✅ Data Quality Assessment</h3>
+<p>Before analyzing the four research questions, I built a completeness scoring system to detect potential survivorship bias. Each record receives a completeness score based on how many schema fields contain high-confidence data vs.&nbsp;missing values.</p>
+<iframe src="../assets/projects/ai-patient-journey/data_quality_completeness.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>AI Engineering Meets Research Rigor
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The completeness distribution revealed that 6/50 records clustered in the low-completeness, low-treatment corner — the early warning signal that led to the churn bias analysis. <strong>The pipeline didn’t just extract data, it <em>quantified extraction quality</em> and surfaced potential biases before results were interpreted.</strong></p>
+</div>
+</div>
+</section>
+</section>
+<section id="treatment-landscape-deep-dive" class="level2">
+<h2 class="anchored" data-anchor-id="treatment-landscape-deep-dive">💊 Treatment Landscape Deep Dive</h2>
+<p>To understand pre-biologic treatment patterns, I extracted medication sequences and classified drugs by therapeutic class using regex patterns matched against clinical terminology:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>MEDICATIONS <span class="op">=</span> {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"aminosalicylates"</span>: [<span class="st">"mesalamine"</span>, <span class="st">"sulfasalazine"</span>, <span class="st">"asacol"</span>, ...],</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"corticosteroids"</span>: [<span class="st">"prednisone"</span>, <span class="st">"budesonide"</span>, <span class="st">"prednisolone"</span>, ...],</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"immunomodulators"</span>: [<span class="st">"methotrexate"</span>, <span class="st">"azathioprine"</span>, <span class="st">"6-mp"</span>, ...],</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"biologics"</span>: [<span class="st">"humira"</span>, <span class="st">"remicade"</span>, <span class="st">"stelara"</span>, <span class="st">"entyvio"</span>, ...],</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This baseline extraction served dual purposes: (1) validation benchmark for LLM accuracy, and (2) treatment ladder analysis independent of LLM interpretation. The consistency between regex counts and LLM-extracted sequences gave confidence in the treatment ordering.</p>
+<iframe src="../assets/projects/ai-patient-journey/q3_treatment_landscape.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
+<p>The ladder analysis shows aminosalicylates (64%), corticosteroids (52%), and immunomodulators (68%) forming the expected step-up progression. What makes this analysis engineering-focused rather than just descriptive: the extraction pipeline preserved <em>temporal order</em> within each patient’s treatment sequence, enabling ladder reconstruction that respects individual patient journeys rather than aggregating across population.</p>
+</section>
+<section id="evidence-summary-confidence-assessment" class="level2">
+<h2 class="anchored" data-anchor-id="evidence-summary-confidence-assessment">📊 Evidence Summary &amp; Confidence Assessment</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Question</th>
+<th>Finding</th>
+<th>Confidence</th>
+<th>Key Caveat</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Biologic adoption</td>
+<td>68% currently on biologic</td>
+<td><strong>Medium-High</strong></td>
+<td>Upper-bound estimate; churn bias means true rate is likely lower (55–65%)</td>
+</tr>
+<tr class="even">
+<td>Main barriers</td>
+<td>Cost/insurance (69%), fear (62%), doctor hesitancy (25%)</td>
+<td><strong>High</strong></td>
+<td>Corroborated across extraction + regex + topic modeling; robust to churn</td>
+</tr>
+<tr class="odd">
+<td>Treatment ladder</td>
+<td>Median 3 steps; aminosalicylates → corticosteroids → immunomodulators → biologic</td>
+<td><strong>High</strong></td>
+<td>Based on narrative order, not verified clinical records</td>
+</tr>
+<tr class="even">
+<td>Referral pathway</td>
+<td>70% misdiagnosed; median 4 provider steps</td>
+<td><strong>Medium</strong></td>
+<td>May be inflated by recall bias in interview setting</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">🎯 Conclusion</h2>
+<p>This project demonstrates an end-to-end GenAI pipeline for extracting structured clinical intelligence from unstructured patient narratives. The combination of classical NLP for exploration, LLM-powered extraction for structured output, confidence scoring, churn detection, and survivorship bias analysis provides a methodological template for healthcare text analytics at scale.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Most Actionable Finding
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Cost and insurance barriers, not clinical resistance, gate biologic access.</strong> This finding is high-confidence, corroborated across multiple extraction methods, and robust to the churn bias present in our data. The 70% misdiagnosis rate and median 4-step referral pathway suggest that market access challenges begin years before the biologic conversation — at the point of initial misdiagnosis.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Key AI Engineering Contributions
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>Structured extraction with validation</strong>: Pydantic schemas + confidence scoring + baseline regex comparison</li>
+<li><strong>Bias quantification</strong>: Churn detection and completeness scoring as first-class pipeline outputs</li>
+<li><strong>Async optimization</strong>: Model rotation and semaphore-based concurrency for free-tier LLM throughput</li>
+<li><strong>Transparent uncertainty</strong>: Every finding presented with confidence levels and methodological caveats</li>
+</ul>
+</div>
+</div>
+<p>The pipeline’s design decisions are transferable to any domain where unstructured text needs to become structured, analyzable data — particularly in healthcare, legal, or customer research contexts where data quality and bias detection are as important as the insights themselves.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/marcocamilo\.com");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<span id="copyright">© <span id="year"></span> Marco-Andrés Camilo-Pietri</span>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+</body></html>

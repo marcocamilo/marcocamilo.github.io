@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.45">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,6 +10,9 @@
 
 <title>BERT, Encoders and Linear Models for Resume Text Classification – marcocamilo</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -22,8 +25,9 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 /* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -34,7 +38,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -65,17 +69,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-a06763021a52c43c40a351ac8b799b8f.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-dbc92dda8186f57fa2e333fbb71d6a9d.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-a06763021a52c43c40a351ac8b799b8f.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-ffead1f4cee643b8aa7f01e3a75b2893.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-b58ffd3c629dc4e5254208ba48bb3f49.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-ffead1f4cee643b8aa7f01e3a75b2893.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -115,10 +122,9 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-QQJ3PCTWK5', { 'anonymize_ip': true});
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -131,7 +137,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -150,7 +156,169 @@ window.Quarto = {
 <link rel="stylesheet" href="../assets/css/global.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -235,6 +403,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content page-columns page-full" id="quarto-document-content">
 
+
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">BERT, Encoders and Linear Models for Resume Text Classification</h1>
@@ -292,10 +461,10 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="preprocessing">Preprocessing</h2>
 <p>Data preprocessing involved two tasks: text preprocessing and data rebalancing.</p>
 <p>For text cleaning, I developed a custom&nbsp;<code>preprocessing</code>&nbsp;function that integrates several operations into a streamlined pipeline. This function is highly adaptable, with parameters to handle tasks such as converting text to lowercase, decoding HTML, removing emails and URLs, eliminating special characters, expanding contractions, applying custom regex cleaning, and performing tokenization, stemming, lemmatization, and stopword removal. In particular, I improved the text quality by eliminating noise like non-existent words and frequent, resume-specific stopwords such as months, function verbs, and section headings.</p>
-<div id="051f49b5" class="cell" data-execution_count="1">
+<div id="1f00551a" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> unidecode <span class="im">import</span> unidecode</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> contractions</span>
@@ -331,19 +500,19 @@ window.Quarto = {
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove Emails</span></span>
 <span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> remove_emails:</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"([a-z0-9+._-]+@[a-z0-9+._-]+\.[a-z0-9+_-]+)"</span>, <span class="st">" "</span>, cleaned_text)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"</span><span class="kw">(</span><span class="pp">[a-z0-9+._-]</span><span class="op">+</span><span class="vs">@</span><span class="pp">[a-z0-9+._-]</span><span class="op">+</span><span class="ch">\.</span><span class="pp">[a-z0-9+_-]</span><span class="op">+</span><span class="kw">)</span><span class="vs">"</span>, <span class="st">" "</span>, cleaned_text)</span>
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># URL removal</span></span>
 <span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> remove_urls:</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>        cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"(http|https|ftp|ssh)://[\w_-]+(?:\.[\w_-]+)+[\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-]?"</span>, <span class="st">" "</span>, cleaned_text)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>        cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"</span><span class="kw">(</span><span class="vs">http</span><span class="cf">|</span><span class="vs">https</span><span class="cf">|</span><span class="vs">ftp</span><span class="cf">|</span><span class="vs">ssh</span><span class="kw">)</span><span class="vs">://</span><span class="pp">[</span><span class="dv">\w</span><span class="pp">_-]</span><span class="op">+</span>(?:<span class="ch">\.</span><span class="pp">[</span><span class="dv">\w</span><span class="pp">_-]</span><span class="op">+</span>)<span class="op">+</span><span class="pp">[</span><span class="dv">\w</span><span class="pp">.,@?^=%&amp;:/~+#-]</span><span class="op">*</span><span class="pp">[</span><span class="dv">\w</span><span class="pp">@?^=%&amp;/~+#-]</span><span class="op">?</span><span class="vs">"</span>, <span class="st">" "</span>, cleaned_text)</span>
 <span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove escape sequences and special characters</span></span>
 <span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> remove_special_chars:</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>        cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"[^\x00-\x7f]"</span>, <span class="st">" "</span>, cleaned_text)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>        cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"</span><span class="pp">[^</span><span class="ch">\x00</span><span class="pp">-</span><span class="ch">\x7f</span><span class="pp">]</span><span class="vs">"</span>, <span class="st">" "</span>, cleaned_text)</span>
 <span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>        cleaned_text <span class="op">=</span> unidecode(cleaned_text)</span>
 <span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove multiple characters</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"(.)\1{3,}"</span>, <span class="vs">r"\1"</span>, cleaned_text)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"</span><span class="kw">(</span><span class="dv">.</span><span class="kw">)</span><span class="ch">\1</span><span class="op">{3,}</span><span class="vs">"</span>, <span class="vs">r"</span><span class="ch">\1</span><span class="vs">"</span>, cleaned_text)</span>
 <span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Expand contractions</span></span>
 <span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> expand_contractions:</span>
@@ -352,17 +521,17 @@ window.Quarto = {
 <span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove digits</span></span>
 <span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> remove_digits:</span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>        cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"\d"</span>, <span class="st">" "</span>, cleaned_text)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>        cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"</span><span class="dv">\d</span><span class="vs">"</span>, <span class="st">" "</span>, cleaned_text)</span>
 <span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Punctuation removal</span></span>
 <span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> remove_punct:</span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>        cleaned_text <span class="op">=</span> re.sub(<span class="st">"[!</span><span class="ch">\"</span><span class="st">#$%&amp;</span><span class="ch">\\</span><span class="st">'()*+\,-./:;&lt;=&gt;?@\[\]\^_`{|}~]"</span>, <span class="st">" "</span>, cleaned_text)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>        cleaned_text <span class="op">=</span> re.sub(<span class="st">"[!</span><span class="ch">\"</span><span class="st">#$%&amp;</span><span class="ch">\\</span><span class="st">'()*+</span><span class="er">\</span><span class="st">,-./:;&lt;=&gt;?@</span><span class="er">\</span><span class="st">[</span><span class="er">\</span><span class="st">]</span><span class="er">\</span><span class="st">^_`{|}~]"</span>, <span class="st">" "</span>, cleaned_text)</span>
 <span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Line break and tab removal</span></span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"[\n\t]"</span>, <span class="st">" "</span>, cleaned_text)</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"</span><span class="pp">[</span><span class="ch">\n\t</span><span class="pp">]</span><span class="vs">"</span>, <span class="st">" "</span>, cleaned_text)</span>
 <span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Excessive spacing removal</span></span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>    cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"\s+"</span>, <span class="st">" "</span>, cleaned_text).strip()</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>    cleaned_text <span class="op">=</span> re.sub(<span class="vs">r"</span><span class="dv">\s</span><span class="op">+</span><span class="vs">"</span>, <span class="st">" "</span>, cleaned_text).strip()</span>
 <span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Regex (in case, before cleaning)</span></span>
 <span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> lst_regex: </span>
@@ -399,7 +568,7 @@ window.Quarto = {
 <span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> tokenize:</span>
 <span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>            cleaned_text <span class="op">=</span> <span class="st">' '</span>.join(cleaned_text)</span>
 <span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> cleaned_text</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> cleaned_text</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>Next, I converted the <code>Category</code> variable to a numerical format using Scikit-Learn’s <code>LabelEncoder</code> to meet the requirements of the algorithms. After cleaning, I saved the text separately for future use in tasks such as topic modeling and document similarity, where balancing is not required.</p>
@@ -422,8 +591,8 @@ window.Quarto = {
 <section id="import-packages-and-data" class="level3">
 <h3 class="anchored" data-anchor-id="import-packages-and-data">Import Packages and Data</h3>
 <p>In addition to standard libraries, I imported two custom functions: <code>classifier_report</code> to generate classification reports and confusion matrices, and <code>save_performance</code> to store model performance metrics in a JSON file for future analysis. I also loaded a pre-trained Label Encoder to label the encoded categories in subsequent visualizations.</p>
-<div id="01e470aa" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<div id="ea8743ba" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.svm <span class="im">import</span> LinearSVC</span>
@@ -439,16 +608,16 @@ window.Quarto = {
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_parquet(<span class="st">'./data/3-processed/resume-features.parquet'</span>)</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Label model to label categories</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>le <span class="op">=</span> joblib.load(<span class="st">'./models/le-resumes.gz'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>le <span class="op">=</span> joblib.load(<span class="st">'./models/le-resumes.gz'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="baseline-linearsvc" class="level3">
 <h3 class="anchored" data-anchor-id="baseline-linearsvc">Baseline LinearSVC</h3>
 <p>I split the dataset into 70% for training and 30% for testing. I used the <code>tfidf_vectors</code> column as the feature matrix, stacking the vectors into a single matrix with <code>np.vstack</code>. The encoded <code>Category</code> column served as the target variable, and I extracted the variables into a NumPy array using the <code>.values</code> method to improve performance. To verify the split, I printed the shapes of the training and testing sets.</p>
-<div id="96e4f38e" class="cell" data-execution_count="3">
+<div id="5e824902" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.vstack(df[<span class="st">'tfidf_vectors'</span>].values)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.vstack(df[<span class="st">'tfidf_vectors'</span>].values)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df[<span class="st">'Category'</span>].values</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, </span>
@@ -457,17 +626,17 @@ window.Quarto = {
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                                                    random_state<span class="op">=</span><span class="dv">42</span>)</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Training set: </span><span class="sc">{</span>X_train<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>y_train<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Testing set: </span><span class="sc">{</span>X_test<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>y_test<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Testing set: </span><span class="sc">{</span>X_test<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>y_test<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <pre><code>Training set: (2016, 11618), (2016,)
 Testing set: (864, 11618), (864,)</code></pre>
 <p>Next, I trained a Linear SVC model with default hyperparameters and evaluated its performance using the <code>classifier_report</code> function, which generated a classification report and confusion matrix.</p>
-<div id="b25c305d" class="cell" data-execution_count="4">
+<div id="8f024333" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>svc <span class="op">=</span> LinearSVC(dual<span class="op">=</span><span class="st">"auto"</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> classifier_report([X_train, X_test, y_train, y_test], svc, le.classes_, <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>svc <span class="op">=</span> LinearSVC(dual<span class="op">=</span><span class="st">"auto"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> classifier_report([X_train, X_test, y_train, y_test], svc, le.classes_, <span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <pre><code>SVC accruacy score 87.15%</code></pre>
@@ -481,10 +650,10 @@ Testing set: (864, 11618), (864,)</code></pre>
 <p><a href="../assets/projects/resume-analyzer/svc_files/truncated-svd.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5"><img src="../assets/projects/resume-analyzer/svc_files/truncated-svd.png" class="img-fluid"></a></p>
 </div><div id="fn3"><p><sup>3</sup>&nbsp;For an in-depth explanation, see Manning, C.D., Raghavan, P., &amp; Schütze, H. (2008) <a href="https://nlp.stanford.edu/IR-book/pdf/18lsi.pdf">‘Matrix Decompositions and Latent Semantic Indexing’</a>, <em>Introduction to Information Retrieval</em>, 1.</p></div></div><p>Transforming TF-IDF matrices with Truncated SVD is known as Latent Semantic Analysis (LSA). This technique extracts the <span class="math inline">\(n\)</span> largest eigenvalues to capture the most significant semantic relationships between terms and documents, while filtering out noise and low-information features<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
 <p>I used <code>TruncatedSVD</code> to reduce the number of components to 500, which is less than 5% of the original number of features. I then applied this transformation, split the resulting feature matrix into training and testing sets, and proceeded to train the new model.</p>
-<div id="0b6ff802" class="cell" data-execution_count="5">
+<div id="9fac24c4" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>t_svd <span class="op">=</span> TruncatedSVD(n_components<span class="op">=</span><span class="dv">500</span>, algorithm<span class="op">=</span><span class="st">'arpack'</span>)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>t_svd <span class="op">=</span> TruncatedSVD(n_components<span class="op">=</span><span class="dv">500</span>, algorithm<span class="op">=</span><span class="st">'arpack'</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>X_svd <span class="op">=</span> t_svd.fit_transform(X)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
@@ -495,27 +664,27 @@ Testing set: (864, 11618), (864,)</code></pre>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Training set: </span><span class="sc">{</span>X_train_svd<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>y_train_svd<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Testing set: </span><span class="sc">{</span>X_test_svd<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>y_test_svd<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Testing set: </span><span class="sc">{</span>X_test_svd<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>y_test_svd<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <pre><code>Training set: (2016, 500), (2016,)
 Testing set: (864, 500), (864,)</code></pre>
 <p>I trained a new Linear SVC model using the SVD-transformed feature matrix and generated a classification report and confusion matrix.</p>
-<div id="57a2d521" class="cell" data-execution_count="6">
+<div id="7125e96a" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>svc_svd <span class="op">=</span> LinearSVC(dual<span class="op">=</span><span class="st">"auto"</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> classifier_report([X_train_svd, X_test_svd, y_train_svd, y_test_svd], svc_svd, le.classes_, <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>svc_svd <span class="op">=</span> LinearSVC(dual<span class="op">=</span><span class="st">"auto"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> classifier_report([X_train_svd, X_test_svd, y_train_svd, y_test_svd], svc_svd, le.classes_, <span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <pre><code>SVC accruacy score 84.94%</code></pre>
 <p><a href="../assets/projects/resume-analyzer/svc_files/figure-markdown_strict/cell-6-output-2.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6"><img src="../assets/projects/resume-analyzer/svc_files/figure-markdown_strict/cell-6-output-2.png" class="img-fluid"></a></p>
 <p>The model achieved an <strong>84% accuracy</strong> on the test set, which is slightly lower than the baseline model. However, this performance comes from a model <strong>trained on less than 5%</strong> of the original features, demonstrating that despite the reduced dimensionality, the model retains a high level of accuracy. This highlights the sparsity of the TF-IDF vectors while showcasing that effective accuracy can be maintained with a significantly smaller feature set.</p>
 <p>Before proceeding to the next model, I saved the performance metrics of the baseline model for future comparison.</p>
-<div id="b7985179" class="cell" data-execution_count="7">
+<div id="3a98ac6b" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>save_performance(model_name<span class="op">=</span><span class="st">'LinearSVC'</span>,</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>save_performance(model_name<span class="op">=</span><span class="st">'LinearSVC'</span>,</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                 architecture<span class="op">=</span><span class="st">'default'</span>,</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                 embed_size<span class="op">=</span><span class="st">'n/a'</span>,</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                 learning_rate<span class="op">=</span><span class="st">'n/a'</span>,</span>
@@ -523,7 +692,7 @@ Testing set: (864, 500), (864,)</code></pre>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                 optimizer<span class="op">=</span><span class="st">'n/a'</span>,</span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                 criterion<span class="op">=</span><span class="st">'n/a'</span>,</span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                 accuracy<span class="op">=</span><span class="fl">87.15</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                 )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                 )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -550,10 +719,10 @@ Testing set: (864, 500), (864,)</code></pre>
 <li><strong><code>test_model</code></strong>: Evaluates the model on the test set using the best model saved during training and returns the test accuracy.</li>
 <li><strong><code>save_performance</code></strong>: Saves the model’s performance metrics to a JSON file for future analysis.</li>
 </ul>
-<div id="36f9d464" class="cell" data-execution_count="8">
+<div id="b7fca8ac" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn <span class="im">as</span> nn</span>
@@ -571,18 +740,18 @@ Testing set: (864, 500), (864,)</code></pre>
 <span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> src.modules.dl <span class="im">import</span> train_model, test_model</span>
 <span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> src.modules.utils <span class="im">import</span> save_performance</span>
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.read_parquet(<span class="st">'./data/3-processed/resume-features.parquet'</span>, columns<span class="op">=</span>[<span class="st">'Category'</span>, <span class="st">'cleaned_resumes'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> pd.read_parquet(<span class="st">'./data/3-processed/resume-features.parquet'</span>, columns<span class="op">=</span>[<span class="st">'Category'</span>, <span class="st">'cleaned_resumes'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>When training deep learning models, I always include the option to use a GPU if available and set the <code>device</code> variable accordingly. This approach not only enables the model to utilize parallel computing resources if available, but also makes the code reproducible across different device setups. The snippet below checks for GPU availability and assigns the <code>device</code> variable, which is then used by the <code>DataLoader</code> and the model.</p>
-<div id="4c9557db" class="cell" data-execution_count="9">
+<div id="fd2579de" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> torch.cuda.is_available():</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> torch.cuda.is_available():</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    device <span class="op">=</span> torch.device(<span class="st">"cuda"</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    device <span class="op">=</span> torch.device(<span class="st">'cpu'</span>)</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Using </span><span class="sc">{}</span><span class="st">."</span>.<span class="bu">format</span>(device))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Using </span><span class="sc">{}</span><span class="st">."</span>.<span class="bu">format</span>(device))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <pre><code>Using cpu.</code></pre>
@@ -590,10 +759,10 @@ Testing set: (864, 500), (864,)</code></pre>
 <section id="dataset-and-dataloader" class="level3">
 <h3 class="anchored" data-anchor-id="dataset-and-dataloader">Dataset and DataLoader</h3>
 <p>Before constructing the <code>Dataset</code> class, I defined a <code>tokenization</code> function that initializes the tokenizer, tokenizes the text data, and builds a vocabulary using PyTorch’s <code>get_tokenizer</code> and <code>build_vocab_from_iterator</code> functions. This function returns the tokenized texts for indexing by the <code>DataLoader</code> during training and the vocabulary for determining vocabulary size.</p>
-<div id="89888852" class="cell" data-execution_count="10">
+<div id="8521f0dc" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tokenization(texts, tokenizer_type<span class="op">=</span><span class="st">'basic_english'</span>, specials<span class="op">=</span>[<span class="st">'&lt;unk&gt;'</span>], device<span class="op">=</span>device):</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tokenization(texts, tokenizer_type<span class="op">=</span><span class="st">'basic_english'</span>, specials<span class="op">=</span>[<span class="st">'&lt;unk&gt;'</span>], device<span class="op">=</span>device):</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Instantiate tokenizer</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    tokenizer <span class="op">=</span> get_tokenizer(tokenizer_type)</span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Tokenize text data</span></span>
@@ -606,14 +775,14 @@ Testing set: (864, 500), (864,)</code></pre>
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert tokenized texts to a tensor</span></span>
 <span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    tokenized_texts <span class="op">=</span> [torch.tensor([vocab[token] <span class="cf">for</span> token <span class="kw">in</span> text], dtype<span class="op">=</span>torch.int64, device<span class="op">=</span>device) <span class="cf">for</span> text <span class="kw">in</span> tokens]</span>
 <span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tokenized_texts, vocab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tokenized_texts, vocab</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>Next, I created the <code>ResumeDataset</code> iterator, which preprocesses the text data using the <code>tokenization</code> function and indexes samples for the <code>DataLoader</code> during training. The class includes: - <strong><code>__len__</code></strong>: Returns the length of the dataset. - <strong><code>vocab_size</code></strong>: Provides the size of the vocabulary. - <strong><code>num_class</code></strong>: Returns the number of unique classes in the dataset. - <strong><code>__getitem__</code></strong>: Returns a sample of text and its corresponding label from the dataset.</p>
-<div id="439cb2bb" class="cell" data-execution_count="11">
+<div id="9fd18592" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ResumeDataset(Dataset):</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ResumeDataset(Dataset):</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Dataset initialization and preprocessing</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, data):</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Initialize dataset attributes</span></span>
@@ -639,32 +808,32 @@ Testing set: (864, 500), (864,)</code></pre>
 <span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__getitem__</span>(<span class="va">self</span>, idx):</span>
 <span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>        sequence <span class="op">=</span> <span class="va">self</span>.tokenized_texts[idx]</span>
 <span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>        label <span class="op">=</span> <span class="va">self</span>.labels[idx]</span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> sequence, label</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> sequence, label</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>I also defined a <code>collate_fn</code> function to implement dynamic padding when batching the data. Dynamic padding is a technique used to adjusts sequence lengths to match the longest sequence in each batch, rather than to the longest sequence in the entire dataset. Dynamic padding allows the model to process sequences of varying lengths more efficiently, saving memory and computation time.</p>
-<div id="541d6a0a" class="cell" data-execution_count="12">
+<div id="89f308c5" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> collate_fn(batch):</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> collate_fn(batch):</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    sequences, labels <span class="op">=</span> <span class="bu">zip</span>(<span class="op">*</span>batch)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Pad sequences to the longest sequence in the batch</span></span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    sequences_padded <span class="op">=</span> pad_sequence(sequences, batch_first<span class="op">=</span><span class="va">True</span>, padding_value<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert labels to tensor</span></span>
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> torch.tensor(labels, dtype<span class="op">=</span>torch.<span class="bu">long</span>)</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sequences_padded, labels</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> sequences_padded, labels</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>Finally, I instantiated the <code>ResumeDataset</code> class and split the dataset into 70% training, 15% validation, and 15% test sets using the <code>random_split</code> function. I created <code>DataLoader</code> iterators for each set, applying dynamic padding through the <code>collate_fn</code> function.</p>
-<div id="b2fb2bd0" class="cell" data-execution_count="13">
+<div id="e9639c1a" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> ResumeDataset(data)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> ResumeDataset(data)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>train_dataset, val_dataset, test_dataset <span class="op">=</span> random_split(dataset, [<span class="fl">0.7</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>])</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>train_loader <span class="op">=</span> DataLoader(train_dataset, batch_size<span class="op">=</span><span class="dv">4</span>, shuffle<span class="op">=</span><span class="va">True</span>, collate_fn<span class="op">=</span>collate_fn)</span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>val_loader <span class="op">=</span> DataLoader(val_dataset, batch_size<span class="op">=</span><span class="dv">4</span>, shuffle<span class="op">=</span><span class="va">True</span>, collate_fn<span class="op">=</span>collate_fn)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>test_loader <span class="op">=</span> DataLoader(test_dataset, batch_size<span class="op">=</span><span class="dv">4</span>, shuffle<span class="op">=</span><span class="va">True</span>, collate_fn<span class="op">=</span>collate_fn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>test_loader <span class="op">=</span> DataLoader(test_dataset, batch_size<span class="op">=</span><span class="dv">4</span>, shuffle<span class="op">=</span><span class="va">True</span>, collate_fn<span class="op">=</span>collate_fn)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -675,10 +844,10 @@ Testing set: (864, 500), (864,)</code></pre>
 <p><a href="../assets/projects/resume-analyzer/nn_files/fnn-architecture.jpg" class="lightbox" data-gallery="quarto-lightbox-gallery-8"><img src="../assets/projects/resume-analyzer/nn_files/fnn-architecture.jpg" class="img-fluid"></a></p>
 </div></div><p>The model is a simple FNN with an embedding layer, followed by two fully connected layers with ReLU activation functions, and a final fully connected layer with output size matching the number of classes. The architecture is defined in the <code>SimpleNN</code> class, which takes the vocabulary size, embedding size, number of classes, and an <code>expansion_factor</code> parameter (set to 2) to determine the hidden dimension size.</p>
 <p>The <code>EmbeddingBag</code> function efficiently computes embeddings by first creating embeddings for the input indices and then averaging the output across the sequence dimension. This approach accommodates sequences of varying lengths, allowing the model to process them more efficiently.</p>
-<div id="9ea5d915" class="cell" data-execution_count="14">
+<div id="9c7a9525" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SimpleNN(nn.Module):</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> SimpleNN(nn.Module):</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, vocab_size, embed_size, num_class, expansion_factor<span class="op">=</span><span class="dv">2</span>, dropout<span class="op">=</span><span class="fl">0.1</span>):</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.embedding <span class="op">=</span> nn.EmbeddingBag(vocab_size, embed_size, sparse<span class="op">=</span><span class="va">False</span>)</span>
@@ -695,34 +864,34 @@ Testing set: (864, 500), (864,)</code></pre>
 <span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> F.relu(<span class="va">self</span>.layer2(x))</span>
 <span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.dropout(x)</span>
 <span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.layer3(x)</span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
 <section id="hyperparameters-and-training" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="hyperparameters-and-training">Hyperparameters and Training</h3>
 <p>Before training, I set the hyperparameters for the neural network. The vocabulary size and number of classes are sourced from the <code>ResumeDataset</code> class. The embedding size is set to 60, the learning rate to 1e-3, and the model is trained for 40 epochs.</p>
-<div id="ee018cac" class="cell" data-execution_count="15">
+<div id="4d55cff6" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>vocab_size <span class="op">=</span> dataset.vocab_size()</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>vocab_size <span class="op">=</span> dataset.vocab_size()</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>num_class <span class="op">=</span> dataset.num_class()</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>embed_size <span class="op">=</span> <span class="dv">60</span></span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>lr<span class="op">=</span><span class="fl">0.001</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>epochs <span class="op">=</span> <span class="dv">40</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>epochs <span class="op">=</span> <span class="dv">40</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>I instantiated the model, assigned it to the available device, and defined the loss function and optimizer. The loss function used is Cross Entropy Loss, suitable for multi-class classification, and the optimizer is Adam, known for its adaptive learning rate capabilities. Additionally, I set up a learning rate scheduler to reduce the learning rate by a factor of 0.1 if the validation loss does not improve over a specified <code>patience</code> period, helping to prevent overfitting and enhance generalization. The model and hyperparameters were then passed to the <code>train_model</code> function<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>.</p>
 <div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;During fine-tuning, the model achieved better accuracy with a dropout rate of 0.4.</p></div></div><p>To visualize the training progress, I set the <code>visualize</code> parameter to ‘liveloss’, utilizing the <a href="https://p.migdal.pl/livelossplot/">PlotLosses library</a> for a dynamically updating plot that shows real-time training and validation loss and accuracy. This allows for effective monitoring and adjustment of hyperparameters as needed.</p>
-<div id="bd6c5b60" class="cell" data-execution_count="16">
+<div id="04d8bcd4" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SimpleNN(vocab_size, embed_size, num_class, dropout<span class="op">=</span><span class="fl">0.4</span>).to(device)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SimpleNN(vocab_size, embed_size, num_class, dropout<span class="op">=</span><span class="fl">0.4</span>).to(device)</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>criterion <span class="op">=</span> CrossEntropyLoss()</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> Adam(model.parameters(), lr<span class="op">=</span>lr)</span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>scheduler <span class="op">=</span> ReduceLROnPlateau(loss, patience<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>train_model(model, train_loader, val_loader, epochs, criterion, loss, scheduler, visualize<span class="op">=</span><span class="st">'liveloss'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>train_model(model, train_loader, val_loader, epochs, criterion, loss, scheduler, visualize<span class="op">=</span><span class="st">'liveloss'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p><a href="../assets/projects/resume-analyzer/nn_files/nn-plot.png" class="lightbox" data-gallery="quarto-lightbox-gallery-9"><img src="../assets/projects/resume-analyzer/nn_files/nn-plot.png" class="img-fluid"></a></p>
@@ -742,10 +911,10 @@ Val Loss: 1.3300 | Val Acc: 0.6852
 <section id="evaluation" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="evaluation">Evaluation</h3>
 <p>After training the model, I evaluated its performance on the test set using the <code>test_model</code> function. This function takes the trained model, test data loader, and criterion as inputs, and returns the model’s accuracy on the test set.</p>
-<div id="de826991" class="cell" data-execution_count="17">
+<div id="9b1070ed" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> test_model(model, test_loader, criterion)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> test_model(model, test_loader, criterion)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <pre><code>Test Loss: 1.1444 | Test Acc: 0.7315
@@ -753,10 +922,10 @@ Val Loss: 1.3300 | Val Acc: 0.6852
 <p>The FNN achieved a test accuracy of <strong>73.15%</strong> and a loss of 1.1444. The test performance is consistent with the validation accuracy observed during training, indicating that the model generalizes well to new data and demonstrates robustness in its predictions.</p>
 <p>While the FNN’s accuracy is lower than the baseline model, it is still impressive given the simplicity of the architecture. Performance could be enhanced by incorporating advanced regularization techniques, utilizing pre-trained word embeddings<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>, or increasing model complexity. The next section explores a more advanced Transformer-based architecture that leverages self-attention mechanisms to capture long-range dependencies in the data.</p>
 <div class="no-row-height column-margin column-container"><div id="fn6"><p><sup>6</sup>&nbsp;Examples of pre-trained embeddings include: <a href="https://code.google.com/archive/p/word2vec/">Word2Vec</a>, <a href="https://nlp.stanford.edu/projects/glove/">GloVe</a>, and <a href="https://fasttext.cc/">fastText</a>.</p></div></div><p>To conclude this section, I saved the performance metrics of the FNN model for future analysis.</p>
-<div id="3a4e5800" class="cell" data-execution_count="18">
+<div id="d359deb4" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>save_performance(model_name<span class="op">=</span><span class="st">'Feedforward Neural Network'</span>,</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>save_performance(model_name<span class="op">=</span><span class="st">'Feedforward Neural Network'</span>,</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                 architecture<span class="op">=</span><span class="st">'embed_layer-&gt;dropout-&gt;120-&gt;dropout-&gt;60-&gt;dropout-&gt;num_classes'</span>,</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                 embed_size<span class="op">=</span><span class="st">'60'</span>,</span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>                 learning_rate<span class="op">=</span><span class="st">'1e-3'</span>,</span>
@@ -764,7 +933,7 @@ Val Loss: 1.3300 | Val Acc: 0.6852
 <span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                 optimizer<span class="op">=</span><span class="st">'Adam'</span>,</span>
 <span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>                 criterion<span class="op">=</span><span class="st">'CrossEntropyLoss'</span>,</span>
 <span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>                 accuracy<span class="op">=</span><span class="fl">73.15</span>,</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>                 )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>                 )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -805,10 +974,10 @@ Val Loss: 1.3300 | Val Acc: 0.6852
 <li><a href="https://towardsdatascience.com/text-classification-with-transformer-encoders-1dcaa50dabae">Text Classification with Transformer Encoders</a></li>
 </ul>
 </blockquote>
-<div id="5082554d" class="cell" data-execution_count="19">
+<div id="98dd4ce6" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EmbeddingLayer(nn.Module):</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EmbeddingLayer(nn.Module):</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, vocab_size: <span class="bu">int</span>, d_model: <span class="bu">int</span>):</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Dimensions of embedding layer</span></span>
@@ -952,37 +1121,37 @@ Val Loss: 1.3300 | Val Acc: 0.6852
 <span id="cb26-142"><a href="#cb26-142" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.encoder(x, mask)</span>
 <span id="cb26-143"><a href="#cb26-143" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x.mean(dim<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb26-144"><a href="#cb26-144" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.classifier(x)</span>
-<span id="cb26-145"><a href="#cb26-145" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-145"><a href="#cb26-145" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
 <section id="hyperparameters-and-training-1" class="level3">
 <h3 class="anchored" data-anchor-id="hyperparameters-and-training-1">Hyperparameters and Training</h3>
 <p>With the model constructed, I set the training hyperparameters. As with the previous model, I obtain the vocabulary size and number of output features from the <code>ResumeDataset</code> class. The embedding size is set to 80, the hidden dimension to 180, and the multi-head attention mechanism uses 4 heads with an encoder stack of 4 layers. I train the model for 20 epochs with a learning rate of 1e-3.</p>
-<div id="16c98110" class="cell" data-execution_count="20">
+<div id="79a2fdfe" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>vocab_size <span class="op">=</span> dataset.vocab_size()</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>vocab_size <span class="op">=</span> dataset.vocab_size()</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>d_model <span class="op">=</span> <span class="dv">80</span></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>num_heads <span class="op">=</span> <span class="dv">4</span></span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>hidden_dim <span class="op">=</span> <span class="dv">180</span></span>
 <span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>num_layers <span class="op">=</span> <span class="dv">4</span></span>
 <span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>out_features <span class="op">=</span> dataset.num_class()</span>
 <span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>lr <span class="op">=</span> <span class="fl">0.001</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>epochs <span class="op">=</span> <span class="dv">20</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>epochs <span class="op">=</span> <span class="dv">20</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>I instantiated the model with the specified hyperparameters and moved it to the appropriate device. The criterion and optimizer remained unchanged from the previous model, using the Adam optimizer and CrossEntropyLoss for multi-class classification. I also initialized a learning rate scheduler with a patience of 2 epochs to mitigate overfitting. The model was trained using the <code>train_model</code> function.</p>
-<div id="e2cedd11" class="cell" data-execution_count="21">
+<div id="882c7d5c" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> TransformerClassifier(vocab_size, d_model, num_heads, </span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> TransformerClassifier(vocab_size, d_model, num_heads, </span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>                                hidden_dim, num_layers, out_features, dropout<span class="op">=</span><span class="dv">0</span>).to(device)</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>criterion <span class="op">=</span> CrossEntropyLoss()</span>
 <span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>loss <span class="op">=</span> Adam(model.parameters(), lr<span class="op">=</span>lr)</span>
 <span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>scheduler <span class="op">=</span> ReduceLROnPlateau(loss, patience<span class="op">=</span><span class="dv">2</span>)</span>
 <span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>train_model(model, train_loader, val_loader, epochs, criterion, loss, scheduler)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>train_model(model, train_loader, val_loader, epochs, criterion, loss, scheduler)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p><a href="../assets/projects/resume-analyzer/encoder_files/encoder-plot.png" class="lightbox" data-gallery="quarto-lightbox-gallery-12"><img src="../assets/projects/resume-analyzer/encoder_files/encoder-plot.png" class="img-fluid"></a></p>
@@ -1001,10 +1170,10 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 </section>
 <section id="evaluation-1" class="level3">
 <h3 class="anchored" data-anchor-id="evaluation-1">Evaluation</h3>
-<div id="b18eafde" class="cell" data-execution_count="22">
+<div id="7a027cef" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> test_model(model, test_loader, criterion)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> test_model(model, test_loader, criterion)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <pre><code>Test Loss: 1.2526 | Test Acc: 0.7454
@@ -1012,10 +1181,10 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 <p>Despite incorporating a more advanced architecture with a multi-head self-attention mechanism, the Encoder model achieved an <strong>accuracy of 74.5%</strong>, similar to the FNN model. The large gap observed between training and validation performance suggests that this overfitting may be affecting the model’s generalization capabilities.</p>
 <p>With improved training and validation performance, the model could potentially reach higher accuracy on the test set. Enhancing the model’s performance might involve techniques such as data augmentation, adjusting hyperparameters like embedding size, hidden dimensions, and the number of layers, or experimenting with different optimizers and learning rate schedulers.</p>
 <p>As with the previous models, I saved the performance metrics for later analysis.</p>
-<div id="1eff122e" class="cell" data-execution_count="23">
+<div id="eb374ae9" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>save_performance(model_name<span class="op">=</span><span class="st">'Transformer'</span>,</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>save_performance(model_name<span class="op">=</span><span class="st">'Transformer'</span>,</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>                 architecture<span class="op">=</span><span class="st">'embed_layer-&gt;encoder-&gt;linear_layer'</span>,</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                 embed_size<span class="op">=</span><span class="st">'64'</span>,</span>
 <span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>                 learning_rate<span class="op">=</span><span class="st">'1e-3'</span>,</span>
@@ -1023,7 +1192,7 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 <span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>                 optimizer<span class="op">=</span><span class="st">'Adam'</span>,</span>
 <span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>                 criterion<span class="op">=</span><span class="st">'CrossEntropyLoss'</span>,</span>
 <span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>                 accuracy<span class="op">=</span><span class="dv">80</span></span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>                 )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>                 )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -1052,12 +1221,12 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 <li><code>DataCollatorWithPadding</code>: Creates batches with dynamically padded sequences.</li>
 </ul>
 <p>Given BERT’s unique output format, I also imported custom functions <code>train_BERT</code> and <code>test_BERT</code>, designed specifically to handle BERT’s outputs, including input IDs and attention masks, for evaluating the model’s performance.</p>
-<div id="61380de9" class="cell" data-execution_count="24">
+<div id="c63876b1" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> BertModel, BertTokenizer, DataCollatorWithPadding</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> BertModel, BertTokenizer, DataCollatorWithPadding</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> src.modules.dl <span class="im">import</span> train_BERT, test_BERT</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> src.modules.dl <span class="im">import</span> train_BERT, test_BERT</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -1065,10 +1234,10 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 <h3 class="anchored" data-anchor-id="dataset-and-dataloader-1">Dataset and DataLoader</h3>
 <p>Before creating the dataset and <code>DataLoader</code>, I initialized the BERT tokenizer and define the pre-trained BERT model. I then constructed the <code>ResumeBertDataset</code>, which handles the tokenization and preparation of resumes for model input.</p>
 <p>Unlike the previous models, I configured the tokenizer using the <code>.encode_plus</code> method. This method returns a dictionary containing the batch encodings, including tokenized input sequences and attention masks. I set <code>padding</code> to <code>False</code>, as dynamic padding will be managed by the data collator, and <code>truncation</code> to <code>True</code> to truncate sequences that exceed the maximum length. The method also adds the special tokens <code>[CLS]</code> and <code>[SEP]</code>, required by BERT. I use <code>return_tensors='pt'</code> to return PyTorch tensors. The function ultimately returns a dictionary with the processed input sequences, attention masks, and labels.</p>
-<div id="944a502b" class="cell" data-execution_count="25">
+<div id="dfd3f45a" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> BertTokenizer.from_pretrained(<span class="st">'bert-base-uncased'</span>)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> BertTokenizer.from_pretrained(<span class="st">'bert-base-uncased'</span>)</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> ResumeBertDataset(Dataset):</span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, data, max_length, tokenizer<span class="op">=</span>tokenizer, device<span class="op">=</span>device):</span>
@@ -1106,31 +1275,31 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 <span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a>            <span class="st">'input_ids'</span>: input_ids,</span>
 <span id="cb34-37"><a href="#cb34-37" aria-hidden="true" tabindex="-1"></a>            <span class="st">'attention_mask'</span>: attention_mask,</span>
 <span id="cb34-38"><a href="#cb34-38" aria-hidden="true" tabindex="-1"></a>            <span class="st">'labels'</span>: labels</span>
-<span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a>        }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a>        }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>I initialized the dataset and set <code>max_length</code> to 512, the maximum token limit that BERT could handle. I then split the dataset into 70% training, 15% validation, and 15% test sets using the <code>random_split</code> function. To manage varying sequence lengths, I used the <code>DataCollatorWithPadding</code> class, which dynamically padded sequences to the maximum length within each batch. Finally, I created <code>DataLoader</code> instances for the training, validation, and test sets, setting the batch size to 16, enabling data shuffling, and applying the data collator for padding.</p>
-<div id="62a9afbf" class="cell" data-execution_count="26">
+<div id="09a9b330" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> ResumeBertDataset(data, max_length<span class="op">=</span><span class="dv">512</span>)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> ResumeBertDataset(data, max_length<span class="op">=</span><span class="dv">512</span>)</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>train_dataset, val_dataset, test_dataset <span class="op">=</span> random_split(dataset, [<span class="fl">0.7</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>])</span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>data_collator <span class="op">=</span> DataCollatorWithPadding(tokenizer<span class="op">=</span>tokenizer)</span>
 <span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>train_loader <span class="op">=</span> DataLoader(train_dataset, batch_size<span class="op">=</span><span class="dv">16</span>, shuffle<span class="op">=</span><span class="va">True</span>, collate_fn<span class="op">=</span>data_collator)</span>
 <span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>val_loader <span class="op">=</span> DataLoader(val_dataset, batch_size<span class="op">=</span><span class="dv">16</span>, shuffle<span class="op">=</span><span class="va">True</span>, collate_fn<span class="op">=</span>data_collator)</span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>test_loader <span class="op">=</span> DataLoader(test_dataset, batch_size<span class="op">=</span><span class="dv">16</span>, shuffle<span class="op">=</span><span class="va">True</span>, collate_fn<span class="op">=</span>data_collator)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>test_loader <span class="op">=</span> DataLoader(test_dataset, batch_size<span class="op">=</span><span class="dv">16</span>, shuffle<span class="op">=</span><span class="va">True</span>, collate_fn<span class="op">=</span>data_collator)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
 <section id="model-architecture-2" class="level3">
 <h3 class="anchored" data-anchor-id="model-architecture-2">Model Architecture</h3>
 <p>The <code>BertResumeClassifier</code> model comprised the pre-trained BERT base model, a dropout layer, and a linear output layer for resume classification. I utilized the <code>bert-base-uncased</code> pre-trained model to generate contextual embeddings from the input sequences. I extracted these embeddings by indexing the <code>pooler_output</code> key from the output dictionary. The embeddings were then passed through a dropout layer to mitigate overfitting, and subsequently fed into a fully connected linear layer that mapped the embeddings to the desired number of output classes for classification.</p>
-<div id="21e07264" class="cell" data-execution_count="27">
+<div id="c4721d2b" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BertResumeClassifier(nn.Module):</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BertResumeClassifier(nn.Module):</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n_classes: <span class="bu">int</span>, dropout: <span class="bu">float</span> <span class="op">=</span> <span class="fl">0.01</span>):</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
 <span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.bert <span class="op">=</span> BertModel.from_pretrained(<span class="st">'bert-base-uncased'</span>)</span>
@@ -1144,7 +1313,7 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 <span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>        )[<span class="st">'pooler_output'</span>]</span>
 <span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>        output <span class="op">=</span> <span class="va">self</span>.dropout(pooled_output)</span>
 <span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>        output <span class="op">=</span> <span class="va">self</span>.out(output)</span>
-<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> output</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> output</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -1152,17 +1321,17 @@ Val Loss: 1.0709 | Val Acc: 0.7847
 <h3 class="anchored" data-anchor-id="hyperparameters-and-training-2">Hyperparameters and Training</h3>
 <p>Since BERT is a pre-trained model with a fixed input size of 512 tokens, there were fewer parameters to set for the model itself. The primary parameter to configure was the number of output classes, which, as before, was obtained from the <code>Dataset</code> class.</p>
 <p>I initialized the model, loss function, optimizer, and set the number of epochs. I used the Cross Entropy Loss function and the Adam optimizer, adjusting the learning rate to 2e-5, which had shown better performance in preliminary tests. The model was trained for 10 epochs.</p>
-<div id="4c21ae06" class="cell" data-execution_count="28">
+<div id="93081a66" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>n_classes <span class="op">=</span> dataset.num_class()</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>n_classes <span class="op">=</span> dataset.num_class()</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> BertResumeClassifier(n_classes).to(device)</span>
 <span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>criterion <span class="op">=</span> CrossEntropyLoss()</span>
 <span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> Adam(model.parameters(), lr<span class="op">=</span><span class="fl">2e-5</span>)</span>
 <span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>epochs <span class="op">=</span> <span class="dv">10</span></span>
 <span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>train_BERT(model, train_loader, val_loader, epochs, criterion, optimizer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>train_BERT(model, train_loader, val_loader, epochs, criterion, optimizer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p><a href="../assets/projects/resume-analyzer/bert_files/bert-plot.png" class="lightbox" data-gallery="quarto-lightbox-gallery-14"><img src="../assets/projects/resume-analyzer/bert_files/bert-plot.png" class="img-fluid"></a></p>
@@ -1182,20 +1351,20 @@ Val Loss: 0.4143 | Val Acc: 0.9190
 <section id="evaluation-2" class="level3">
 <h3 class="anchored" data-anchor-id="evaluation-2">Evaluation</h3>
 <p>As before, I evaluate the model using the <code>test_model</code> function using the best saved model.</p>
-<div id="3a5fdf0d" class="cell" data-execution_count="29">
+<div id="837b3287" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> test_BERT(model, test_loader, criterion)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>accuracy <span class="op">=</span> test_BERT(model, test_loader, criterion)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <pre><code>Test Loss: 0.3984 | Test Acc: 0.9167
 ✅ Testing complete!</code></pre>
 <p>The BERT model achieved impressive performance on the test set, reaching an <strong>accuracy of 91.67%</strong> with a test loss of 0.3984. This result significantly outperformed all previous models tested. As anticipated from the training and validation performances, the model demonstrated robustness and excellent generalization to unseen data. This was further confirmed by the close alignment between test and validation accuracies, both of which represented datasets not previously seen by the model. The similar accuracy between the validation data and the test data indicated that the model could generalize effectively to new resumes and accurately classify them into the correct categories.</p>
 <p>As with the previous models, I saved its performance using the <code>save_performance</code> function.</p>
-<div id="8b6d7011" class="cell" data-execution_count="30">
+<div id="08290b03" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>save_performance(model_name<span class="op">=</span><span class="st">'BERT'</span>,</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>save_performance(model_name<span class="op">=</span><span class="st">'BERT'</span>,</span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>                 architecture<span class="op">=</span><span class="st">'bert-base-uncased&gt;dropout-&gt;linear_layer'</span>,</span>
 <span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>                 embed_size<span class="op">=</span><span class="st">'768'</span>,</span>
 <span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>                 learning_rate<span class="op">=</span><span class="st">'2e-5'</span>,</span>
@@ -1203,7 +1372,7 @@ Val Loss: 0.4143 | Val Acc: 0.9190
 <span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>                 optimizer<span class="op">=</span><span class="st">'Adam'</span>,</span>
 <span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>                 criterion<span class="op">=</span><span class="st">'CrossEntropyLoss'</span>,</span>
 <span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>                 accuracy<span class="op">=</span><span class="dv">90</span></span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>                 )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>                 )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -1212,14 +1381,14 @@ Val Loss: 0.4143 | Val Acc: 0.9190
 <h2 class="anchored" data-anchor-id="results-and-discussion">Results and Discussion</h2>
 <p>Below I discuss the performance of the classification models, the reasons behind their varying accuracies, and their implications in industry applications.</p>
 <p>All four models achieved accuracies above 70%, in large part thanks to effective data preparation including, involving thorough text preprocessing, data balancing, and advanced vectorization techniques. The models can be categorized into two performance groups: Linear SVC and BERT, both achieving around 90% accuracy, and FNN and Transformer, with approximately 70% accuracy. Interestingly, the highest-performing models are at opposite ends of the complexity spectrum, with Linear SVC being the simplest and BERT the most complex, while the lower-performing models have higher complexity than the baseline. The reasons for these performance differences are discussed below.</p>
-<div id="bbed7685" class="cell" data-execution_count="31">
+<div id="8b4e161a" class="cell">
 <details class="code-fold">
 <summary>View Code</summary>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>evaluation_df <span class="op">=</span> pd.read_json(<span class="st">'./output/classifier_performance.json'</span>).sort_values(by<span class="op">=</span><span class="st">'accuracy'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>evaluation_df <span class="op">=</span> pd.read_json(<span class="st">'./output/classifier_performance.json'</span>).sort_values(by<span class="op">=</span><span class="st">'accuracy'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> sns.barplot(evaluation_df, x<span class="op">=</span><span class="st">'model'</span>, y<span class="op">=</span><span class="st">'accuracy'</span>, hue<span class="op">=</span><span class="st">'model'</span>, palette<span class="op">=</span><span class="st">'hls'</span>)</span>
 <span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>[ax.bar_label(container, fmt<span class="op">=</span><span class="st">"</span><span class="sc">%0.2f%%</span><span class="st">"</span>) <span class="cf">for</span> container <span class="kw">in</span> ax.containers]</span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p><a href="../assets/projects/resume-analyzer/eval_files/model-performances.png" class="lightbox" data-gallery="quarto-lightbox-gallery-15"><img src="../assets/projects/resume-analyzer/eval_files/model-performances.png" class="img-fluid"></a></p>
@@ -1265,383 +1434,256 @@ Val Loss: 0.4143 | Val Acc: 0.9190
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
-window.document.addEventListener("DOMContentLoaded", function (event) {
-  const toggleBodyColorMode = (bsSheetEl) => {
-    const mode = bsSheetEl.getAttribute("data-mode");
-    const bodyEl = window.document.querySelector("body");
-    if (mode === "dark") {
-      bodyEl.classList.add("quarto-dark");
-      bodyEl.classList.remove("quarto-light");
-    } else {
-      bodyEl.classList.add("quarto-light");
-      bodyEl.classList.remove("quarto-dark");
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
     }
-  }
-  const toggleBodyColorPrimary = () => {
-    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-    if (bsSheetEl) {
-      toggleBodyColorMode(bsSheetEl);
-    }
-  }
-  toggleBodyColorPrimary();  
-  const disableStylesheet = (stylesheets) => {
-    for (let i=0; i < stylesheets.length; i++) {
-      const stylesheet = stylesheets[i];
-      stylesheet.rel = 'prefetch';
-    }
-  }
-  const enableStylesheet = (stylesheets) => {
-    for (let i=0; i < stylesheets.length; i++) {
-      const stylesheet = stylesheets[i];
-      stylesheet.rel = 'stylesheet';
-    }
-  }
-  const manageTransitions = (selector, allowTransitions) => {
-    const els = window.document.querySelectorAll(selector);
-    for (let i=0; i < els.length; i++) {
-      const el = els[i];
-      if (allowTransitions) {
-        el.classList.remove('notransition');
-      } else {
-        el.classList.add('notransition');
-      }
-    }
-  }
-  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
-    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
-    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
-    let newTheme = '';
-    if(darkModeDefault) {
-      newTheme = isAlternate ? baseTheme : alternateTheme;
-    } else {
-      newTheme = isAlternate ? alternateTheme : baseTheme;
-    }
-    const changeGiscusTheme = () => {
-      // From: https://github.com/giscus/giscus/issues/336
-      const sendMessage = (message) => {
-        const iframe = document.querySelector('iframe.giscus-frame');
-        if (!iframe) return;
-        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
-      }
-      sendMessage({
-        setConfig: {
-          theme: newTheme
-        }
-      });
-    }
-    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
-    if (isGiscussLoaded) {
-      changeGiscusTheme();
-    }
-  }
-  const toggleColorMode = (alternate) => {
-    // Switch the stylesheets
-    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
-    manageTransitions('#quarto-margin-sidebar .nav-link', false);
-    if (alternate) {
-      enableStylesheet(alternateStylesheets);
-      for (const sheetNode of alternateStylesheets) {
-        if (sheetNode.id === "quarto-bootstrap") {
-          toggleBodyColorMode(sheetNode);
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
         }
       }
-    } else {
-      disableStylesheet(alternateStylesheets);
-      toggleBodyColorPrimary();
-    }
-    manageTransitions('#quarto-margin-sidebar .nav-link', true);
-    // Switch the toggles
-    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
-    for (let i=0; i < toggles.length; i++) {
-      const toggle = toggles[i];
-      if (toggle) {
-        if (alternate) {
-          toggle.classList.add("alternate");     
-        } else {
-          toggle.classList.remove("alternate");
-        }
-      }
-    }
-    // Hack to workaround the fact that safari doesn't
-    // properly recolor the scrollbar when toggling (#1455)
-    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
-      manageTransitions("body", false);
-      window.scrollTo(0, 1);
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-        manageTransitions("body", true);
-      }, 40);  
-    }
-  }
-  const isFileUrl = () => { 
-    return window.location.protocol === 'file:';
-  }
-  const hasAlternateSentinel = () => {  
-    let styleSentinel = getColorSchemeSentinel();
-    if (styleSentinel !== null) {
-      return styleSentinel === "alternate";
-    } else {
       return false;
     }
-  }
-  const setStyleSentinel = (alternate) => {
-    const value = alternate ? "alternate" : "default";
-    if (!isFileUrl()) {
-      window.localStorage.setItem("quarto-color-scheme", value);
-    } else {
-      localAlternateSentinel = value;
-    }
-  }
-  const getColorSchemeSentinel = () => {
-    if (!isFileUrl()) {
-      const storageValue = window.localStorage.getItem("quarto-color-scheme");
-      return storageValue != null ? storageValue : localAlternateSentinel;
-    } else {
-      return localAlternateSentinel;
-    }
-  }
-  const darkModeDefault = false;
-  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
-  // Dark / light mode switch
-  window.quartoToggleColorScheme = () => {
-    // Read the current dark / light value 
-    let toAlternate = !hasAlternateSentinel();
-    toggleColorMode(toAlternate);
-    setStyleSentinel(toAlternate);
-    toggleGiscusIfUsed(toAlternate, darkModeDefault);
-  };
-  // Ensure there is a toggle, if there isn't float one in the top right
-  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
-    const a = window.document.createElement('a');
-    a.classList.add('top-right');
-    a.classList.add('quarto-color-scheme-toggle');
-    a.href = "";
-    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
-    const i = window.document.createElement("i");
-    i.classList.add('bi');
-    a.appendChild(i);
-    window.document.body.appendChild(a);
-  }
-  // Switch to dark mode if need be
-  if (hasAlternateSentinel()) {
-    toggleColorMode(true);
-  } else {
-    toggleColorMode(false);
-  }
-  const icon = "";
-  const anchorJS = new window.AnchorJS();
-  anchorJS.options = {
-    placement: 'right',
-    icon: icon
-  };
-  anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
       }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
     }
-    return false;
-  }
-  const onCopySuccess = function(e) {
-    // button target
-    const button = e.trigger;
-    // don't keep focus
-    button.blur();
-    // flash "checked"
-    button.classList.add('code-copy-button-checked');
-    var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
-    setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
-      button.setAttribute("title", currentTitle);
-      button.classList.remove('code-copy-button-checked');
-    }, 1000);
-    // clear code selection
-    e.clearSelection();
-  }
-  const getTextToCopy = function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
       for (const childEl of codeEl.children) {
         if (isCodeAnnotation(childEl)) {
           childEl.remove();
         }
       }
       return codeEl.innerText;
-  }
-  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-    text: getTextToCopy
-  });
-  clipboard.on('success', onCopySuccess);
-  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
-    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-      text: getTextToCopy,
-      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
     });
-    clipboardModal.on('success', onCopySuccess);
-  }
-    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-    var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/marcocamilo\.com");
-    var isInternal = (href) => {
-        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
     }
-    // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-    for (var i=0; i<links.length; i++) {
-      const link = links[i];
-      if (!isInternal(link.href)) {
-        // undo the damage that might have been done by quarto-nav.js in the case of
-        // links that we want to consider external
-        if (link.dataset.originalHref !== undefined) {
-          link.href = link.dataset.originalHref;
-        }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/marcocamilo\.com");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
-    }
-  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-    const config = {
-      allowHTML: true,
-      maxWidth: 500,
-      delay: 100,
-      arrow: false,
-      appendTo: function(el) {
-          return el.parentElement;
-      },
-      interactive: true,
-      interactiveBorder: 10,
-      theme: 'quarto',
-      placement: 'bottom-start',
-    };
-    if (contentFn) {
-      config.content = contentFn;
-    }
-    if (onTriggerFn) {
-      config.onTrigger = onTriggerFn;
-    }
-    if (onUntriggerFn) {
-      config.onUntrigger = onUntriggerFn;
-    }
-    window.tippy(el, config); 
-  }
-  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-  for (var i=0; i<noterefs.length; i++) {
-    const ref = noterefs[i];
-    tippyHover(ref, function() {
-      // use id or data attribute instead here
-      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-      try { href = new URL(href).hash; } catch {}
-      const id = href.replace(/^#\/?/, "");
-      const note = window.document.getElementById(id);
-      if (note) {
-        return note.innerHTML;
-      } else {
-        return "";
-      }
-    });
-  }
-  const xrefs = window.document.querySelectorAll('a.quarto-xref');
-  const processXRef = (id, note) => {
-    // Strip column container classes
-    const stripColumnClz = (el) => {
-      el.classList.remove("page-full", "page-columns");
-      if (el.children) {
-        for (const child of el.children) {
-          stripColumnClz(child);
-        }
-      }
-    }
-    stripColumnClz(note)
-    if (id === null || id.startsWith('sec-')) {
-      // Special case sections, only their first couple elements
-      const container = document.createElement("div");
-      if (note.children && note.children.length > 2) {
-        container.appendChild(note.children[0].cloneNode(true));
-        for (let i = 1; i < note.children.length; i++) {
-          const child = note.children[i];
-          if (child.tagName === "P" && child.innerText === "") {
-            continue;
-          } else {
-            container.appendChild(child.cloneNode(true));
-            break;
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
           }
         }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(container);
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
         }
-        return container.innerHTML
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
       } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
         if (window.Quarto?.typesetMath) {
           window.Quarto.typesetMath(note);
         }
-        return note.innerHTML;
-      }
-    } else {
-      // Remove any anchor links if they are present
-      const anchorLink = note.querySelector('a.anchorjs-link');
-      if (anchorLink) {
-        anchorLink.remove();
-      }
-      if (window.Quarto?.typesetMath) {
-        window.Quarto.typesetMath(note);
-      }
-      // TODO in 1.5, we should make sure this works without a callout special case
-      if (note.classList.contains("callout")) {
-        return note.outerHTML;
-      } else {
-        return note.innerHTML;
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
       }
     }
-  }
-  for (var i=0; i<xrefs.length; i++) {
-    const xref = xrefs[i];
-    tippyHover(xref, undefined, function(instance) {
-      instance.disable();
-      let url = xref.getAttribute('href');
-      let hash = undefined; 
-      if (url.startsWith('#')) {
-        hash = url;
-      } else {
-        try { hash = new URL(url).hash; } catch {}
-      }
-      if (hash) {
-        const id = hash.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note !== null) {
-          try {
-            const html = processXRef(id, note.cloneNode(true));
-            instance.setContent(html);
-          } finally {
-            instance.enable();
-            instance.show();
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
           }
         } else {
-          // See if we can fetch this
-          fetch(url.split('#')[0])
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
           .then(res => res.text())
           .then(html => {
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.getElementById(id);
+            const note = htmlDoc.querySelector('main.content');
             if (note !== null) {
-              const html = processXRef(id, note);
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
               instance.setContent(html);
             } 
           }).finally(() => {
@@ -1649,190 +1691,167 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             instance.show();
           });
         }
-      } else {
-        // See if we can fetch a full url (with no hash to target)
-        // This is a special case and we should probably do some content thinning / targeting
-        fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const htmlDoc = parser.parseFromString(html, "text/html");
-          const note = htmlDoc.querySelector('main.content');
-          if (note !== null) {
-            // This should only happen for chapter cross references
-            // (since there is no id in the URL)
-            // remove the first header
-            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-              note.children[0].remove();
-            }
-            const html = processXRef(null, note);
-            instance.setContent(html);
-          } 
-        }).finally(() => {
-          instance.enable();
-          instance.show();
-        });
-      }
-    }, function(instance) {
-    });
-  }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            div.style.left = 0;
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-        // Handle positioning of the toggle
-    window.addEventListener(
-      "resize",
-      throttle(() => {
-        elRect = undefined;
-        if (selectedAnnoteEl) {
-          selectCodeLines(selectedAnnoteEl);
-        }
-      }, 10)
-    );
-    function throttle(fn, ms) {
-    let throttle = false;
-    let timer;
-      return (...args) => {
-        if(!throttle) { // first call gets through
-            fn.apply(this, args);
-            throttle = true;
-        } else { // all the others get throttled
-            if(timer) clearTimeout(timer); // cancel #2
-            timer = setTimeout(() => {
-              fn.apply(this, args);
-              timer = throttle = false;
-            }, ms);
-        }
-      };
-    }
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
-  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-  for (var i=0; i<bibliorefs.length; i++) {
-    const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+      }, function(instance) {
       });
     }
-  }
-});
-</script>
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>© 2024 Marco-Andrés Camilo-Pietri</p>
+<span id="copyright">© <span id="year"></span> Marco-Andrés Camilo-Pietri</span>
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
 </div>   
     <div class="nav-footer-center">
       &nbsp;
@@ -1842,7 +1861,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
-<script>var lightboxQuarto = GLightbox({"selector":".lightbox","closeEffect":"zoom","descPosition":"bottom","openEffect":"zoom","loop":false});
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
 (function() {
   let previousOnload = window.onload;
   window.onload = () => {

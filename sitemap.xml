@@ -2,34 +2,38 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://marcocamilo.com/portfolio.html</loc>
-    <lastmod>2024-07-01T20:23:33.331Z</lastmod>
-  </url>
-  <url>
-    <loc>https://marcocamilo.com/portfolio/biodiversity.html</loc>
-    <lastmod>2024-07-29T01:42:21.156Z</lastmod>
+    <lastmod>2026-03-21T15:02:48.328Z</lastmod>
   </url>
   <url>
     <loc>https://marcocamilo.com/portfolio/stock-sentiment-prediction.html</loc>
-    <lastmod>2024-08-18T18:46:41.467Z</lastmod>
+    <lastmod>2026-03-21T16:29:17.672Z</lastmod>
   </url>
   <url>
-    <loc>https://marcocamilo.com/about.html</loc>
-    <lastmod>2024-08-06T00:28:05.000Z</lastmod>
-  </url>
-  <url>
-    <loc>https://marcocamilo.com/index.html</loc>
-    <lastmod>2024-07-01T20:26:14.205Z</lastmod>
-  </url>
-  <url>
-    <loc>https://marcocamilo.com/portfolio/resume-classifier.html</loc>
-    <lastmod>2024-08-31T18:52:06.200Z</lastmod>
+    <loc>https://marcocamilo.com/portfolio/llm-resume-optimizer.html</loc>
+    <lastmod>2026-03-21T16:29:36.799Z</lastmod>
   </url>
   <url>
     <loc>https://marcocamilo.com/portfolio/airline-performance.html</loc>
-    <lastmod>2024-08-31T18:52:21.368Z</lastmod>
+    <lastmod>2026-03-21T16:29:17.671Z</lastmod>
   </url>
   <url>
-    <loc>https://marcocamilo.com/portfolio/ai-resume-optimizer.html</loc>
-    <lastmod>2024-08-31T18:52:06.196Z</lastmod>
+    <loc>https://marcocamilo.com/portfolio/ai-patient-journey.html</loc>
+    <lastmod>2026-03-21T16:29:33.764Z</lastmod>
+  </url>
+  <url>
+    <loc>https://marcocamilo.com/portfolio/biodiversity.html</loc>
+    <lastmod>2026-03-21T16:29:17.671Z</lastmod>
+  </url>
+  <url>
+    <loc>https://marcocamilo.com/portfolio/resume-classifier.html</loc>
+    <lastmod>2026-03-21T16:29:39.688Z</lastmod>
+  </url>
+  <url>
+    <loc>https://marcocamilo.com/about.html</loc>
+    <lastmod>2026-03-21T15:02:48.161Z</lastmod>
+  </url>
+  <url>
+    <loc>https://marcocamilo.com/index.html</loc>
+    <lastmod>2026-03-21T15:02:48.328Z</lastmod>
   </url>
 </urlset>

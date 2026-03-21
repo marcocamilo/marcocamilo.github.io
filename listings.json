@@ -2,21 +2,23 @@
   {
     "listing": "/portfolio.html",
     "items": [
-      "/portfolio/ai-resume-optimizer.html",
+      "/portfolio/ai-patient-journey.html",
+      "/portfolio/airline-performance.html",
       "/portfolio/resume-classifier.html",
       "/portfolio/biodiversity.html",
-      "/portfolio/airline-performance.html",
+      "/portfolio/llm-resume-optimizer.html",
       "/portfolio/stock-sentiment-prediction.html"
     ]
   },
   {
     "listing": "/index.html",
     "items": [
-      "/portfolio/ai-resume-optimizer.html",
+      "/portfolio/ai-patient-journey.html",
+      "/portfolio/llm-resume-optimizer.html",
       "/portfolio/resume-classifier.html",
-      "/portfolio/stock-sentiment-prediction.html",
       "/portfolio/airline-performance.html",
-      "/portfolio/biodiversity.html"
+      "/portfolio/biodiversity.html",
+      "/portfolio/stock-sentiment-prediction.html"
     ]
   }
 ]
