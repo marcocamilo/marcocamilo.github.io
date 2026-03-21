@@ -457,7 +457,7 @@ Tip
 <p>The data reveals a clear, consistent treatment escalation pattern across patients:</p>
 <p><strong>Mesalamine → Prednisone → Azathioprine/Methotrexate → Biologics</strong></p>
 <p>Patients try a median of <strong>3 medications</strong> before reaching their first biologic (range: 0–6). The step-up approach is clinically sound — aminosalicylates (found in 64% of pre-biologic regimens), corticosteroids (52%), and immunomodulators (68%) all serve their role in the ladder.</p>
-<iframe src="../assets/projects/ai-patient-journey/q3_steps_to_biologic.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+<iframe src="../assets/projects/ai-patient-journey/steps_to_biologic.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 <p>But the ladder has a broken rung. When patients reach biologics, many hit a wall that isn’t clinical — it’s financial and administrative. Insurance companies enforce “step therapy” requirements, demanding patients fail on cheaper medications before approving biologics, even when physicians believe earlier biologic intervention is warranted.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
@@ -479,7 +479,7 @@ Warning
 <p><strong>68% (34/50) of patients appear to be on a biologic</strong>, but this snapshot understates the progression story. The funnel provides clearer context: nearly every patient has had biologics discussed, and engagement narrows predictably at each stage.</p>
 <p><strong>90% discussed → 72% ever used → 68% currently on</strong></p>
 <p>The 4% gap between “ever used” and “currently on” represents two patients who discontinued — a small but strategically important segment. More importantly, <em>the gap between discussion and adoption isn’t driven by ignorance — it’s driven by access</em>.</p>
-<iframe src="../assets/projects/ai-patient-journey/q1_biologic_adoption.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+<iframe src="../assets/projects/ai-patient-journey/biologic_adoption.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 <p>Adoption also increases with disease duration, consistent with step-up therapy dynamics. Patients diagnosed less than one year ago show lower current biologic use not because of resistance, but because they have not yet progressed through conventional lines of therapy — positioning them as future biologic candidates rather than permanent non-adopters.</p>
 <p>Among the 34 patients on biologics, <strong>Humira (adalimumab)</strong> dominates with 25 mentions, followed by Remicade (infliximab) at 18 and Stelara (ustekinumab) at 12. This aligns with Humira’s first-mover advantage and subcutaneous convenience, though Remicade’s strong showing reflects its continued role for severe or refractory cases.</p>
@@ -487,7 +487,7 @@ Warning
 <section id="the-barrier-landscape-distinct-patient-archetypes" class="level3">
 <h3 class="anchored" data-anchor-id="the-barrier-landscape-distinct-patient-archetypes">🧱 The Barrier Landscape: Distinct Patient Archetypes</h3>
 <p>The 16 patients not on biologics aren’t a monolith. They fall into distinct archetypes, each requiring a different intervention according to the biologic barriers they face.</p>
-<iframe src="../assets/projects/ai-patient-journey/q2_biologic_barriers.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+<iframe src="../assets/projects/ai-patient-journey/biologic_barriers.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 <p><strong>1. The Insurance-Blocked Patient (69%)</strong> The largest group. These patients have physicians who want to prescribe biologics, but insurance denies coverage or demands step therapy failures first. Some face catastrophic out-of-pocket costs.</p>
 <p><strong>2. The Fear-Driven Patient (62%)</strong> Patients who are medically eligible but terrified of side effects — cancer risk, serious infections, immunosuppression. Often amplified by online research.</p>
@@ -506,7 +506,7 @@ Warning
 <p><strong>Cost/insurance co-occurs with nearly every other barrier.</strong> A patient might fear side effects and face insurance denials and have a hesitant doctor. Solving any single barrier in isolation won’t move the needle — <strong>interventions need to address the <em>cluster</em>.</strong></p>
 </div>
 </div>
-<iframe src="../assets/projects/ai-patient-journey/q2_barrier_cooccurrence.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+<iframe src="../assets/projects/ai-patient-journey/barrier_cooccurrence.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 </section>
 <section id="the-referral-maze-70-are-initially-misdiagnosed" class="level3">
@@ -514,7 +514,7 @@ Warning
 <p>Perhaps the most striking finding is the referral pathway data. Patients navigate a median of <strong>4 provider steps</strong> from first symptoms to established care (range: 2–12). The dominant path is:</p>
 <p><strong>GP/Primary Care → Gastroenterologist → Specialist(s) → Mental Health</strong></p>
 <p>But 70% of patients (35/50) were initially misdiagnosed — most commonly as <strong>IBS</strong> or told their symptoms were <strong>stress-related</strong>. This misdiagnosis introduces significant diagnostic delay, during which disease progression continues unchecked.</p>
-<iframe src="../assets/projects/ai-patient-journey/q4_misdiagnosis_impact.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+<iframe src="../assets/projects/ai-patient-journey/misdiagnosis_impact.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 <p>The Sankey diagram shows the branching complexity: patients bounce between GPs, ERs, multiple GI specialists, surgeons, and mental health providers before their care stabilizes. The <em>real</em> market access challenge may begin years before the biologic conversation — at the point of initial misdiagnosis.</p>
 </section>
@@ -759,7 +759,7 @@ Warning
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"biologics"</span>: [<span class="st">"humira"</span>, <span class="st">"remicade"</span>, <span class="st">"stelara"</span>, <span class="st">"entyvio"</span>, ...],</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This baseline extraction served dual purposes: (1) validation benchmark for LLM accuracy, and (2) treatment ladder analysis independent of LLM interpretation. The consistency between regex counts and LLM-extracted sequences gave confidence in the treatment ordering.</p>
-<iframe src="../assets/projects/ai-patient-journey/q3_treatment_landscape.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+<iframe src="../assets/projects/ai-patient-journey/treatment_landscape.html" width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 <p>The ladder analysis shows aminosalicylates (64%), corticosteroids (52%), and immunomodulators (68%) forming the expected step-up progression. What makes this analysis engineering-focused rather than just descriptive: the extraction pipeline preserved <em>temporal order</em> within each patient’s treatment sequence, enabling ladder reconstruction that respects individual patient journeys rather than aggregating across population.</p>
 </section>
