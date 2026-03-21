@@ -60,7 +60,7 @@ The data reveals a clear, consistent treatment escalation pattern across patient
 
 Patients try a median of **3 medications** before reaching their first biologic (range: 0–6). The step-up approach is clinically sound — aminosalicylates (found in 64% of pre-biologic regimens), corticosteroids (52%), and immunomodulators (68%) all serve their role in the ladder.
 
-<iframe src="/assets/projects/ai-patient-journey/q3_steps_to_biologic.html"
+<iframe src="../assets/projects/ai-patient-journey/steps_to_biologic.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
@@ -78,7 +78,7 @@ This isn't just bureaucratic friction: **it's measurable delay in effective trea
 
 The 4% gap between "ever used" and "currently on" represents two patients who discontinued — a small but strategically important segment. More importantly, *the gap between discussion and adoption isn't driven by ignorance — it's driven by access*.
 
-<iframe src="/assets/projects/ai-patient-journey/q1_biologic_adoption.html"
+<iframe src="../assets/projects/ai-patient-journey/biologic_adoption.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
@@ -90,7 +90,7 @@ Among the 34 patients on biologics, **Humira (adalimumab)** dominates with 25 me
 
 The 16 patients not on biologics aren't a monolith. They fall into distinct archetypes, each requiring a different intervention according to the biologic barriers they face.
 
-<iframe src="/assets/projects/ai-patient-journey/q2_biologic_barriers.html"
+<iframe src="../assets/projects/ai-patient-journey/biologic_barriers.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
@@ -112,7 +112,7 @@ Patients who prefer to explore non-biologic options, whether due to personal bel
 **Cost/insurance co-occurs with nearly every other barrier.** A patient might fear side effects and face insurance denials and have a hesitant doctor. Solving any single barrier in isolation won't move the needle — **interventions need to address the *cluster*.**
 :::
 
-<iframe src="/assets/projects/ai-patient-journey/q2_barrier_cooccurrence.html"
+<iframe src="../assets/projects/ai-patient-journey/barrier_cooccurrence.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
@@ -124,7 +124,7 @@ Perhaps the most striking finding is the referral pathway data. Patients navigat
 
 But 70% of patients (35/50) were initially misdiagnosed — most commonly as **IBS** or told their symptoms were **stress-related**. This misdiagnosis introduces significant diagnostic delay, during which disease progression continues unchecked.
 
-<iframe src="/assets/projects/ai-patient-journey/q4_misdiagnosis_impact.html"
+<iframe src="../assets/projects/ai-patient-journey/misdiagnosis_impact.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
@@ -146,7 +146,7 @@ The critical question: **does patient incompleteness correlate with biologic ado
 
 The difference is stark: 72% vs 33%. This means our headline 68% adoption rate is likely an **overestimate** of the true population rate and thus to be taken as an *upper-bound* estimate, because patients with more complete records are more likely to be on biologics.
 
-<iframe src="/assets/projects/ai-patient-journey/churn_bias_scatter.html"
+<iframe src="../assets/projects/ai-patient-journey/churn_bias_scatter.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
@@ -259,7 +259,7 @@ This schema evolved through exploratory data analysis. Before building the extra
 
 Before analyzing the four research questions, I built a completeness scoring system to detect potential survivorship bias. Each record receives a completeness score based on how many schema fields contain high-confidence data vs. missing values.
 
-<iframe src="/assets/projects/ai-patient-journey/data_quality_completeness.html"
+<iframe src="../assets/projects/ai-patient-journey/data_quality_completeness.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
@@ -284,7 +284,7 @@ MEDICATIONS = {
 
 This baseline extraction served dual purposes: (1) validation benchmark for LLM accuracy, and (2) treatment ladder analysis independent of LLM interpretation. The consistency between regex counts and LLM-extracted sequences gave confidence in the treatment ordering.
 
-<iframe src="/assets/projects/ai-patient-journey/q3_treatment_landscape.html"
+<iframe src="../assets/projects/ai-patient-journey/treatment_landscape.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
