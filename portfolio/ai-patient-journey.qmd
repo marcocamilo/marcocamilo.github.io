@@ -20,149 +20,144 @@ skills:
 
 ![]({{< meta image >}})
 
+## Executive Summary
+
+This project analyzes 50 synthetic interview transcripts from inflammatory bowel disease (IBD) patients using an LLM-powered extraction pipeline to answer four critical research questions:
+
+1. **What is the current rate of biologic adoption among IBD patients?**
+2. **What barriers prevent patients from accessing biologic therapy?**
+3. **What treatment patterns exist before patients reach biologics?**
+4. **How do patients navigate the healthcare system from initial symptoms to established care?**
+
+**The central finding is that cost and insurance — not clinical resistance — is the dominant barrier preventing biologic adoption.** Among the 32% of patients not currently on a biologic, 69% cite cost or insurance obstacles. This represents an addressable market gap:
+
+> Patients and their physicians *want* biologics, but the system makes access difficult.
+
+However, these numbers come with important caveats. Our dataset contains incomplete patient journeys that likely bias results, and the small sample size limits generalizability. This analysis demonstrates how an AI engineering pipeline can extract structured insights from unstructured clinical narratives while transparently accounting for data quality limitations.
+
 ### Key Findings
 
-- **68% of patients are currently on a biologic**, but churn bias suggests the true population rate is lower (55–65%).
-- **Cost and insurance (69%) is the dominant barrier** to biologic adoption — not clinical resistance. This co-occurs with nearly every other barrier.
-- **Median 3 treatment steps** before first biologic, following a consistent ladder: mesalamine → prednisone → immunomodulators → biologics.
-- **70% of patients were initially misdiagnosed** — most commonly as IBS or stress-related — navigating a median of 4 provider steps to established care.
+- **68% of patients are currently on a biologic**, but churn bias suggests the true population rate is lower (55–65%)
+- **Cost and insurance (69%) is the dominant barrier** to biologic adoption — not clinical resistance
+- **Median 3 treatment steps** before first biologic, following a consistent ladder: mesalamine → prednisone → immunomodulators → biologics
+- **70% of patients were initially misdiagnosed** — most commonly as IBS or stress-related — navigating a median of 4 provider steps to established care
 
-## Dataset
+## The Story the Data Tells
 
-The project uses 50 synthetic patient interview transcripts simulating clinical interviews with IBD patients. Each transcript is a first-person narrative covering diagnosis history, treatment sequences, biologic therapy experiences, insurance barriers, referral pathways, and emotional burden. The transcripts vary in length from ~1,000 to ~4,300 characters, with shorter transcripts potentially representing incomplete patient journeys (churn candidates).
+### The Treatment Ladder Is Working... Until It Hits a Wall
 
-![](/assets/projects/ai-patient-journey/corpus_statistics.png)
+The data reveals a clear, consistent treatment escalation pattern across patients:
 
-The dataset is stored as a JSON array where each entry contains a `patient_id` and an `interview_transcript`:
+**Mesalamine → Prednisone → Azathioprine/Methotrexate → Biologics**
 
-```{python}
-#| code-fold: false
-DATA_PATH = Path("../data/interviews.json")
+Patients try a median of **3 medications** before reaching their first biologic (range: 0–6). The step-up approach is clinically sound — aminosalicylates (found in 64% of pre-biologic regimens), corticosteroids (52%), and immunomodulators (68%) all serve their role in the ladder.
 
-with open(DATA_PATH) as f:
-    interviews = json.load(f)
+<iframe src="/assets/projects/ai-patient-journey/q3_steps_to_biologic.html"
+        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
 
-df = pd.DataFrame(interviews)
-df["transcript_length"] = df["interview_transcript"].str.len()
-df["word_count"] = df["interview_transcript"].str.split().str.len()
-df["sentence_count"] = df["interview_transcript"].apply(lambda t: len(re.split(r"[.!?]+", t)))
+But the ladder has a broken rung. When patients reach biologics, many hit a wall that isn't clinical — it's financial and administrative. Insurance companies enforce "step therapy" requirements, demanding patients fail on cheaper medications before approving biologics, even when physicians believe earlier biologic intervention is warranted.
 
-print(f"Interviews loaded: {len(df)}")
-df.iloc[:,-3:].describe()
-```
+This isn't just bureaucratic friction: it's measurable delay in effective treatment for a progressive, tissue-damaging disease.
 
-## Exploratory Data Analysis
+### Who Is on Biologics, and Who Isn't?
 
-### Word Cloud & TF-IDF
+**68% (34/50) of patients appear to be on a biologic**, but this snapshot understates the progression story. The funnel provides clearer context: nearly every patient has had biologics discussed, and engagement narrows predictably at each stage.
 
-Before running any LLM extraction, I performed classical NLP exploration to understand the corpus structure and surface dominant themes. A word cloud (with domain-specific stopwords filtered) and TF-IDF analysis revealed the vocabulary landscape.
+**90% discussed → 72% ever used → 68% currently on**
 
-![](/assets/projects/ai-patient-journey/wordcloud.png)
+The 4% gap between "ever used" and "currently on" represents two patients who discontinued — a small but strategically important segment. More importantly, *the gap between discussion and adoption isn't driven by ignorance — it's driven by access*.
 
-TF-IDF scoring identifies terms that are *distinctive* across transcripts — not just frequent, but discriminative. The top terms confirm the treatment-heavy nature of these interviews and surface both medical terminology and patient experience language.
+<iframe src="/assets/projects/ai-patient-journey/q1_biologic_adoption.html"
+        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
 
-```{python}
-tfidf = TfidfVectorizer(
-    max_features=1000, stop_words="english",
-    ngram_range=(1, 2), min_df=2, max_df=0.85,
-)
-tfidf_matrix = tfidf.fit_transform(df["interview_transcript"])
-feature_names = tfidf.get_feature_names_out()
+Adoption also increases with disease duration, consistent with step-up therapy dynamics. Patients diagnosed less than one year ago show lower current biologic use not because of resistance, but because they have not yet progressed through conventional lines of therapy — positioning them as future biologic candidates rather than permanent non-adopters.
 
-print(f"TF-IDF matrix shape: {tfidf_matrix.shape}")
-print(f"Vocabulary size: {len(feature_names)}")
-```
+Among the 34 patients on biologics, **Humira (adalimumab)** dominates with 25 mentions, followed by Remicade (infliximab) at 18 and Stelara (ustekinumab) at 12. This aligns with Humira's first-mover advantage and subcutaneous convenience, though Remicade's strong showing reflects its continued role for severe or refractory cases.
 
-![](/assets/projects/ai-patient-journey/tfidf_top25.png)
+### The Barrier Landscape: Distinct Patient Archetypes
 
-### N-gram Analysis
+The 16 patients not on biologics aren't a monolith. They fall into distinct archetypes, each requiring a different intervention according to the biologic barriers they face.
 
-Bigrams and trigrams reveal common multi-word expressions. Medical terminology and patient experiences manifest as phrases rather than single words — "chronic illness", "support group", "side effects", and "weight loss" all appear prominently.
+<iframe src="/assets/projects/ai-patient-journey/q2_biologic_barriers.html"
+        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
 
-```{python}
-bigram_vec = CountVectorizer(
-    ngram_range=(2, 2), stop_words="english",
-    min_df=2, max_features=500,
-)
-bigram_matrix = bigram_vec.fit_transform(df["interview_transcript"])
-```
+**1. The Insurance-Blocked Patient (69%)**
+The largest group. These patients have physicians who want to prescribe biologics, but insurance denies coverage or demands step therapy failures first. Some face catastrophic out-of-pocket costs.
 
-![](/assets/projects/ai-patient-journey/ngram_frequency.png)
+**2. The Fear-Driven Patient (62%)**
+Patients who are medically eligible but terrified of side effects — cancer risk, serious infections, immunosuppression. Often amplified by online research.
 
-### Topic Modeling
+**3. The Doctor-Deferred Patient (25%)**
+Physicians who are hesitant to escalate, preferring to exhaust conventional options first — sometimes beyond what guidelines recommend.
 
-I applied two complementary approaches — LDA^[Latent Dirichlet Allocation — a generative probabilistic model that produces interpretable topic distributions.] and NMF^[Non-negative Matrix Factorization — a deterministic decomposition that tends to produce more specific, discriminative topics.] — to discover latent thematic structure across the 50 transcripts.
+**4. The Preference-Driven Patient (19%)**
+Patients who prefer to explore non-biologic options, whether due to personal beliefs, desire for autonomy, or reluctance to commit to long-term injectable therapy.
 
-```{python}
-# LDA
-lda = LatentDirichletAllocation(
-    n_components=5, random_state=42, max_iter=30,
-    learning_method="online",
-)
-doc_topics_lda = lda.fit_transform(doc_term)
+The critical insight is that **cost/insurance co-occurs with nearly every other barrier.** A patient might fear side effects and face insurance denials and have a hesitant doctor. Solving any single barrier in isolation won't move the needle — interventions need to address the *cluster*.
 
-# NMF
-nmf = NMF(n_components=5, random_state=42, max_iter=500, init="nndsvda")
-doc_topics_nmf = nmf.fit_transform(tfidf_matrix)
-```
+<iframe src="/assets/projects/ai-patient-journey/q2_barrier_cooccurrence.html"
+        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
 
-Both models converge on similar thematic clusters:
+### The Referral Maze: 70% Are Initially Misdiagnosed
 
-| Theme | Description |
-|---|---|
-| **Medication & treatment management** | Biologic therapies and medication routines (Humira, Remicade, Stelara, prednisone, injection schedules) |
-| **Healthcare system navigation** | Clinical interactions and care access (insurance, coverage, appointments, diagnosis coordination) |
-| **Family & social responsibilities** | Illness within family and caregiving roles (work–family pressures, relationship strain) |
-| **Mental health & psychological burden** | Emotional and psychiatric challenges (anxiety, depression, coping with flares) |
-| **Chronic illness burden & complications** | Comorbidities and disease impacts (diabetes, arthritis, surgery, complications) |
+Perhaps the most striking finding is the referral pathway data. Patients navigate a median of **4 provider steps** from first symptoms to established care (range: 2–12). The dominant path is:
 
-These 5 themes confirmed that the LLM extraction schema needed to capture treatment sequences, barriers, emotional context, and referral complexity.
+**GP/Primary Care → Gastroenterologist → Specialist(s) → Mental Health**
 
-### Regex-Based Entity Extraction
+But 70% of patients (35/50) were initially misdiagnosed — most commonly as **IBS** or told their symptoms were **stress-related**. This misdiagnosis introduces significant diagnostic delay, during which disease progression continues unchecked.
 
-Before deploying the LLM, I used regex patterns to identify medications, symptoms, and provider types as a baseline to validate LLM output against.
+<iframe src="/assets/projects/ai-patient-journey/q4_misdiagnosis_impact.html"
+        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
 
-```{python}
-MEDICATIONS = {
-    "aminosalicylates": ["mesalamine", "sulfasalazine", "asacol", "pentasa", "lialda"],
-    "corticosteroids": ["prednisone", "budesonide", "prednisolone", "hydrocortisone"],
-    "immunomodulators": ["methotrexate", "azathioprine", "mercaptopurine", "6-mp", "imuran"],
-    "biologics": ["humira", "remicade", "stelara", "entyvio", "adalimumab",
-                  "infliximab", "ustekinumab", "vedolizumab", "cimzia", "certolizumab"],
-}
-```
+The Sankey diagram shows the branching complexity: patients bounce between GPs, ERs, multiple GI specialists, surgeons, and mental health providers before their care stabilizes. The *real* market access challenge may begin years before the biologic conversation — at the point of initial misdiagnosis.
 
-![](/assets/projects/ai-patient-journey/medication_mentions.png)
+## Data Limitations & Churn Bias
 
-![](/assets/projects/ai-patient-journey/entity_extraction.png)
+### The Churn Problem
 
-> **Observations:**
-> - **Biologic mentions dominate**: Humira, Stelara, Remicade
-> - **"Step therapy" is visible**: aminosalicylates → corticosteroids → immunomodulators → biologics matches the treatment escalation ladder
-> - The regex baseline provides ground truth for validating downstream LLM extraction accuracy
+Of 50 transcripts, 44 are classified as "complete" interviews (completeness score ≥ 0.75) and 6 are "partial" (lower completeness scores). The partial transcripts correspond to shorter interviews with less treatment history.
 
-### Sentiment Analysis
+The critical question: **does patient incompleteness correlate with biologic adoption?**
 
-Using VADER^[Valence Aware Dictionary and sEntiment Reasoner — a rule-based sentiment analysis tool particularly suited to social media and informal text.], I mapped the emotional tone across all transcripts.
+| Group | n | On Biologic | Adoption Rate |
+|---|---|---|---|
+| Complete interviews | 44 | 32 | **72%** |
+| Partial interviews | 6 | 2 | **33%** |
+| **Overall** | **50** | **34** | **68%** |
 
-```{python}
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+The difference is stark: 72% vs 33%. This means our headline 68% adoption rate is likely an **overestimate** of the true population rate and thus to be taken as an *upper-bound* estimate, because patients with more complete records are more likely to be on biologics.
 
-analyzer = SentimentIntensityAnalyzer()
-df["sentiment"] = df["interview_transcript"].apply(
-    lambda t: analyzer.polarity_scores(t)["compound"]
-)
-```
+<iframe src="/assets/projects/ai-patient-journey/churn_bias_scatter.html"
+        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
+</iframe>
 
-![](/assets/projects/ai-patient-journey/sentiment_analysis.png)
+### Why This Matters
 
-> Transcripts skew **strongly negative sentiment** — consistent with chronic disease narratives. The tone scatter plot shows most patients use more negative than positive language, confirming the emotional burden dimension that the extraction schema needs to capture.
+If incomplete interviews represent patients who disengaged from the healthcare system, then the "real" untreated population is larger than our 32% estimate suggests. The patients we *can't* fully see in the data — those who dropped out before reaching a biologic conversation — may represent the highest-need, hardest-to-reach segment.
 
-## Pipeline Architecture
+**The direction of bias is important:** it makes the addressable opportunity look *smaller* than it actually is. *The true population eligible for biologic outreach is likely larger than 32%*.
 
-The extraction pipeline transforms unstructured transcripts into structured records through a multi-stage process:
+### Communicating Uncertainty
 
-```{mermaid}
+We recommend interpreting these results as **directional signals, not precise measurements:**
+
+- The **68% biologic adoption rate is a reasonable estimate** for patients *engaged enough to complete an interview*. The true population rate is likely lower.
+- **Cost/insurance being the #1 barrier is a high-confidence finding** — it appears across both complete and partial interviews, is corroborated by entity extraction, and aligns with published literature on biologic access.
+- **The treatment ladder** (median 3 steps to biologic) **is robust** because it's derived from ordered sequences within individual transcripts, not cross-patient comparisons.
+- The **70% misdiagnosis** rate should be treated as **directionally correct** *but potentially inflated* — patients in interviews may over-report negative experiences.
+
+## Technical Implementation
+
+### Pipeline Architecture
+
+The extraction pipeline transforms unstructured transcripts into structured records through a multi-stage AI engineering workflow. I designed the system around three core principles: **structured extraction with confidence scoring**, **churn detection as a first-class concept**, and **async processing with rate limit management**.
+
+```mermaid
 flowchart
     A[📄 interviews.json<br>50 transcripts] --> B[🧪 EDA Notebook<br>NLP / Topics]
     B --> C[📐 Schema Design<br>Pydantic models]
@@ -184,21 +179,41 @@ flowchart
 | Extraction | instructor + litellm | Structured LLM output with chain-of-thought prompting |
 | LLM | Gemini 2.5 Flash / Flash Lite | Free-tier models with round-robin rotation |
 | Analysis | pandas + Python | Research question analysis with churn-adjusted metrics |
-| Visualization | Plotly | Donut, bars, Sankey, histograms |
+| Visualization | Plotly | Interactive charts with hover, zoom, pan |
 | EDA | scikit-learn, wordcloud, VADER | Topic modeling (LDA/NMF), TF-IDF, entity extraction |
 | Testing | pytest | 16 unit tests covering schema, data loading, analysis |
 
-### Schema Design
+### Key Design Decisions
 
-The Pydantic schema captures the full complexity of each patient record — demographics, diagnosis, treatment sequences, biologic status with barriers, referral pathways, and data completeness with churn indicators. Every extracted field carries a confidence level (HIGH / MEDIUM / LOW / NOT_FOUND).
+**1. Chain-of-thought extraction:** The LLM is prompted to first *identify* relevant information by category, then *structure* it into the Pydantic schema. This two-step approach improves accuracy on complex temporal reasoning (treatment order, referral sequences).
+
+**2. Confidence scoring:** Every extracted field carries a confidence level (HIGH / MEDIUM / LOW / NOT_FOUND). This lets downstream analysis weight findings appropriately and distinguishes "patient is not on biologic" from "we don't know if patient is on biologic."
 
 ::: {.column-margin}
-Confidence scoring lets downstream analysis distinguish "patient is not on biologic" from "we don't know if patient is on biologic."
+Confidence scoring is critical for healthcare analytics where missing data vs. negative findings have different clinical implications.
 :::
 
-```{python}
-#| code-fold: false
-# Core schema structure (simplified)
+**3. Churn as a first-class concept:** The `DataCompleteness` model explicitly tracks completeness scores, churn indicators, and missing information — enabling the bias analysis that became central to interpreting results.
+
+**4. Async extraction with model rotation:** The pipeline uses `asyncio` with semaphore-based concurrency, rotating requests across multiple Gemini models to maximize free-tier throughput (~3× faster than sequential). This was essential for processing 50 transcripts without hitting rate limits.
+
+::: {.column-margin}
+```python
+# Simplified async pattern
+async with asyncio.Semaphore(5):
+    tasks = [extract(t, model)
+             for t, model in
+             zip(transcripts, cycle(models))]
+    results = await asyncio.gather(*tasks)
+```
+:::
+
+### Schema Design
+
+The Pydantic schema captures the full complexity of each patient record — demographics, diagnosis, treatment sequences, biologic status with barriers, referral pathways, and data completeness with churn indicators.
+
+```python
+# Core schema structure (simplified for readability)
 class PatientRecord(BaseModel):
     patient_id: str
     demographics: Demographics           # age, gender, occupation, comorbidities
@@ -210,298 +225,59 @@ class PatientRecord(BaseModel):
     data_completeness: DataCompleteness   # completeness score, churn indicator
 ```
 
-### Chain-of-thought Extraction
+This schema evolved through exploratory data analysis. Before building the extraction pipeline, I performed classical NLP analysis (TF-IDF, topic modeling with LDA/NMF, sentiment analysis with VADER, regex-based entity extraction) to understand corpus structure and identify the key information dimensions that needed capture. The 5 dominant themes that emerged — medication management, healthcare navigation, family burden, mental health, and chronic illness complications — directly informed the schema design.
 
-The LLM is prompted to first *identify* relevant information by category, then *structure* it into the Pydantic schema. This two-step approach improves accuracy on complex temporal reasoning — treatment order and referral sequences in particular.
+### Data Quality Assessment
 
-::: {.column-margin}
-The pipeline uses `asyncio` with semaphore-based concurrency, rotating requests across multiple Gemini models to maximize free-tier throughput (~3× faster than sequential).
-:::
-
-### Loading Extracted Records
-
-After extraction, records are validated through Pydantic and flattened into a DataFrame for analysis:
-
-```{python}
-file_path = "outputs/extracted_records.json"
-with open(file_path, encoding="utf-8") as f:
-    data = json.load(f)
-records = [PatientRecord.model_validate(d) for d in data]
-print(f"Loaded {len(records)} extracted records")
-```
-
-```{python}
-rows = []
-for r in records:
-    row = {
-        "patient_id": r.patient_id,
-        "age": r.demographics.age,
-        "gender": r.demographics.gender.value if r.demographics.gender else None,
-        "is_on_biologic": r.biologic_status.is_on_biologic,
-        "has_ever_used_biologic": r.biologic_status.has_ever_used_biologic,
-        "biologic_discussed": r.biologic_status.biologic_discussed,
-        "biologic_barriers": [b.value for b in r.biologic_status.barriers],
-        "total_treatments": len(r.treatments),
-        "referral_steps": len(r.referral_pathway),
-        "completeness_score": r.data_completeness.completeness_score,
-        "churn_indicator": r.data_completeness.churn_indicator.value,
-        # ... additional fields
-    }
-    rows.append(row)
-
-df = pd.DataFrame(rows)
-print(f"Created DataFrame: {df.shape[0]} rows × {df.shape[1]} columns")
-```
-
-## Data Quality Assessment
-
-Before answering the research questions, I assessed extraction quality and identified potential survivorship bias.
-
-```{python}
-fig, axes = plt.subplots(1, 3, figsize=(16, 5))
-
-# Churn status
-churn_counts = df["churn_indicator"].value_counts()
-axes[0].bar(churn_counts.index, churn_counts.values, ...)
-# Completeness score distribution
-axes[1].hist(df["completeness_score"], bins=12, ...)
-# Completeness vs total treatments
-axes[2].scatter(df["total_treatments"], df["completeness_score"], ...)
-```
+Before analyzing the four research questions, I built a completeness scoring system to detect potential survivorship bias. Each record receives a completeness score based on how many schema fields contain high-confidence data vs. missing values.
 
 <iframe src="/assets/projects/ai-patient-journey/data_quality_completeness.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
-> 44/50 records are complete, but the 6 partial records cluster towards the low-treatment, low-biologic corner of the scatter plot — an early warning of **survivorship bias** that becomes central to the churn analysis later.
+The completeness distribution revealed that 6/50 records clustered in the low-completeness, low-treatment corner — the early warning signal that led to the churn bias analysis. This is where AI engineering meets research rigor: the pipeline didn't just extract data, it *quantified extraction quality* and surfaced potential biases before results were interpreted.
 
-## Biologic Treatment Adoption
+## Treatment Landscape Deep Dive
 
-```{python}
-# Adoption donut + engagement funnel + adoption by duration
-fig, axes = plt.subplots(1, 3, figsize=(16, 5))
+To understand pre-biologic treatment patterns, I extracted medication sequences and classified drugs by therapeutic class using regex patterns matched against clinical terminology:
 
-on = df["is_on_biologic"].sum()
-off = (~df["is_on_biologic"]).sum()
-axes[0].pie([on, off], labels=["On biologic", "Not on biologic"], ...)
-
-funnel = pd.DataFrame({
-    "Stage": ["Discussed", "Ever used", "Currently on", "Not on a biologic"],
-    "Count": [df["biologic_discussed"].sum(), df["has_ever_used_biologic"].sum(),
-              df["is_on_biologic"].sum(), len(df) - df["is_on_biologic"].sum()],
-})
-axes[1].bar(funnel["Stage"], funnel["Count"], ...)
-```
-
-<iframe src="/assets/projects/ai-patient-journey/biologic_adoption.html"
-        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
-</iframe>
-
-> **Findings:**
->
-> 1. **68% (34/50) are currently on a biologic.** But this number alone is misleading — the funnel tells a richer story.
-> 2. **The funnel narrows at each stage:** 90% discussed → 72% ever used → 68% currently on.
-> 3. The **4% gap** between "ever used" and "currently on" represents **2 patients who discontinued** — a small but important segment.
-> 4. **Adoption increases with disease duration** as expected, since patients progress through step-up therapy.
-> 5. **Patients diagnosed <1 year ago have low adoption** not because they resist biologics, but because they haven't yet exhausted the treatment ladder — they're future biologic candidates, not permanent non-adopters.
-
-## Barriers to Biologic Adoption
-
-```{python}
-not_on = df[~df["is_on_biologic"]].copy()
-
-all_barriers = []
-barrier_sets = []
-for b in not_on["biologic_barriers"].dropna():
-    parsed = safe_parse(b)
-    all_barriers.extend(parsed)
-    barrier_sets.append(set(parsed))
-
-barrier_counts = Counter(all_barriers)
-```
-
-<iframe src="/assets/projects/ai-patient-journey/biologic_barriers.html"
-        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
-</iframe>
-
-### Patient Barrier Archetypes
-
-The 16 patients not on biologics fall into distinct archetypes:
-
-| Archetype | Barrier | Prevalence | Addressable? |
-|---|---|---|---|
-| **Insurance-Blocked** | cost_insurance | 69% (11/16) | Yes — financial assistance, policy advocacy |
-| **Fear-Driven** | fear_of_side_effects / fear_of_needles | 62% (10/16) | Yes — patient education, nurse counseling |
-| **Doctor-Deferred** | doctor_not_recommended | 25% (4/16) | Partially — HCP education, guidelines |
-| **Preference-Driven** | patient_preference | 19% (2/16) | Partially — patient education, counseling |
-
-The critical insight is that **cost/insurance co-occurs with nearly every other barrier**. Solving any single barrier in isolation won't move the needle — interventions need to address the *cluster*.
-
-```{python}
-# Co-occurrence heatmap
-co_occur = Counter()
-for barriers in barrier_sets:
-    for pair in combinations(sorted(barriers), 2):
-        co_occur[pair] += 1
-```
-
-<iframe src="/assets/projects/ai-patient-journey/barrier_cooccurrence.html"
-        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
-</iframe>
-
-## Pre-Biologic Treatment Landscape
-
-```{python}
-fig, axes = plt.subplots(1, 3, figsize=(16, 5))
-
-# Drug class usage, steps to biologic, total treatment burden
-steps = df["steps_to_biologic"].dropna()
-axes[1].hist(steps, bins=range(0, int(steps.max()) + 2), ...)
-axes[1].axvline(steps.median(), color="red", linestyle="--",
-                label=f"Median: {steps.median():.0f}")
-```
-
-<iframe src="/assets/projects/ai-patient-journey/treatment_landscape.html"
-        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
-</iframe>
-
-The treatment ladder is consistent across patients:
-
-```{python}
-bio_patients = df[df["steps_to_biologic"].notna()]
-
-ladder = {
-    "Aminosalicylates": (bio_patients["n_aminosalicylate"] > 0).mean() * 100,
-    "Corticosteroids": (bio_patients["n_corticosteroid"] > 0).mean() * 100,
-    "Immunomodulators": (bio_patients["n_immunomodulator"] > 0).mean() * 100,
+```python
+MEDICATIONS = {
+    "aminosalicylates": ["mesalamine", "sulfasalazine", "asacol", ...],
+    "corticosteroids": ["prednisone", "budesonide", "prednisolone", ...],
+    "immunomodulators": ["methotrexate", "azathioprine", "6-mp", ...],
+    "biologics": ["humira", "remicade", "stelara", "entyvio", ...],
 }
 ```
 
-![](/assets/projects/ai-patient-journey/treatment_ladder.png)
+This baseline extraction served dual purposes: (1) validation benchmark for LLM accuracy, and (2) treatment ladder analysis independent of LLM interpretation. The consistency between regex counts and LLM-extracted sequences gave confidence in the treatment ordering.
 
-> **Findings:**
->
-> - Patients try a **median of 3 medications** before reaching their first biologic (range: 0–6)
-> - **Aminosalicylates (64%)**, **corticosteroids (52%)**, and **immunomodulators (68%)** form the pre-biologic treatment ladder
-> - The consistent ladder pattern confirms step-up therapy as the standard approach
-
-## Referral Pathway Analysis
-
-```{python}
-fig, axes = plt.subplots(1, 3, figsize=(16, 5))
-
-# Entry points
-entry_cts = df["entry_point"].value_counts()
-axes[0].barh(entry_labels[::-1], entry_cts.values[::-1], ...)
-
-# Misdiagnosis rate
-misdiag_cts = df["was_misdiagnosed"].value_counts()
-axes[1].pie(misdiag_cts.values, ...)
-
-# Referral pathway length
-axes[2].hist(df["referral_steps"], ...)
-```
-
-![](/assets/projects/ai-patient-journey/referral_pathway.png)
-
-```{python}
-misdiag_impact = df.groupby("was_misdiagnosed").agg(
-    biologic_rate=("is_on_biologic", "mean"),
-    mean_referral_steps=("referral_steps", "mean"),
-    mean_treatments=("total_treatments", "mean"),
-    mean_steps_to_bio=("steps_to_biologic", "mean"),
-).round(2)
-```
-
-<iframe src="/assets/projects/ai-patient-journey/misdiagnosis_impact.html"
+<iframe src="/assets/projects/ai-patient-journey/q3_treatment_landscape.html"
         width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
 </iframe>
 
-> **Findings:**
->
-> - **76% enter through GP** — this is where misdiagnosis happens
-> - IBS and "stress" are the most common incorrect diagnoses
-> - **70% are initially misdiagnosed** — a striking rate, though potentially inflated by recall bias
-> - **Median 4 provider steps** from first contact to established care, with range extending to 12
-> - Misdiagnosed patients face longer pathways and more treatment steps, suggesting the real biologic access bottleneck may begin years before the biologic conversation
-
-## Churn Bias & Survivorship Analysis
-
-```{python}
-complete = df[df["churn_indicator"] == "complete"]
-partial = df[df["churn_indicator"] != "complete"]
-
-metrics = {
-    "is_on_biologic": lambda x: x.mean() * 100,
-    "total_treatments": "mean",
-    "referral_steps": "mean",
-    "years_since_diagnosis": "mean",
-    "was_misdiagnosed": lambda x: x.mean() * 100,
-    "completeness_score": "mean"
-}
-comparison = df.groupby("churn_indicator").agg(metrics).round(2)
-```
-
-<iframe src="/assets/projects/ai-patient-journey/churn_bias_scatter.html"
-        width="100%" height="500" frameborder="0" style="border: 1px solid #e1e4e8; border-radius: 6px;">
-</iframe>
-
-### Quantifying the Bias
-
-| Cohort | n | Biologic Adoption |
-|---|---|---|
-| Complete records | 44 | **72%** |
-| Partial records | 6 | **33%** |
-| **Overall** | **50** | **68%** |
-
-The **moderate positive correlation between completeness and biologic adoption** is the most important methodological finding in this analysis.
-
-> **Findings:**
->
-> 1. **Our 68% adoption rate is an upper-bound estimate.** Patients with more complete records are more likely to be on biologics, so the true population rate is probably lower.
-> 2. **The direction of bias favors the addressable opportunity.** If the true adoption rate is lower than 68%, then the untreated market is *larger* than the 32% we report.
-> 3. **We cannot distinguish between three explanations** for partial records: (a) recently diagnosed patients who will eventually reach biologics, (b) patients who disengaged from care entirely (true churn), or (c) patients who simply gave shorter interviews (measurement artifact).
-
-## Cross-Variable Relationships
-
-```{python}
-numeric_cols = ["age", "years_since_diagnosis", "comorbidity_count", "total_treatments",
-                "referral_steps", "steps_to_biologic", "completeness_score", "n_barriers"]
-df_num = df[numeric_cols + ["is_on_biologic"]].copy()
-df_num["is_on_biologic"] = df_num["is_on_biologic"].astype(float)
-
-corr = df_num.corr()
-sns.heatmap(corr, mask=mask, annot=True, fmt=".2f", cmap="RdBu_r", ...)
-```
-
-![](/assets/projects/ai-patient-journey/correlation_matrix.png)
-
-> **Findings:**
->
-> - **Years since diagnosis → biologic adoption (r ≈ 0.56):** The strongest predictor. More time = more opportunities to escalate therapy. This is *expected* and *structural*, not a market insight.
-> - **Completeness → biologic adoption (r ≈ -0.22):** The churn bias signal.
-> - **Age and comorbidities show weak correlations** — demographics are far less predictive than treatment history. Segmentation by treatment stage, not demographics, would be more effective.
+The ladder analysis shows aminosalicylates (64%), corticosteroids (52%), and immunomodulators (68%) forming the expected step-up progression. What makes this analysis engineering-focused rather than just descriptive: the extraction pipeline preserved *temporal order* within each patient's treatment sequence, enabling ladder reconstruction that respects individual patient journeys rather than aggregating across population.
 
 ## Evidence Summary & Confidence Assessment
 
 | Question | Finding | Confidence | Key Caveat |
 |---|---|---|---|
-| Adoption rate | 68% currently on biologic | **Medium-High** | Upper-bound estimate; churn bias means true rate is likely lower (55–65%) |
+| Biologic adoption | 68% currently on biologic | **Medium-High** | Upper-bound estimate; churn bias means true rate is likely lower (55–65%) |
 | Main barriers | Cost/insurance (69%), fear (62%), doctor hesitancy (25%) | **High** | Corroborated across extraction + regex + topic modeling; robust to churn |
-| Treatment ladder | Median 3 steps; mesalamine → prednisone → immunomodulators → biologic | **High** | Based on narrative order, not verified clinical records |
+| Treatment ladder | Median 3 steps; aminosalicylates → corticosteroids → immunomodulators → biologic | **High** | Based on narrative order, not verified clinical records |
 | Referral pathway | 70% misdiagnosed; median 4 provider steps | **Medium** | May be inflated by recall bias in interview setting |
-
-### Recommendations for Interpretation
-
-1. Present adoption rate as a **range** (55–68%), not a point estimate
-2. Lead with the barrier story — it's the most actionable and most robust finding
-3. Flag churn bias explicitly — stakeholders should know the direction of uncertainty
-4. Distinguish between acquirable (insurance-blocked, fear-driven) and non-acquirable (medically complex) patient segments
 
 ## Conclusion
 
-This project demonstrates an end-to-end GenAI pipeline for extracting structured clinical intelligence from unstructured patient narratives. The combination of classical NLP for exploration and LLM-powered extraction for structured output — with confidence scoring, churn detection, and survivorship bias analysis — provides a methodological template for healthcare text analytics at scale.
+This project demonstrates an end-to-end GenAI pipeline for extracting structured clinical intelligence from unstructured patient narratives. The combination of classical NLP for exploration, LLM-powered extraction for structured output, confidence scoring, churn detection, and survivorship bias analysis provides a methodological template for healthcare text analytics at scale.
 
 The most actionable finding is clear: **cost and insurance barriers, not clinical resistance, gate biologic access.** This finding is high-confidence, corroborated across multiple extraction methods, and robust to the churn bias present in our data. The 70% misdiagnosis rate and median 4-step referral pathway suggest that market access challenges begin years before the biologic conversation — at the point of initial misdiagnosis.
 
-The pipeline's design decisions — confidence scoring on every field, churn as a first-class concept, async extraction with model rotation — are transferable to any domain where unstructured text needs to become structured, analyzable data.
+From an AI engineering perspective, the key contributions are:
+
+- **Structured extraction with validation**: Pydantic schemas + confidence scoring + baseline regex comparison
+- **Bias quantification**: Churn detection and completeness scoring as first-class pipeline outputs
+- **Async optimization**: Model rotation and semaphore-based concurrency for free-tier LLM throughput
+- **Transparent uncertainty**: Every finding presented with confidence levels and methodological caveats
+
+The pipeline's design decisions are transferable to any domain where unstructured text needs to become structured, analyzable data — particularly in healthcare, legal, or customer research contexts where data quality and bias detection are as important as the insights themselves.
