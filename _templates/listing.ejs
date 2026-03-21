@@ -2,17 +2,29 @@
 // Portfolio Listing Template
 // Displays all projects grouped by category with technology badges
 
-const categories = {
-  'NLP': [],
-  'GenAI': [],
-  'Exploratory Data Analysis': [],
-  'Machine Learning': []
-};
+// Define category order for AI/ML Engineering profile
+const categoryOrder = ['GenAI', 'NLP', 'Machine Learning', 'Analytics'];
 
-// Group items by category
+// Dynamically group items by category (only includes categories with projects)
+const categories = {};
 items.forEach(item => {
-  if (categories[item.category]) {
-    categories[item.category].push(item);
+  if (!categories[item.category]) {
+    categories[item.category] = [];
+  }
+  categories[item.category].push(item);
+});
+
+// Sort categories by defined order
+const sortedCategories = {};
+categoryOrder.forEach(cat => {
+  if (categories[cat]) {
+    sortedCategories[cat] = categories[cat];
+  }
+});
+// Add any additional categories not in the predefined order
+Object.keys(categories).forEach(cat => {
+  if (!categoryOrder.includes(cat)) {
+    sortedCategories[cat] = categories[cat];
   }
 });
 
@@ -115,7 +127,7 @@ const badges = {
 };
 %>
 
-<% for (const [category, items] of Object.entries(categories)) { %>
+<% for (const [category, items] of Object.entries(sortedCategories)) { %>
 <h3><%= category %></h3>
 <ul class="list-unstyled">
 <% items.forEach(item => { %>

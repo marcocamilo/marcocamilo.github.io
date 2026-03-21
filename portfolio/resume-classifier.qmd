@@ -4,7 +4,7 @@ subtitle: Exploring Performance of Advanced NLP Algorithms for Text Classificati
 image: /assets/projects/resume-analyzer/resume-analyzer.jpg
 description: This project evaluates the performance of advanced NLP models and vectorization techniques for text classifcation using a resume dataset. Implementing Linear SVC, FNN, Encoder models, and BERT, the project achieved an accuracy of 91.67% with BERT. The project demonstrates how to build efficient preprocessing pipelines, optimize feature representation to enhance resource usage, and develop high-performing text classification models using Scikit-Learn and PyTorch.
 featured: 3
-category: NLP
+category: Machine Learning
 type: Deep Learning
 skills:
     - PyTorch
