@@ -16,43 +16,45 @@ skills:
 
 ![]({{< meta image >}})
 
-### Key Findings
+::: {.callout-note}
+## Key Findings
 - **30%-40% Improvement in ATS Scores**: Optimized resumes demonstrated a 30%-40% increase in Applicant Tracking System (ATS) scores, significantly boosting the chances of passing initial screenings.
 - **40% Increase in Resume-Job Alignment**: The app achieved a 30%-40% enhancement in alignment between resumes and job descriptions, verified using similarity evaluations across various Large Language Models.
 - **60% Improvement in Bullet Point Quality**: The optimized resumes showed a 60% enhancement in the quality of bullet points, with increased use of action verbs, quantifiable metrics, and relevant keywords.
 - **80% Reduction in Processing Time**: The system reduced resume evaluation and optimization time by 70%-80%, completing the task in just 20 seconds on average, compared to the typical 15-30 minutes required by manual methods.
 - **High-Precision Evaluation**: The system consistently delivered accurate assessments of resume strengths, weaknesses, and missing keywords, providing actionable recommendations for optimization.
+:::
 
-### Preprocessing
+## 🔧 Preprocessing
 
-#### Text Extraction
+### 📄 Text Extraction
 
 The project employs two preprocessing approaches to clean and format the resume and job description, adapting to various input formats. Aside from direct text input, the app supports two input formats: URL-based and PDF-based.
 
 1. **URL-based Text Extraction** (Job Descriptions): for job descriptions provided as URLs, the app utilizes the WebBaseLoader from LangChain to fetch content from job posting URLs.
 2. **PDF-based Extraction** (Resumes): for resumes provided as PDF files, the pipeline applies the `read_pdf` function from `utils.py` module, which uses the `PdfReader` function from `PyPDF2` to extract text from uploaded PDF resumes.
 
-#### Advanced Text Processing
+### ⚙️ Advanced Text Processing
 
-Regardless of the input method, all text undergoes a comprehensive preprocessing pipeline implemented in the `preprocessing` function from the `nlp.py` module. 
+Regardless of the input method, all text undergoes a comprehensive preprocessing pipeline implemented in the `preprocessing` function from the `nlp.py` module.
 
 1. **Text Normalization**: Converts text to lowercase for consistency, removes HTML content (if present in URL-extracted text), and expands contractions (e.g., "don't" to "do not").
 2. **Noise Reduction**: Eliminates email addresses and URLs, and removes special characters, punctuation, and excessive spacing.
 3. **Stopword Removal**: Removes common stopwords using the `NLTK` library's English stopwords list.
 4. **Domain-Specific Cleaning**: Involves removing a custom list of resume-specific stopwords defined in `utils.py`, as well as removing non-existent words cross-referenced with a standard English dictionary.
 
-### Prompt Engineering
+## ✨ Prompt Engineering
 
-The strategies for prompt engineering involved a combination of role-based contextualization, task decomposition, and chain-of-thought prompting to guide the model in evaluating and later optimizing the resume against a job description^[For more details about prompt engineering strategies, please visit [Prompt Engineering for Generative AI (Google)](https://developers.google.com/machine-learning/resources/prompt-eng#prompting_with_examples_one-_few-_and_multi-shot).]. 
+The strategies for prompt engineering involved a combination of role-based contextualization, task decomposition, and chain-of-thought prompting to guide the model in evaluating and later optimizing the resume against a job description^[For more details about prompt engineering strategies, please visit [Prompt Engineering for Generative AI (Google)](https://developers.google.com/machine-learning/resources/prompt-eng#prompting_with_examples_one-_few-_and_multi-shot).].
 
 Both evaluation and optimization phases involved a multi-step process that required the AI to identify strengths, weaknesses, missing keywords, and generate recommendations. The optimization task further expanded this by chaining various tasks such as bullet point optimization, keyword inclusion, and output formatting based on the weaknesses and recommendations identified in the evaluation phase. The diagram below illustrates the multi-step evaluation and optimization pipeline:
 
 ![](/assets/projects/ai-resume-optimizer/prompt-diagram.png)
 
 
-#### Role Prompting
+### 🎭 Role Prompting
 
-Role prompting is a kind of zero-shot or direct prompting^[Zero-shot or direct prompting provides the model with the direct instruction, optionally framed as a question or within a role.] that frames the model's task in the context of a specific role. 
+Role prompting is a kind of zero-shot or direct prompting^[Zero-shot or direct prompting provides the model with the direct instruction, optionally framed as a question or within a role.] that frames the model's task in the context of a specific role.
 
 This role guides it to focus on the most relevant aspects of the resume and job description. The prompt usually takes the form of: *[role] + [focus] + [task]*. This technique sets the tone and perspective for all subsequent interactions, encourages the AI to draw upon domain-specific knowledge and best practices in HR, and enhances the authority and relevance of the AI's responses. Below an example:
 
@@ -64,9 +66,9 @@ You are an experienced Human Resources Manager, specializing in analyzing resume
 """
 ```
 
-#### Task Decomposition
+### 🧩 Task Decomposition
 
-Task decomposition involves breaking down the overall task into smaller, more manageable sub-tasks guide the AI's reasoning throughout the entire process. 
+Task decomposition involves breaking down the overall task into smaller, more manageable sub-tasks guide the AI's reasoning throughout the entire process.
 
 Both the evaluation and optimization tasks were broken down into multiple sub-tasks, with the evaluation task broken down into three independent sub-tasks.
 
@@ -77,12 +79,12 @@ Both the evaluation and optimization tasks were broken down into multiple sub-ta
 
 - **Output**:
     - **Evaluation Report** (used for optimization): Compile the results of the evaluation tasks into a comprehensive evaluation report.
-    
+
 Breaking down the tasks into smaller, more manageable sub-tasks allowed for more focused and precise responses from the AI, enhanced the overall quality of the analysis by addressing each aspect separately, and provided a clear structure for the processes.
 
-#### Chain-of-Thought Prompting
+### 🔗 Chain-of-Thought Prompting
 
-Chain-of-thought prompting involves chaining multiple prompts together to guide the AI's reasoning through a series of related tasks. 
+Chain-of-thought prompting involves chaining multiple prompts together to guide the AI's reasoning through a series of related tasks.
 
 The optimization phase, in particular, relied on a chain of thought that connected the results of the evaluation phase to the optimization tasks, as well as each subtask within the optimization phase with the subsequent subtask. This ensured that the AI's responses built upon the results of the previous tasks to optimize the same content at different levels. Chain-of-thought was also key in maintaining the quality of information and reasoning throughout the optimization process.
 
@@ -90,23 +92,26 @@ The optimization phase, in particular, relied on a chain of thought that connect
     1. **Bullet Point Optimization**: Optimize the bullet points based on a set of five instructions.
     2. **Keyword Optimization**: Optimize the keywords in the resume based on the job description.
     3. **Formatting**: Optimize the formatting of the resume to improve readability and visual appeal.
-    
+
 - **Output**:
     - **Optimized Resume**: Implement the recommendations generated in the evaluation phase to optimize the resume.
-    
-#### Additional Strategies
 
+### ➕ Additional Strategies
+
+::: {.callout-note}
+## Complementary Prompt Engineering Techniques
 - **Constraint Specification**: defines limits or constraints on the AI's responses, ensuring that the responses are within the desired scope and quality.
 - **Context Preservation**: maintains the context of the conversation and the information provided in previous interactions, ensuring consistency and coherence in the AI's responses.
 - **Structured Output Formatting**: organizes the AI's responses in a structured format, making it easier for users to understand and act upon the information provided.
+:::
 
 > To see the full list of prompts implemented in the project, you can refer to the `prompts.py` module in the project repository [here](https://github.com/marcocamilo/ai-resume-alignment-engine/blob/main/src/templates/prompts.py)
 
-### Evaluation Phase
+## 📊 Evaluation Phase
 
 The resume evaluation process utilizes the Google Gemini API through the `ChatGoogleGenerativeAI` class from LangChain. The evaluation is broken down into several components.
 
-#### Initialization
+### ⚡ Initialization
 
 The process begins by setting up the Google Gemini API using the `ChatGoogleGenerativeAI` class from LangChain. The retrieves the API key from the `.env` file using `load_dotenv` from the `dotenv` library and initializes the `genai` model with the specified API key. The app uses the "gemini-1.5-flash", a mid-sized model optimized for fast response times and a one-million-token context window^[The app is currently being developed to offer the user more models, including Llama 3.].
 
@@ -117,7 +122,7 @@ model_name = "gemini-1.5-flash"
 llm = ChatGoogleGenerativeAI(model=model_name)
 ```
 
-#### Evaluation Chain
+### ⛓️ Evaluation Chain
 
 The `create_evaluation_chain` function creates a pipeline that combines the role-based prompt, the Gemini model, and the output parser to evaluate the resume against the job description. The pipeline is created using the updated pipe `|` notation from LangChain, which chains the components together to produce the response. The function is applied to each evaluation prompt stored in the `EVALUATION_PROMPTS` dictionary, which contains the role-based prompts for each evaluation sub-task. The results of the evaluation are stored in a dictionary for further processing.
 
@@ -128,7 +133,7 @@ The `create_evaluation_chain` function creates a pipeline that combines the role
      return prompt_template | model | StrOutputParser()
 ```
 
-#### Evaluation Function
+### 🔄 Evaluation Function
 
 The `run_evaluation` function invokes each chain of the evaluation pipeline and returns the responses for the strengths, weaknesses, missing keywords, and recommendations prompts. The function is cached using Streamlit's `@st.cache_data` decorator to improve performance by storing the results in memory and avoiding redundant computations.
 
@@ -148,7 +153,7 @@ def run_evaluation(description, resume):
     ]
 ```
 
-### Optimization Phase
+## 🚀 Optimization Phase
 
 The optimization process builds upon the results of the evaluation phase to systematically enhance the resume against the job description at various levels. Unlike the evaluation phrase, the optimization phase is a chained process where each subtask builds upon the results of the previous one. As such, the bullet optimization task builds upon the original resume, the keyword optimization task builds upon the bullet-optimized resume, and the formatting task builds upon the keyword-optimized resume.
 
@@ -197,14 +202,17 @@ optimization_chain = (
 
 Additionally, a summary of changes is generated, which compares the original and optimized resumes to provide users with a clear overview of the changes made.
 
-## Results and Discussion
+## 📈 Results and Discussion
 
 The AI-powered resume optimizer demonstrates impressive capabilities in analyzing and enhancing resumes. From a prompt engineering and model performance perspective, the model produces:
 
+::: {.callout-note}
+## Model Performance Highlights
 1. **High-Precision Evaluation**: The system's multi-faceted evaluation approach consistently produced highly accurate assessments of resume strengths and weaknesses, as well as missing keywords.
 2. **Effective Keyword Optimization**: The engine's keyword integration capabilities have shown a consistently marked improvement in resume-job description alignment, not only in the skills included in the skills section, but also in the keywords worked into the bullet points in other sections.
 3. **Impactful Bullet Point Enhancement**: The bullet point optimization feature has led a significant increase in the use of strong action verbs and quantifiable achievements within optimized resumes.
 4. **Clear NLP Visualization**: The integration of word cloud generation provided an intuitive, visual representation of resume-job description alignment, especially useful in comparing the improvement between the original and optimized resumes.
+:::
 
 These achievements can be attributed to several factors:
 
@@ -213,24 +221,28 @@ These achievements can be attributed to several factors:
 - The modular, pipeline-based architecture allows for efficient, step-by-step resume optimization, ensuring that each aspect of the resume is thoroughly addressed.
 - Careful consideration of real-world HR practices and ATS requirements in the system design ensures that the optimizations are not just technically sound but also practically relevant.
 
-#### Key Achievements
+### 🏆 Key Achievements
 
 Although specific metrics would require extensive testing, the are several key metrics that were observed during development:
 
+::: {.callout-tip}
+## Quantifiable Impact Metrics
 1. **30% ATS Optimization**: The optimized resumes consistently showed 30%-40% improvement in ATS scores^[Measurements of ATS scores were obtained using available ATS tools and APIs such as Jobscan, Resumeworded, and Nodefair.], increasing the chances of passing initial screening.
 2. **40% Increase in Resume-Job Alignment**: The improvement in alignment was tested using similarity evaluations across various LLMs, including GPT4, Claude and Gemini. Tested resumes consistently showed a 30%-40% increase in alignment scores according to various LLM estimations.
 3. **60% Increase in Bullet Point Quality**: Optimized resumes consistently exhibited a minimum of 60% improvement in the quality of bullet points based on the template provided during prompting. Optimized bullet points included more action verbs, quantifiable metrics, and relevant skills and keywords from the job description and evaluation.
 4. **80% Reduced Processing**: The LLM choice enabled the system to evaluate and optimize a resume in an average of 20 seconds, a task that typically takes 15-30 minutes, which represents a percentage of 70-80% time saved compared to manual methods.
+:::
 
-## Conclusion
+## 🎯 Conclusion
 
 The AI-Powered Resume Optimization Engine demonstrated high success in advancing the application of AI to improve a crucial step in job search process. By leveraging cutting-edge AI models and a strategic prompt engineering approach, the system offers a powerful tool that dramatically improves resume tailoring process, providing faster, more consistent, and highly personalized resume optimization. The system's ability to significantly improve resume quality while dramatically reducing the time investment for job seekers showcases the tangible benefits of AI integration in career development tools.
 
+::: {.callout-note}
+## Future Development Opportunities
 While the current system has shown impressive results, there are still several areas for future development:
 
 1. **Improve Prompt Engineering**: Further refine the prompt engineering strategies to enhance the AI's understanding of the evaluation and optimization tasks, leading to more precise and consistent optimizations.
 2. **Apply Resume Templates**: Implementing a feature to return optimized resumes in various templates to suit different roles and seniority levels.
 4. **Multilingual Support**: Expanding capabilities to handle resumes in multiple languages, increasing global applicability.
 6. **Adaptive Learning**: Developing a more interactive interface that allows users to collaborate with the AI in real-time, fine-tuning optimizations based on user feedback.
-
-The AI-Powered Resume Optimization Engine demonstrates a strong capability to produce high-performing AI products that address real-world challenges. For recruiters and team leaders, this project showcases:
+:::
