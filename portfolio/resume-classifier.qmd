@@ -19,7 +19,8 @@ skills:
 
 ![]({{< meta image >}})
 
-### Key Findings
+::: {.callout-important}
+## Key Findings
 - **Factors Influencing Model Performance**: The quality of feature representations and the ability to capture contextual information were crucial in determining model effectiveness.
 - **Preprocessing and Vectorization**:  Robust preprocessing and advanced vectorization techniques significantly enhanced model performance, with all models surpassing 70% accuracy.
 - **Model performance**
@@ -27,8 +28,9 @@ skills:
   - **Linear SVC**: Achieved an accuracy of **87.15%** with TF-IDF vectors. Attributed to the model's simplicity and use of effective feature representation.
   - **Encoder Model**: Reached a **74.54%** accuracy. Suggests the need for further fine-tuning, given the large difference with its cousin transformer model.
   - **Feedforward Neural Network**: Recorded the lowest accuracy at 73.15%. Highlights the model's challenges with sequential dependencies and contextual nuances.
+:::
 
-## Dataset
+## 📊 Dataset
 
 The project utilizes the [Resume Dataset](https://www.kaggle.com/datasets/snehaanbhawal/resume-dataset) from LiveCareer, available at Kaggle. The dataset comprises over 2400 resumes in both string and HTML format, each labeled with their respective labeled categories. The dataset includes of the following variables:
 
@@ -41,11 +43,11 @@ The project utilizes the [Resume Dataset](https://www.kaggle.com/datasets/snehaa
 - `Resume html`: The HTML content of the resume
 - `Category`: The job field classification of each resume (e.g., Information Technology, Teaching, Advocacy, Business Development, Healthcare)
 
-## Preprocessing
+## 🔧 Preprocessing
 
 Data preprocessing involved two tasks: text preprocessing and data rebalancing.
 
-For text cleaning, I developed a custom `preprocessing` function that integrates several operations into a streamlined pipeline. This function is highly adaptable, with parameters to handle tasks such as converting text to lowercase, decoding HTML, removing emails and URLs, eliminating special characters, expanding contractions, applying custom regex cleaning, and performing tokenization, stemming, lemmatization, and stopword removal. In particular, I improved the text quality by eliminating noise like non-existent words and frequent, resume-specific stopwords such as months, function verbs, and section headings.
+For text cleaning, I developed a custom `preprocessing` function that integrates several operations into a streamlined pipeline. This function is highly adaptable, with parameters to handle tasks such as converting text to lowercase, decoding HTML, removing emails and URLs, eliminating special characters, expanding contractions, applying custom regex cleaning, and performing tokenization, stemming, lemmatization, and stopword removal. In particular, I improved the text quality by eliminating noise like non-existent words and frequent, resume-specific stopwords such as months, function verbs, and section headings.
 
 ```{python}
 import re
@@ -57,7 +59,7 @@ from nltk.stem.porter import PorterStemmer
 from nltk.stem import WordNetLemmatizer
 
 def preprocessing(
-    text, 
+    text,
     tokenize=False,
     stem=False,
     lem=False,
@@ -73,7 +75,7 @@ def preprocessing(
     lst_stopwords=None,
     lst_regex=None
 ) -> str | list[str]:
-    
+
     # Lowercase conversion
     cleaned_text = text.lower()
 
@@ -81,44 +83,44 @@ def preprocessing(
     if html:
         soup = BeautifulSoup(cleaned_text, "html.parser")
         cleaned_text = soup.get_text()
-    
+
     # Remove Emails
     if remove_emails:
         cleaned_text = re.sub(r"([a-z0-9+._-]+@[a-z0-9+._-]+\.[a-z0-9+_-]+)", " ", cleaned_text)
-    
+
     # URL removal
     if remove_urls:
         cleaned_text = re.sub(r"(http|https|ftp|ssh)://[\w_-]+(?:\.[\w_-]+)+[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-]?", " ", cleaned_text)
-    
+
     # Remove escape sequences and special characters
     if remove_special_chars:
         cleaned_text = re.sub(r"[^\x00-\x7f]", " ", cleaned_text)
         cleaned_text = unidecode(cleaned_text)
-    
+
     # Remove multiple characters
     cleaned_text = re.sub(r"(.)\1{3,}", r"\1", cleaned_text)
-    
+
     # Expand contractions
     if expand_contractions:
         cleaned_text = contractions.fix(cleaned_text)
         cleaned_text = re.sub("'(?=[Ss])", "", cleaned_text)
-    
+
     # Remove digits
     if remove_digits:
         cleaned_text = re.sub(r"\d", " ", cleaned_text)
-    
+
     # Punctuation removal
     if remove_punct:
         cleaned_text = re.sub("[!\"#$%&\\'()*+\,-./:;<=>?@\[\]\^_`{|}~]", " ", cleaned_text)
-    
+
     # Line break and tab removal
     cleaned_text = re.sub(r"[\n\t]", " ", cleaned_text)
-    
+
     # Excessive spacing removal
     cleaned_text = re.sub(r"\s+", " ", cleaned_text).strip()
-    
+
     # Regex (in case, before cleaning)
-    if lst_regex: 
+    if lst_regex:
         for regex in lst_regex:
             compiled_regex = re.compile(regex)
             cleaned_text = re.sub(compiled_regex, '', cleaned_text)
@@ -127,7 +129,7 @@ def preprocessing(
     if stem or lem or remove_stopwords or tokenize:
         if isinstance(cleaned_text, str):
             cleaned_text = cleaned_text.split()
-        
+
         # Remove stopwords
         if remove_stopwords:
             if lst_stopwords is None:
@@ -148,18 +150,18 @@ def preprocessing(
         if lem:
             lemmatizer = WordNetLemmatizer()
             cleaned_text = [lemmatizer.lemmatize(word) for word in cleaned_text]
-        
+
         if not tokenize:
             cleaned_text = ' '.join(cleaned_text)
 
     return cleaned_text
 ```
 
-Next, I converted the `Category` variable to a numerical format using Scikit-Learn’s `LabelEncoder` to meet the requirements of the algorithms. After cleaning, I saved the text separately for future use in tasks such as topic modeling and document similarity, where balancing is not required. 
+Next, I converted the `Category` variable to a numerical format using Scikit-Learn's `LabelEncoder` to meet the requirements of the algorithms. After cleaning, I saved the text separately for future use in tasks such as topic modeling and document similarity, where balancing is not required.
 
-To address category imbalance for text classification, I employed random resampling using Scikit-Learn’s `resample` method. This approach ensures balanced representation across all categories, enhancing accuracy and reducing bias, thereby improving overall model performance.
+To address category imbalance for text classification, I employed random resampling using Scikit-Learn's `resample` method. This approach ensures balanced representation across all categories, enhancing accuracy and reducing bias, thereby improving overall model performance.
 
-## Linear SVC
+## 📈 Linear SVC
 
 ::: {.column-margin}
 ![](/assets/projects/resume-analyzer/svc_files/svm.png)
@@ -167,13 +169,14 @@ To address category imbalance for text classification, I employed random resampl
 
 For this first model, I trained a baseline Linear SVC^[Linear Support Vector Classifier (SVC) is a classification algorithm that seeks to find the *maximum-margin hyperplane*, that is, the hyperplane that most clearly classifies observations] using the TF-IDF vectors. Then, I performed Latent Semantic Analysis (LSA) by applying Truncated Singular Value Decomposition (SVD)^[Truncated Singular Value Decomposition (SVD) is a dimensionality reduction technique that decomposes a matrix into three smaller matrices, retaining only the most significant features of the original matrix.] to reduce the TF-IDF matrix to a lower-dimensional space. The performance of both models provides a baseline for comparison with more advanced models in subsequent sections.
 
-> ### Takeaways
->
-> -   The baseline model delivers **robust accuracy while optimizing resource usage**, particularly when dimensionality reduction is applied.
-> -   Linear SVC achieved an **accuracy of 84%** on the test set.
-> -   Linear SVC achieved **81% accuracy with Truncated SVD** on the test set, utilizing only 5% of the original features.
+::: {.callout-note}
+## Model Performance Summary
+-   The baseline model delivers **robust accuracy while optimizing resource usage**, particularly when dimensionality reduction is applied.
+-   Linear SVC achieved an **accuracy of 84%** on the test set.
+-   Linear SVC achieved **81% accuracy with Truncated SVD** on the test set, utilizing only 5% of the original features.
+:::
 
-### Import Packages and Data
+### 📦 Import Packages and Data
 
 In addition to standard libraries, I imported two custom functions: `classifier_report` to generate classification reports and confusion matrices, and `save_performance` to store model performance metrics in a JSON file for future analysis. I also loaded a pre-trained Label Encoder to label the encoded categories in subsequent visualizations.
 
@@ -198,7 +201,7 @@ df = pd.read_parquet('./data/3-processed/resume-features.parquet')
 le = joblib.load('./models/le-resumes.gz')
 ```
 
-### Baseline LinearSVC
+### ⚙️ Baseline LinearSVC
 
 I split the dataset into 70% for training and 30% for testing. I used the `tfidf_vectors` column as the feature matrix, stacking the vectors into a single matrix with `np.vstack`. The encoded `Category` column served as the target variable, and I extracted the variables into a NumPy array using the `.values` method to improve performance. To verify the split, I printed the shapes of the training and testing sets.
 
@@ -206,9 +209,9 @@ I split the dataset into 70% for training and 30% for testing. I used the `tfidf
 X = np.vstack(df['tfidf_vectors'].values)
 y = df['Category'].values
 
-X_train, X_test, y_train, y_test = train_test_split(X, 
-                                                    y, 
-                                                    test_size=0.30, 
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    y,
+                                                    test_size=0.30,
                                                     random_state=42)
 
 print(f"Training set: {X_train.shape}, {y_train.shape}")
@@ -231,13 +234,13 @@ accuracy = classifier_report([X_train, X_test, y_train, y_test], svc, le.classes
 
 The model achieved an **accuracy of 87%** on the test set, which was a strong result for a baseline model. However, TF-IDF vectors often lead to sparse, high-dimensional representations with low information density. To address this, I employed Truncated Singular Value Decomposition (SVD).
 
-### LinearSVC with Truncated SVD
+### 🔍 LinearSVC with Truncated SVD
 
 ::: {.column-margin}
 ![](/assets/projects/resume-analyzer/svc_files/truncated-svd.png)
 :::
 
-Transforming TF-IDF matrices with Truncated SVD is known as Latent Semantic Analysis (LSA). This technique extracts the $n$ largest eigenvalues to capture the most significant semantic relationships between terms and documents, while filtering out noise and low-information features^[For an in-depth explanation, see Manning, C.D., Raghavan, P., & Schütze, H. (2008) [‘Matrix Decompositions and Latent Semantic Indexing’](https://nlp.stanford.edu/IR-book/pdf/18lsi.pdf), *Introduction to Information Retrieval*, 1.].
+Transforming TF-IDF matrices with Truncated SVD is known as Latent Semantic Analysis (LSA). This technique extracts the $n$ largest eigenvalues to capture the most significant semantic relationships between terms and documents, while filtering out noise and low-information features^[For an in-depth explanation, see Manning, C.D., Raghavan, P., & Schütze, H. (2008) ['Matrix Decompositions and Latent Semantic Indexing'](https://nlp.stanford.edu/IR-book/pdf/18lsi.pdf), *Introduction to Information Retrieval*, 1.].
 
 I used `TruncatedSVD` to reduce the number of components to 500, which is less than 5% of the original number of features. I then applied this transformation, split the resulting feature matrix into training and testing sets, and proceeded to train the new model.
 
@@ -246,9 +249,9 @@ t_svd = TruncatedSVD(n_components=500, algorithm='arpack')
 X_svd = t_svd.fit_transform(X)
 
 
-X_train_svd, X_test_svd, y_train_svd, y_test_svd = train_test_split(X_svd, 
-                                                                    y, 
-                                                                    test_size=0.30, 
+X_train_svd, X_test_svd, y_train_svd, y_test_svd = train_test_split(X_svd,
+                                                                    y,
+                                                                    test_size=0.30,
                                                                     random_state=42)
 
 
@@ -272,7 +275,7 @@ accuracy = classifier_report([X_train_svd, X_test_svd, y_train_svd, y_test_svd],
 
 The model achieved an **84% accuracy** on the test set, which is slightly lower than the baseline model. However, this performance comes from a model **trained on less than 5%** of the original features, demonstrating that despite the reduced dimensionality, the model retains a high level of accuracy. This highlights the sparsity of the TF-IDF vectors while showcasing that effective accuracy can be maintained with a significantly smaller feature set.
 
-Before proceeding to the next model, I saved the performance metrics of the baseline model for future comparison. 
+Before proceeding to the next model, I saved the performance metrics of the baseline model for future comparison.
 
 ```{python}
 save_performance(model_name='LinearSVC',
@@ -286,7 +289,7 @@ save_performance(model_name='LinearSVC',
                  )
 ```
 
-## Feedforward Neural Network
+## 🧠 Feedforward Neural Network
 
 ::: {.column-margin}
 ![](/assets/projects/resume-analyzer/nn_files/fnn.png)
@@ -294,13 +297,14 @@ save_performance(model_name='LinearSVC',
 
 The next model is a Feedforward Neural Network (FNN)^[Feedforward Neural Networks (FNN) are a type of neural networks where information moves in only one direction—forward—from the input nodes, through hidden layers, and to the output nodes.] built using PyTorch. I created an iterator for the dataset with the `DataLoader` class, which tokenized and numericalized the resumes, dynamically padded the sequences, and batched the data for training, thus saving memory and computation time. I then constructed a simple neural network architecture featuring an embedding layer, followed by three fully connected layers with ReLU activation functions. The model was trained using the Adam optimizer and Cross Entropy Loss criterion, and its performance was evaluated on the test set with accuracy as the metric.
 
-> ### Takeaways
->
-> - The Feedforward Neural Network achieved an accuracy of **73.15%** with a loss of **1.1444** on the test set.
-> - Performance suggests **minimal overfitting**, indicated by the small gap between training and validation accuracies.
-> - The model demonstrates **robust generalization**, with test accuracy closely aligning with validation accuracy.
+::: {.callout-note}
+## Model Performance Summary
+- The Feedforward Neural Network achieved an accuracy of **73.15%** with a loss of **1.1444** on the test set.
+- Performance suggests **minimal overfitting**, indicated by the small gap between training and validation accuracies.
+- The model demonstrates **robust generalization**, with test accuracy closely aligning with validation accuracy.
+:::
 
-### Import Packages and Data
+### 📦 Import Packages and Data
 
 In addition to standard PyTorch and pandas imports, I also imported three custom functions:
 
@@ -342,9 +346,9 @@ print("Using {}.".format(device))
 
     Using cpu.
 
-### Dataset and DataLoader
+### 🔄 Dataset and DataLoader
 
-Before constructing the `Dataset` class, I defined a `tokenization` function that initializes the tokenizer, tokenizes the text data, and builds a vocabulary using PyTorch’s `get_tokenizer` and `build_vocab_from_iterator` functions. This function returns the tokenized texts for indexing by the `DataLoader` during training and the vocabulary for determining vocabulary size.
+Before constructing the `Dataset` class, I defined a `tokenization` function that initializes the tokenizer, tokenizes the text data, and builds a vocabulary using PyTorch's `get_tokenizer` and `build_vocab_from_iterator` functions. This function returns the tokenized texts for indexing by the `DataLoader` during training and the vocabulary for determining vocabulary size.
 
 ```{python}
 def tokenization(texts, tokenizer_type='basic_english', specials=['<unk>'], device=device):
@@ -377,7 +381,7 @@ class ResumeDataset(Dataset):
         super().__init__()
         self.text = data.iloc[:,1]
         self.labels = data.iloc[:,0]
-        
+
         self.tokenized_texts, self.vocab = tokenization(self.text)
 
     # Get length of dataset
@@ -422,7 +426,7 @@ val_loader = DataLoader(val_dataset, batch_size=4, shuffle=True, collate_fn=coll
 test_loader = DataLoader(test_dataset, batch_size=4, shuffle=True, collate_fn=collate_fn)
 ```
 
-### Model Architecture
+### 🏗️ Model Architecture
 
 ::: {.column-margin}
 ![](/assets/projects/resume-analyzer/nn_files/fnn-architecture.jpg)
@@ -453,7 +457,7 @@ class SimpleNN(nn.Module):
         return x
 ```
 
-### Hyperparameters and Training
+### 🚂 Hyperparameters and Training
 
 Before training, I set the hyperparameters for the neural network. The vocabulary size and number of classes are sourced from the `ResumeDataset` class. The embedding size is set to 60, the learning rate to 1e-3, and the model is trained for 40 epochs.
 
@@ -495,7 +499,7 @@ The training and validation losses decreased steadily until the 30th epoch, indi
 
 In terms of accuracy, both training and validation accuracies increased until they converged at 40 epochs. At convergence, the training accuracy was 71% and the validation accuracy was 69%. The small difference between these accuracies indicates minimal overfitting and good generalization to unseen data. The best model saved achieved a validation loss of 1.33 and a validation accuracy of 68.52%.
 
-### Evaluation
+### 📊 Evaluation
 
 After training the model, I evaluated its performance on the test set using the `test_model` function. This function takes the trained model, test data loader, and criterion as inputs, and returns the model's accuracy on the test set.
 
@@ -524,7 +528,7 @@ save_performance(model_name='Feedforward Neural Network',
                  )
 ```
 
-## Encoder Model
+## 🔗 Encoder Model
 
 ::: {.column-margin}
 ![](/assets/projects/resume-analyzer/encoder_files/transformer_encoder-highlighted.png)
@@ -532,16 +536,17 @@ save_performance(model_name='Feedforward Neural Network',
 
 The next model utilizes the encoder component of the Transformer architecture for text classification. Unlike decoders, which generate output sequences from dense representations, encoders instead transform input sequences into dense representations. This capability is particularly valuable for tasks such as sentiment analysis, named entity recognition, and text classification.
 
-The encoder model follows the Transformer architecture described in *Attention is All You Need*^[Vaswani, Ashish u. a. (2017): Attention Is All You Need. Advances in neural information processing systems 30.] and is used as a baseline for transformer-based models. I construct the encoder architecture with an embedding layer, a stack of encoder layers, and a feed-forward neural network for classification. I then initialize the hyperparameters for training and train the model using the Adam optimizer and Cross Entropy Loss criterion. The model's performance is evaluated on the test set using accuracy as the evaluation metric.
+The encoder model follows the Transformer architecture described in *Attention is All You Need*^[Vaswani, Ashish u. a. (2017): Attention Is All You Need. Advances in neural information processing systems 30.] and is used as a baseline for transformer-based models. I construct the encoder architecture with an embedding layer, a stack of encoder layers, and a feed-forward neural network for classification. I then initialize the hyperparameters for training and train the model using the Adam optimizer and Cross Entropy Loss criterion. The model's performance is evaluated on the test set using accuracy as the evaluation metric.
 
 The imported packages and the `DataLoader` setup mirror those used for the Feedforward Neural Network model (see [packages](https://marcocamilo.com/resume-analyzer#import-packages-and-data-1) and [data preparation](https://marcocamilo.com/resume-analyzer#dataloader)), so I will focus on the model architecture.
 
-> ### Takeaways
->
-> - The Transformer Encoder model achieved an accuracy of 75% on the test set.
-> - This model provides a solid baseline for transformer-based approaches in text classification tasks.
+::: {.callout-note}
+## Model Performance Summary
+- The Transformer Encoder model achieved an accuracy of 75% on the test set.
+- This model provides a solid baseline for transformer-based approaches in text classification tasks.
+:::
 
-### Model Architecture
+### 🏗️ Model Architecture
 
 ::: {.column-margin}
 ![Modified image from [Sebastian Raschka](https://magazine.sebastianraschka.com/p/understanding-encoder-and-decoder)](/assets/projects/resume-analyzer/encoder_files/encoder.jpg)
@@ -551,13 +556,15 @@ The Encoder model features an embedding layer, a stack of encoder layers, and a 
 
 I built the encoder model from scratch to gain a deeper understanding of its architecture and components. Using a modular approach, I created each component as a separate class and integrated them in the `TransformerEncoder` class.
 
-> **Further Reading:**
->
-> The implementation draws inspiration from these resources:
->
-> - [The Annotated Transformer](https://nlp.seas.harvard.edu/2018/04/03/attention.html)
-> - [Coding a Transformer from Scratch on PyTorch (YouTube)](https://www.youtube.com/watch?v=ISNdQcPhsts)
-> - [Text Classification with Transformer Encoders](https://towardsdatascience.com/text-classification-with-transformer-encoders-1dcaa50dabae)
+::: {.callout-tip}
+## Further Reading
+
+The implementation draws inspiration from these resources:
+
+- [The Annotated Transformer](https://nlp.seas.harvard.edu/2018/04/03/attention.html)
+- [Coding a Transformer from Scratch on PyTorch (YouTube)](https://www.youtube.com/watch?v=ISNdQcPhsts)
+- [Text Classification with Transformer Encoders](https://towardsdatascience.com/text-classification-with-transformer-encoders-1dcaa50dabae)
+:::
 
 ```{python}
 class EmbeddingLayer(nn.Module):
@@ -707,7 +714,7 @@ class TransformerClassifier(nn.Module):
         return x
 ```
 
-### Hyperparameters and Training
+### 🚂 Hyperparameters and Training
 
 With the model constructed, I set the training hyperparameters. As with the previous model, I obtain the vocabulary size and number of output features from the `ResumeDataset` class. The embedding size is set to 80, the hidden dimension to 180, and the multi-head attention mechanism uses 4 heads with an encoder stack of 4 layers. I train the model for 20 epochs with a learning rate of 1e-3.
 
@@ -726,7 +733,7 @@ epochs = 20
 I instantiated the model with the specified hyperparameters and moved it to the appropriate device. The criterion and optimizer remained unchanged from the previous model, using the Adam optimizer and CrossEntropyLoss for multi-class classification. I also initialized a learning rate scheduler with a patience of 2 epochs to mitigate overfitting. The model was trained using the `train_model` function.
 
 ```{python}
-model = TransformerClassifier(vocab_size, d_model, num_heads, 
+model = TransformerClassifier(vocab_size, d_model, num_heads,
                                 hidden_dim, num_layers, out_features, dropout=0).to(device)
 criterion = CrossEntropyLoss()
 loss = Adam(model.parameters(), lr=lr)
@@ -752,7 +759,7 @@ Despite achieving better validation accuracy than the FNN, the Encoder model exh
 
 Nevertheless, the Encoder model achieved a validation accuracy of 78%, which was slightly higher than that of the Feedforward Neural Network. I proceeded to evaluate the model on the test set to determine its final accuracy.
 
-### Evaluation
+### 📊 Evaluation
 
 ```{python}
 accuracy = test_model(model, test_loader, criterion)
@@ -763,7 +770,7 @@ accuracy = test_model(model, test_loader, criterion)
 
 Despite incorporating a more advanced architecture with a multi-head self-attention mechanism, the Encoder model achieved an **accuracy of 74.5%**, similar to the FNN model. The large gap observed between training and validation performance suggests that this overfitting may be affecting the model's generalization capabilities.
 
-With improved training and validation performance, the model could potentially reach higher accuracy on the test set. Enhancing the model’s performance might involve techniques such as data augmentation, adjusting hyperparameters like embedding size, hidden dimensions, and the number of layers, or experimenting with different optimizers and learning rate schedulers.
+With improved training and validation performance, the model could potentially reach higher accuracy on the test set. Enhancing the model's performance might involve techniques such as data augmentation, adjusting hyperparameters like embedding size, hidden dimensions, and the number of layers, or experimenting with different optimizers and learning rate schedulers.
 
 As with the previous models, I saved the performance metrics for later analysis.
 
@@ -783,7 +790,7 @@ save_performance(model_name='Transformer',
 
 [^enc-3]: Layer normalization is a normalization technique that uses the mean and variance statistics calculated across all features.
 
-## BERT
+## 🚀 BERT
 
 ::: {.column-margin}
 ![](/assets/projects/resume-analyzer/bert_files/bert-classifier.png)
@@ -793,12 +800,14 @@ The final model is Bidirectional Encoder Representations from Transformers (BERT
 
 I created an iterable dataset using the `Dataset` and `DataLoader` classes to tokenize resumes with the BERT tokenizer, pad sequences to uniform lengths, and batch the data for training. The model architecture includes the pre-trained BERT base model, a dropout layer, and a linear output layer for classification. Hyperparameters were initialized, and the model was trained using Cross Entropy Loss and the Adam optimizer. Performance was evaluated based on accuracy, consistent with other deep learning models.
 
-> ### Takeaways
-> - The BERT model achieved a notable **accuracy of 91.67%** on the test set, significantly outperforming all previous models.
-> - The close alignment between the validation and test accuracies demonstrated the model's **strong generalization** ability to new, unseen data.
-> - The model **significantly outperforms** all previous models tested so far.
+::: {.callout-note}
+## Model Performance Summary
+- The BERT model achieved a notable **accuracy of 91.67%** on the test set, significantly outperforming all previous models.
+- The close alignment between the validation and test accuracies demonstrated the model's **strong generalization** ability to new, unseen data.
+- The model **significantly outperforms** all previous models tested so far.
+:::
 
-### Import Packages
+### 📦 Import Packages
 
 In addition to the standard deep learning packages, I imported three classes from the `transformers` package:
 
@@ -814,7 +823,7 @@ from transformers import BertModel, BertTokenizer, DataCollatorWithPadding
 from src.modules.dl import train_BERT, test_BERT
 ```
 
-### Dataset and DataLoader
+### 🔄 Dataset and DataLoader
 
 Before creating the dataset and `DataLoader`, I initialized the BERT tokenizer and define the pre-trained BERT model. I then constructed the `ResumeBertDataset`, which handles the tokenization and preparation of resumes for model input.
 
@@ -876,7 +885,7 @@ val_loader = DataLoader(val_dataset, batch_size=16, shuffle=True, collate_fn=dat
 test_loader = DataLoader(test_dataset, batch_size=16, shuffle=True, collate_fn=data_collator)
 ```
 
-### Model Architecture
+### 🏗️ Model Architecture
 
 The `BertResumeClassifier` model comprised the pre-trained BERT base model, a dropout layer, and a linear output layer for resume classification. I utilized the `bert-base-uncased` pre-trained model to generate contextual embeddings from the input sequences. I extracted these embeddings by indexing the `pooler_output` key from the output dictionary. The embeddings were then passed through a dropout layer to mitigate overfitting, and subsequently fed into a fully connected linear layer that mapped the embeddings to the desired number of output classes for classification.
 
@@ -899,7 +908,7 @@ class BertResumeClassifier(nn.Module):
         return output
 ```
 
-### Hyperparameters and Training
+### 🚂 Hyperparameters and Training
 
 Since BERT is a pre-trained model with a fixed input size of 512 tokens, there were fewer parameters to set for the model itself. The primary parameter to configure was the number of output classes, which, as before, was obtained from the `Dataset` class.
 
@@ -933,7 +942,7 @@ The BERT model demonstrated a significant and steady decrease in both training a
 
 In terms of accuracy, both training and validation accuracies showed a steady increase throughout the 10 epochs. Training accuracy rose from 0.0774 to 0.9950, while validation accuracy improved from 0.3472 to 0.9028. These results indicated that the model effectively learned the data patterns and generalized well to unseen data. The minimal difference between the final training and validation accuracies underscored the model's robustness and its ability to avoid overfitting, ensuring reliable performance on new data. The best saved model achieved a validation loss of 0.5070 and an accuracy of 0.9028.
 
-### Evaluation
+### 📊 Evaluation
 
 As before, I evaluate the model using the `test_model` function using the best saved model.
 
@@ -960,7 +969,7 @@ save_performance(model_name='BERT',
                  )
 ```
 
-## Results and Discussion
+## 📉 Results and Discussion
 
 Below I discuss the performance of the classification models, the reasons behind their varying accuracies, and their implications in industry applications.
 
@@ -976,36 +985,43 @@ plt.show()
 
 ![](/assets/projects/resume-analyzer/eval_files/model-performances.png)
 
+::: {.callout-note}
+## Performance Analysis by Model Type
+
 1. **BERT and Linear SVC: High Accuracy and Robust Performance**
 
-    - **Linear SVC**: Achieved 84% accuracy, offering competitive performance due to its simplicity and effective feature representation^[To read more on the efficiency of linear classifiers in text classification, see [Lin, Y.-C. et al. (2023) 'Linear Classifier: An Often-Forgotten Baseline for Text Classification'](https://doi.org/10.18653/v1/2023.acl-short.160).] using TF-IDF vectors. This simplicity reduces the risk of overfitting and the straightforward feature representation contributes to the model's high accuracy and fast training times. This model is a reliable option for businesses that prioritize efficiency and simplicity without sacrificing too much accuracy.
-    - **BERT**: With an accuracy of 91.67%, BERT demonstrated the highest performance among the models. Its success is attributed to its pre-trained nature and high-quality embeddings. The model was pre-trained on a large corpus and thus has the ability to generate embeddings that encode deep semantic information^[See [Devlin, J. et al. (2018) 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding'](https://doi.org/10.48550/ARXIV.1810.04805).]. Moreover, its bidirectional nature captures a wide range of contextual information across a long-range dependencies. Businesses with the resources to deploy complex models would benefit from BERT's superior accuracy.
-    
+    - **Linear SVC**: Achieved 84% accuracy, offering competitive performance due to its simplicity and effective feature representation^[To read more on the efficiency of linear classifiers in text classification, see [Lin, Y.-C. et al. (2023) 'Linear Classifier: An Often-Forgotten Baseline for Text Classification'](https://doi.org/10.18653/v1/2023.acl-short.160).] using TF-IDF vectors. This simplicity reduces the risk of overfitting and the straightforward feature representation contributes to the model's high accuracy and fast training times. This model is a reliable option for businesses that prioritize efficiency and simplicity without sacrificing too much accuracy.
+    - **BERT**: With an accuracy of 91.67%, BERT demonstrated the highest performance among the models. Its success is attributed to its pre-trained nature and high-quality embeddings. The model was pre-trained on a large corpus and thus has the ability to generate embeddings that encode deep semantic information^[See [Devlin, J. et al. (2018) 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding'](https://doi.org/10.48550/ARXIV.1810.04805).]. Moreover, its bidirectional nature captures a wide range of contextual information across a long-range dependencies. Businesses with the resources to deploy complex models would benefit from BERT's superior accuracy.
+
 2. **FNN and Encoder Model: Moderate Performance with Complex Architectures**
 
     - **Feedforward Neural Network**: Achieved around 73.15% accuracy. While more advanced than linear models, the FNN lacks the capability to capture sequential dependencies and contextual nuances, which limits its effectiveness in tasks requiring a deeper understanding of text.
     - **Encoder Model**: Achieved 74.54% accuracy. Despite its sophisticated architecture, the Transformer underperformed relative to expectations. This is attributed to its lack of pre-training on a large corpus and possibly insufficient fine-tuning. While Transformers have significant potential, their performance is heavily influenced by pre-training and proper hyperparameter tuning.
+:::
 
-3. **Industry Recommendations**:
+::: {.callout-tip}
+## Industry Recommendations
 
-    - **Opt for BERT for Maximum Accuracy**: For businesses prioritizing high accuracy and capable of supporting complex models, BERT is the best choice. Its high performance in classification tasks makes it ideal for scenarios where precision is critical.
-    - **Consider Linear SVC for Simplicity and Efficiency**: Linear SVC offers a balance of good performance and computational efficiency. It is suitable for applications needing quick deployment and easy interpretability.
-    - **Invest in Transformer Models with Pre-Training**: For those interested in advanced models, investing in pre-training or additional fine-tuning for Transformers could enhance their performance. Transformers show promise but require adequate preparation to reach their full potential.
+- **Opt for BERT for Maximum Accuracy**: For businesses prioritizing high accuracy and capable of supporting complex models, BERT is the best choice. Its high performance in classification tasks makes it ideal for scenarios where precision is critical.
+- **Consider Linear SVC for Simplicity and Efficiency**: Linear SVC offers a balance of good performance and computational efficiency. It is suitable for applications needing quick deployment and easy interpretability.
+- **Invest in Transformer Models with Pre-Training**: For those interested in advanced models, investing in pre-training or additional fine-tuning for Transformers could enhance their performance. Transformers show promise but require adequate preparation to reach their full potential.
+:::
 
-## Conclusion
+## 🎯 Conclusion
 
 In this project, I tackled the challenge of resume classification using a range of machine learning and deep learning models. The process began with preprocessing the resume data, including tokenizing the resumes and preparing them for model input. I implemented and evaluated four different models: Linear Support Vector Classifier (SVC), Feedforward Neural Network (FNN), Transformer model, and BERT. Each model was trained on the resume dataset and assessed based on accuracy metrics.
 
 The evaluation provided valuable insights into the impact of model complexity and feature representation on performance. BERT achieved the highest accuracy of 91.67%, followed by the Linear SVC model at 87.15%. The Feedforward Neural Network and Transformer models recorded accuracies of 73.15% and 74.54%, respectively. BERT's outstanding performance is attributed to its pre-trained architecture, which effectively captures deep semantic relationships within text. On the other hand, Linear SVC's strong performance is due to its simplicity and efficiency with high-dimensional data, utilizing interpretable features like TF-IDF vectors.
 
-Two important observations arise from these results:
+::: {.callout-important}
+## Key Takeaways
 
->
-> 1. **State-of-the-art transformer** models, such as BERT, combined with transfer learning, deliver superior performance.
-> 2. **Simple models** with high-quality, interpretable feature representations such as Linear SVC with TF-IDF vectors, can also achieve impressive.
+1. **State-of-the-art transformer** models, such as BERT, combined with transfer learning, deliver superior performance.
+2. **Simple models** with high-quality, interpretable feature representations such as Linear SVC with TF-IDF vectors, can also achieve impressive results.
 
 These findings reveal that model complexity does not automatically translate to better performance. This is further supported by the fact that the two models with the lowest accuracies have more complex architectures than the baseline.
 
-> **Quality feature representations and capturing contextual information are more important factors in achieving high performing text classification models.**
+**Quality feature representations and capturing contextual information are more important factors in achieving high performing text classification models.**
+:::
 
 Ultimately, the choice of model depends on the task requirements and available resources. For applications where high performance is critical and ample resources are available, leveraging advanced transformers like BERT with transfer learning is recommended. For scenarios prioritizing simplicity and interpretability, Linear SVC with TF-IDF vectors provides a high-performing, resource-efficient solution.
